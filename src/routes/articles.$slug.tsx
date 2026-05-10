@@ -101,7 +101,7 @@ function Article() {
               <div className="eyebrow">About the author</div>
               <div className="flex items-start gap-4 mt-4">
                 <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center font-display text-primary text-lg">
-                  {a.author.split(" ").map((p) => p[0]).slice(0, 2).join("")}
+                  {a.author.split(" ").map((p: string) => p[0]).slice(0, 2).join("")}
                 </div>
                 <div>
                   <div className="font-display text-lg">{a.author}</div>
