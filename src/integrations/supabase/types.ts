@@ -14,16 +14,264 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      articles: {
+        Row: {
+          abstract: string | null
+          author_id: string | null
+          category_id: string | null
+          content: string | null
+          cover_url: string | null
+          created_at: string
+          id: string
+          issue_id: string | null
+          published_at: string | null
+          read_time: number | null
+          slug: string
+          status: Database["public"]["Enums"]["article_status"]
+          title: string
+          views: number
+        }
+        Insert: {
+          abstract?: string | null
+          author_id?: string | null
+          category_id?: string | null
+          content?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          issue_id?: string | null
+          published_at?: string | null
+          read_time?: number | null
+          slug: string
+          status?: Database["public"]["Enums"]["article_status"]
+          title: string
+          views?: number
+        }
+        Update: {
+          abstract?: string | null
+          author_id?: string | null
+          category_id?: string | null
+          content?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          issue_id?: string | null
+          published_at?: string | null
+          read_time?: number | null
+          slug?: string
+          status?: Database["public"]["Enums"]["article_status"]
+          title?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      issues: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          issue_number: number
+          pdf_url: string | null
+          published_at: string | null
+          title: string
+          volume: number
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          issue_number: number
+          pdf_url?: string | null
+          published_at?: string | null
+          title: string
+          volume: number
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          issue_number?: number
+          pdf_url?: string | null
+          published_at?: string | null
+          title?: string
+          volume?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          country: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          institution: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          institution?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          institution?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      submissions: {
+        Row: {
+          abstract: string
+          category_id: string | null
+          content: string | null
+          created_at: string
+          id: string
+          keywords: string | null
+          notes: string | null
+          plan: Database["public"]["Enums"]["membership_plan"]
+          status: Database["public"]["Enums"]["submission_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          abstract: string
+          category_id?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          notes?: string | null
+          plan?: Database["public"]["Enums"]["membership_plan"]
+          status?: Database["public"]["Enums"]["submission_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          abstract?: string
+          category_id?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          notes?: string | null
+          plan?: Database["public"]["Enums"]["membership_plan"]
+          status?: Database["public"]["Enums"]["submission_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submissions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "author" | "reader"
+      article_status: "draft" | "published" | "archived"
+      membership_plan: "single" | "annual" | "lifetime" | "institute"
+      submission_status:
+        | "draft"
+        | "submitted"
+        | "under_review"
+        | "revision_requested"
+        | "approved"
+        | "rejected"
+        | "published"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +398,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "author", "reader"],
+      article_status: ["draft", "published", "archived"],
+      membership_plan: ["single", "annual", "lifetime", "institute"],
+      submission_status: [
+        "draft",
+        "submitted",
+        "under_review",
+        "revision_requested",
+        "approved",
+        "rejected",
+        "published",
+      ],
+    },
   },
 } as const
