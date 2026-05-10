@@ -2,54 +2,217 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { articles, cover, issues } from "@/lib/mock-data";
-import { Download } from "lucide-react";
+import { Download, FileText, BookOpen, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/current-issue")({
   component: CurrentIssue,
-  head: () => ({ meta: [
-    { title: "Current Issue · May 2026 — Agripop" },
-    { name: "description", content: "Volume 4 Issue 5: Adapting to a Warming Climate." },
-  ] }),
+  head: () => ({
+    meta: [
+      { title: "Current Issue · May 2026 — The Agriculture Popular Article Magazine" },
+      {
+        name: "description",
+        content:
+          "Volume 4, Issue 5 — May 2026. Adapting to a Warming Climate. Read or download the latest issue.",
+      },
+    ],
+  }),
 });
 
 function CurrentIssue() {
   const issue = issues[0];
+  const pdfHref = "#"; // wire to Supabase Storage when issue PDFs are uploaded
+
   return (
     <>
       <SiteHeader />
-      <main className="container-editorial pt-16 pb-24">
-        <div className="grid md:grid-cols-12 gap-12 items-start">
-          <div className="md:col-span-5 md:sticky md:top-28">
-            <img src={cover} alt={issue.title} className="w-full max-w-md shadow-2xl rounded-sm" />
-            <button className="mt-6 inline-flex items-center gap-2 text-sm bg-primary text-primary-foreground px-5 py-3 rounded-sm">
-              <Download className="h-4 w-4" /> Download PDF (12.4 MB)
-            </button>
-          </div>
-          <div className="md:col-span-7">
-            <div className="eyebrow">Volume {issue.volume} · Issue {issue.number} · {issue.date}</div>
-            <h1 className="font-display text-5xl md:text-6xl mt-4 text-ink leading-[1.05]">{issue.title}</h1>
-            <p className="mt-6 text-foreground/75 leading-relaxed text-lg max-w-2xl">{issue.desc}</p>
-
-            <div className="mt-14">
-              <div className="eyebrow">Table of Contents</div>
-              <div className="rule-thick mt-3" />
-              <ul className="divide-y divide-[var(--color-rule)]">
-                {articles.map((a, i) => (
-                  <li key={a.slug} className="py-6">
-                    <Link to="/articles/$slug" params={{ slug: a.slug }} className="grid grid-cols-12 gap-4 group">
-                      <div className="col-span-1 font-display text-xl text-muted-foreground">{String(i + 1).padStart(2, "0")}</div>
-                      <div className="col-span-11">
-                        <div className="eyebrow text-[0.6rem]">{a.category}</div>
-                        <h3 className="font-display text-xl md:text-2xl mt-1 group-hover:text-primary transition-colors">{a.title}</h3>
-                        <div className="text-xs text-muted-foreground mt-2">{a.author} · {a.affiliation} · {a.readTime} min read</div>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+      <main>
+        {/* Masthead band */}
+        <section className="border-b border-[oklch(var(--navy))]/15 bg-[oklch(var(--navy))]/[0.02]">
+          <div className="container-editorial py-12 md:py-16">
+            <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+              Current Issue
+            </div>
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl mt-3 text-[oklch(var(--navy))] leading-[1.05] max-w-4xl">
+              Volume {issue.volume}, Issue {issue.number} — {issue.date}
+            </h1>
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/70">
+              <span className="font-display italic text-[oklch(var(--navy))] text-base">
+                {issue.title}
+              </span>
+              <span className="text-[oklch(var(--navy))]/30">·</span>
+              <span>{articles.length} articles</span>
+              <span className="text-[oklch(var(--navy))]/30">·</span>
+              <span>ISSN 2583-XXXX</span>
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="container-editorial py-16">
+          <div className="grid lg:grid-cols-12 gap-12 items-start">
+            {/* Cover + download rail */}
+            <aside className="lg:col-span-5 lg:sticky lg:top-28">
+              <div className="relative">
+                <img
+                  src={cover}
+                  alt={`Cover of Volume ${issue.volume}, Issue ${issue.number} — ${issue.title}`}
+                  className="w-full max-w-md mx-auto shadow-2xl ring-1 ring-[oklch(var(--navy))]/10"
+                />
+                <div className="absolute -top-3 -left-3 bg-[oklch(var(--orange))] text-white text-[0.65rem] uppercase tracking-[0.2em] font-semibold px-3 py-1.5">
+                  Just Released
+                </div>
+              </div>
+
+              {/* Download / Read CTAs */}
+              <div className="mt-8 max-w-md mx-auto space-y-3">
+                <a
+                  href={pdfHref}
+                  className="group flex items-center justify-between gap-4 bg-[oklch(var(--navy))] text-white px-5 py-4 hover:bg-[oklch(var(--navy))]/90 transition-colors"
+                >
+                  <span className="flex items-center gap-3">
+                    <Download className="h-5 w-5" />
+                    <span>
+                      <span className="block text-sm font-semibold">View / Download Full Issue</span>
+                      <span className="block text-[0.7rem] uppercase tracking-wider opacity-70">
+                        PDF · ~12.4 MB
+                      </span>
+                    </span>
+                  </span>
+                  <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
+                </a>
+                <a
+                  href={pdfHref}
+                  className="group flex items-center justify-between gap-4 border border-[oklch(var(--navy))]/25 text-[oklch(var(--navy))] px-5 py-4 hover:bg-[oklch(var(--navy))]/5 transition-colors"
+                >
+                  <span className="flex items-center gap-3">
+                    <FileText className="h-5 w-5 text-[oklch(var(--orange))]" />
+                    <span>
+                      <span className="block text-sm font-semibold">Cover & Editorial</span>
+                      <span className="block text-[0.7rem] uppercase tracking-wider opacity-60">
+                        PDF · 1.2 MB
+                      </span>
+                    </span>
+                  </span>
+                  <ArrowRight className="h-4 w-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                </a>
+                <Link
+                  to="/archives"
+                  className="group flex items-center justify-between gap-4 border border-[oklch(var(--navy))]/25 text-[oklch(var(--navy))] px-5 py-4 hover:bg-[oklch(var(--navy))]/5 transition-colors"
+                >
+                  <span className="flex items-center gap-3">
+                    <BookOpen className="h-5 w-5 text-[oklch(var(--orange))]" />
+                    <span className="text-sm font-semibold">Browse all back issues</span>
+                  </span>
+                  <ArrowRight className="h-4 w-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+
+              {/* Citation block */}
+              <div className="mt-8 max-w-md mx-auto border-t border-[oklch(var(--navy))]/15 pt-6">
+                <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+                  How to cite
+                </div>
+                <p className="mt-2 text-xs text-foreground/65 font-mono leading-relaxed">
+                  The Agriculture Popular Article Magazine, Vol. {issue.volume}, Iss. {issue.number}{" "}
+                  ({issue.date}). Online ISSN 2583-XXXX.
+                </p>
+              </div>
+            </aside>
+
+            {/* Editorial + ToC */}
+            <div className="lg:col-span-7">
+              <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+                In This Issue
+              </div>
+              <h2 className="font-display text-3xl md:text-4xl mt-3 text-[oklch(var(--navy))] leading-[1.1]">
+                {issue.title}
+              </h2>
+              <p className="mt-6 text-lg text-foreground/75 leading-relaxed font-display">
+                {issue.desc}
+              </p>
+              <p className="mt-4 text-foreground/70 leading-relaxed">
+                A peer-reviewed selection of original research and field reports curated by the
+                editorial board — covering agronomy, plant protection, horticulture, soil science
+                and rural extension across the Indian sub-continent and beyond.
+              </p>
+
+              {/* Read articles */}
+              <div className="mt-14">
+                <div className="flex items-baseline justify-between border-b-2 border-[oklch(var(--navy))] pb-3">
+                  <h3 className="font-display text-2xl text-[oklch(var(--navy))]">
+                    Read the articles
+                  </h3>
+                  <span className="text-xs uppercase tracking-wider text-foreground/60">
+                    {articles.length} papers
+                  </span>
+                </div>
+                <ol className="divide-y divide-[oklch(var(--navy))]/10">
+                  {articles.map((a, i) => (
+                    <li key={a.slug}>
+                      <Link
+                        to="/articles/$slug"
+                        params={{ slug: a.slug }}
+                        className="group grid grid-cols-12 gap-4 py-6 items-start"
+                      >
+                        <div className="col-span-2 sm:col-span-1 font-display text-2xl text-[oklch(var(--orange))] tabular-nums">
+                          {String(i + 1).padStart(2, "0")}
+                        </div>
+                        <div className="col-span-10 sm:col-span-8">
+                          <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+                            {a.category}
+                          </div>
+                          <h4 className="font-display text-xl md:text-2xl mt-1.5 text-[oklch(var(--navy))] group-hover:text-[oklch(var(--orange))] transition-colors leading-snug">
+                            {a.title}
+                          </h4>
+                          <p className="mt-2 text-sm text-foreground/65 leading-relaxed line-clamp-2">
+                            {a.abstract}
+                          </p>
+                          <div className="mt-3 text-xs text-foreground/60">
+                            <span className="text-[oklch(var(--navy))] font-medium">{a.author}</span>
+                            <span className="mx-2 text-[oklch(var(--navy))]/30">·</span>
+                            <span className="italic">{a.affiliation}</span>
+                          </div>
+                        </div>
+                        <div className="hidden sm:flex col-span-3 flex-col items-end gap-2 text-xs text-foreground/55">
+                          <span>{a.readTime} min read</span>
+                          <span>{a.views} views</span>
+                          <a
+                            href={pdfHref}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 mt-1 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] uppercase tracking-wider font-semibold"
+                          >
+                            <Download className="h-3 w-3" /> PDF
+                          </a>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              {/* Submit CTA */}
+              <div className="mt-16 border border-[oklch(var(--navy))]/15 bg-[oklch(var(--navy))]/[0.03] p-8 flex flex-col md:flex-row md:items-center gap-6 justify-between">
+                <div>
+                  <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+                    Call for Papers
+                  </div>
+                  <h4 className="font-display text-2xl mt-2 text-[oklch(var(--navy))]">
+                    Submit to the next issue
+                  </h4>
+                  <p className="mt-2 text-sm text-foreground/70 max-w-md">
+                    Original research, field reports and short reviews from agricultural scientists,
+                    extension officers and research scholars are welcome year-round.
+                  </p>
+                </div>
+                <Link
+                  to="/submit"
+                  className="inline-flex items-center gap-2 bg-[oklch(var(--orange))] text-white px-6 py-3 text-sm font-semibold uppercase tracking-wider hover:bg-[oklch(var(--orange))]/90 transition-colors whitespace-nowrap"
+                >
+                  Submit Article <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
       <SiteFooter />
     </>
