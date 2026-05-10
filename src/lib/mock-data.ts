@@ -19,6 +19,8 @@ export type Article = {
   cover: string;
   abstract: string;
   date: string;
+  /** Path of the article PDF inside the `article-pdfs` Supabase Storage bucket. */
+  pdfPath?: string;
 };
 
 export const articles: Article[] = [
