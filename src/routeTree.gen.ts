@@ -20,9 +20,15 @@ import { Route as CurrentIssueRouteImport } from './routes/current-issue'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArchivesRouteImport } from './routes/archives'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
+import { Route as AdminSubmissionsRouteImport } from './routes/admin.submissions'
+import { Route as AdminIssuesRouteImport } from './routes/admin.issues'
+import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminArticlesRouteImport } from './routes/admin.articles'
 
 const SubmitRoute = SubmitRouteImport.update({
   id: '/submit',
@@ -79,6 +85,11 @@ const ArchivesRoute = ArchivesRouteImport.update({
   path: '/archives',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -89,15 +100,41 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
   id: '/articles/$slug',
   path: '/articles/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSubmissionsRoute = AdminSubmissionsRouteImport.update({
+  id: '/submissions',
+  path: '/submissions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIssuesRoute = AdminIssuesRouteImport.update({
+  id: '/issues',
+  path: '/issues',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminArticlesRoute = AdminArticlesRouteImport.update({
+  id: '/articles',
+  path: '/articles',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -109,7 +146,12 @@ export interface FileRoutesByFullPath {
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
   '/submit': typeof SubmitRoute
+  '/admin/articles': typeof AdminArticlesRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/issues': typeof AdminIssuesRoute
+  '/admin/submissions': typeof AdminSubmissionsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -125,12 +167,18 @@ export interface FileRoutesByTo {
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
   '/submit': typeof SubmitRoute
+  '/admin/articles': typeof AdminArticlesRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/issues': typeof AdminIssuesRoute
+  '/admin/submissions': typeof AdminSubmissionsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -142,13 +190,19 @@ export interface FileRoutesById {
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
   '/submit': typeof SubmitRoute
+  '/admin/articles': typeof AdminArticlesRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/issues': typeof AdminIssuesRoute
+  '/admin/submissions': typeof AdminSubmissionsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/archives'
     | '/auth'
     | '/contact'
@@ -160,7 +214,12 @@ export interface FileRouteTypes {
     | '/startup-spotlight'
     | '/submission-guidelines'
     | '/submit'
+    | '/admin/articles'
+    | '/admin/categories'
+    | '/admin/issues'
+    | '/admin/submissions'
     | '/articles/$slug'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -176,11 +235,17 @@ export interface FileRouteTypes {
     | '/startup-spotlight'
     | '/submission-guidelines'
     | '/submit'
+    | '/admin/articles'
+    | '/admin/categories'
+    | '/admin/issues'
+    | '/admin/submissions'
     | '/articles/$slug'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/archives'
     | '/auth'
     | '/contact'
@@ -192,12 +257,18 @@ export interface FileRouteTypes {
     | '/startup-spotlight'
     | '/submission-guidelines'
     | '/submit'
+    | '/admin/articles'
+    | '/admin/categories'
+    | '/admin/issues'
+    | '/admin/submissions'
     | '/articles/$slug'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ArchivesRoute: typeof ArchivesRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
@@ -291,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArchivesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -305,6 +383,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/articles/$slug': {
       id: '/articles/$slug'
       path: '/articles/$slug'
@@ -312,12 +397,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArticlesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/submissions': {
+      id: '/admin/submissions'
+      path: '/submissions'
+      fullPath: '/admin/submissions'
+      preLoaderRoute: typeof AdminSubmissionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/issues': {
+      id: '/admin/issues'
+      path: '/issues'
+      fullPath: '/admin/issues'
+      preLoaderRoute: typeof AdminIssuesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/articles': {
+      id: '/admin/articles'
+      path: '/articles'
+      fullPath: '/admin/articles'
+      preLoaderRoute: typeof AdminArticlesRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminArticlesRoute: typeof AdminArticlesRoute
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminIssuesRoute: typeof AdminIssuesRoute
+  AdminSubmissionsRoute: typeof AdminSubmissionsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminArticlesRoute: AdminArticlesRoute,
+  AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminIssuesRoute: AdminIssuesRoute,
+  AdminSubmissionsRoute: AdminSubmissionsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
   ArchivesRoute: ArchivesRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,

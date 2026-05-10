@@ -127,7 +127,7 @@ function Field({ label, ...p }: { label: string } & React.InputHTMLAttributes<HT
     </div>
   );
 }
-function Th({ children }: { children: React.ReactNode }) { return <th className="px-4 py-3 eyebrow">{children}</th>; }
+function Th({ children }: { children?: React.ReactNode }) { return <th className="px-4 py-3 eyebrow">{children}</th>; }
 function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <td className={`px-4 py-3 align-top ${className}`}>{children}</td>;
 }

@@ -26,7 +26,7 @@ function AdminSubmissions() {
   useEffect(() => { load(); }, []);
 
   const setStatus = async (id: string, status: string, notes?: string) => {
-    const { error } = await supabase.from("submissions").update({ status, ...(notes != null ? { notes } : {}) }).eq("id", id);
+    const { error } = await supabase.from("submissions").update({ status: status as "submitted" | "under_review" | "revision_requested" | "approved" | "published" | "rejected", ...(notes != null ? { notes } : {}) }).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Updated"); load();
   };

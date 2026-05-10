@@ -48,7 +48,7 @@ function AdminArticles() {
     const fd = new FormData(e.currentTarget);
     const title = String(fd.get("title"));
     const slug = (String(fd.get("slug") || "") || title).toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const status = String(fd.get("status")) as Article["status"];
+    const status = String(fd.get("status")) as "draft" | "published" | "archived";
     const payload = {
       title, slug,
       abstract: String(fd.get("abstract") || "") || null,
@@ -192,7 +192,7 @@ function SelectField({ label, options, ...p }: { label: string; options: { v: st
     </div>
   );
 }
-function Th({ children }: { children: React.ReactNode }) { return <th className="px-4 py-3 eyebrow">{children}</th>; }
+function Th({ children }: { children?: React.ReactNode }) { return <th className="px-4 py-3 eyebrow">{children}</th>; }
 function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <td className={`px-4 py-3 align-top ${className}`}>{children}</td>;
 }
