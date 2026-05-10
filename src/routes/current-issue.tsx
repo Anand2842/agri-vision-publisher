@@ -152,11 +152,7 @@ function CurrentIssue() {
                 <ol className="divide-y divide-[oklch(var(--navy))]/10">
                   {articles.map((a, i) => (
                     <li key={a.slug}>
-                      <Link
-                        to="/articles/$slug"
-                        params={{ slug: a.slug }}
-                        className="group grid grid-cols-12 gap-4 py-6 items-start"
-                      >
+                      <div className="group grid grid-cols-12 gap-4 py-6 items-start">
                         <div className="col-span-2 sm:col-span-1 font-display text-2xl text-[oklch(var(--orange))] tabular-nums">
                           {String(i + 1).padStart(2, "0")}
                         </div>
@@ -164,12 +160,18 @@ function CurrentIssue() {
                           <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
                             {a.category}
                           </div>
-                          <h4 className="font-display text-xl md:text-2xl mt-1.5 text-[oklch(var(--navy))] group-hover:text-[oklch(var(--orange))] transition-colors leading-snug">
-                            {a.title}
-                          </h4>
-                          <p className="mt-2 text-sm text-foreground/65 leading-relaxed line-clamp-2">
-                            {a.abstract}
-                          </p>
+                          <Link
+                            to="/articles/$slug"
+                            params={{ slug: a.slug }}
+                            className="block"
+                          >
+                            <h4 className="font-display text-xl md:text-2xl mt-1.5 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] transition-colors leading-snug">
+                              {a.title}
+                            </h4>
+                            <p className="mt-2 text-sm text-foreground/65 leading-relaxed line-clamp-2">
+                              {a.abstract}
+                            </p>
+                          </Link>
                           <div className="mt-3 text-xs text-foreground/60">
                             <span className="text-[oklch(var(--navy))] font-medium">{a.author}</span>
                             <span className="mx-2 text-[oklch(var(--navy))]/30">·</span>
@@ -179,15 +181,22 @@ function CurrentIssue() {
                         <div className="hidden sm:flex col-span-3 flex-col items-end gap-2 text-xs text-foreground/55">
                           <span>{a.readTime} min read</span>
                           <span>{a.views} views</span>
-                          <a
-                            href={pdfHref}
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 mt-1 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] uppercase tracking-wider font-semibold"
-                          >
-                            <Download className="h-3 w-3" /> PDF
-                          </a>
+                          {pdfUrl(a.pdfPath) ? (
+                            <a
+                              href={pdfUrl(a.pdfPath)!}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 mt-1 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] uppercase tracking-wider font-semibold"
+                            >
+                              <Download className="h-3 w-3" /> PDF
+                            </a>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 mt-1 text-foreground/30 uppercase tracking-wider font-semibold cursor-not-allowed">
+                              <Download className="h-3 w-3" /> PDF
+                            </span>
+                          )}
                         </div>
-                      </Link>
+                      </div>
                     </li>
                   ))}
                 </ol>
