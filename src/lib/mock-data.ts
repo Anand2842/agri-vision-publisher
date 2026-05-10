@@ -19,6 +19,8 @@ export type Article = {
   cover: string;
   abstract: string;
   date: string;
+  /** Path of the article PDF inside the `article-pdfs` Supabase Storage bucket. */
+  pdfPath?: string;
 };
 
 export const articles: Article[] = [
@@ -34,6 +36,7 @@ export const articles: Article[] = [
     abstract:
       "A multi-season field study on stripe rust resistance traits in indigenous wheat varieties across northern India.",
     date: "May 2026",
+    pdfPath: "v4-i5/01-wheat-rust-resistance.pdf",
   },
   {
     slug: "vertical-farming-energy-economics",
@@ -47,6 +50,7 @@ export const articles: Article[] = [
     abstract:
       "Quantifying LED, HVAC and labour costs across 14 commercial vertical farms in Europe and Southeast Asia.",
     date: "May 2026",
+    pdfPath: "v4-i5/02-vertical-farming-energy.pdf",
   },
   {
     slug: "drip-irrigation-thar-desert",
@@ -60,6 +64,7 @@ export const articles: Article[] = [
     abstract:
       "Ten years of micro-irrigation adoption in arid Rajasthan — yields, water-use efficiency and farmer livelihoods.",
     date: "May 2026",
+    pdfPath: "v4-i5/03-drip-irrigation-thar.pdf",
   },
   {
     slug: "regenerative-soil-carbon-sequestration",
@@ -73,6 +78,7 @@ export const articles: Article[] = [
     abstract:
       "Cover cropping, no-till and rotational grazing measured against five-year SOC change in Sahel soils.",
     date: "April 2026",
+    pdfPath: "v4-i5/04-regenerative-soil-carbon.pdf",
   },
   {
     slug: "ict-smart-farming-paddy",
@@ -86,6 +92,7 @@ export const articles: Article[] = [
     abstract:
       "How tablet-based advisory services changed input decisions for 2,400 smallholder rice farmers.",
     date: "April 2026",
+    pdfPath: "v4-i5/05-ict-smart-farming-paddy.pdf",
   },
   {
     slug: "pollinator-decline-orchards",
@@ -99,6 +106,7 @@ export const articles: Article[] = [
     abstract:
       "Long-term surveys of bee diversity in apple and stone-fruit orchards across the Southern Cone.",
     date: "April 2026",
+    pdfPath: "v4-i5/06-pollinator-decline-orchards.pdf",
   },
 ];
 
