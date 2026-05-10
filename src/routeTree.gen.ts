@@ -9,18 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as SubmissionGuidelinesRouteImport } from './routes/submission-guidelines'
 import { Route as StartupSpotlightRouteImport } from './routes/startup-spotlight'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as EditorialBoardRouteImport } from './routes/editorial-board'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CurrentIssueRouteImport } from './routes/current-issue'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArchivesRouteImport } from './routes/archives'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 
+const SubmitRoute = SubmitRouteImport.update({
+  id: '/submit',
+  path: '/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubmissionGuidelinesRoute = SubmissionGuidelinesRouteImport.update({
   id: '/submission-guidelines',
   path: '/submission-guidelines',
@@ -46,6 +54,11 @@ const EditorialBoardRoute = EditorialBoardRouteImport.update({
   path: '/editorial-board',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CurrentIssueRoute = CurrentIssueRouteImport.update({
   id: '/current-issue',
   path: '/current-issue',
@@ -54,6 +67,11 @@ const CurrentIssueRoute = CurrentIssueRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArchivesRoute = ArchivesRouteImport.update({
@@ -81,26 +99,32 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/archives': typeof ArchivesRoute
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
+  '/dashboard': typeof DashboardRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
+  '/submit': typeof SubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/archives': typeof ArchivesRoute
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
+  '/dashboard': typeof DashboardRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
+  '/submit': typeof SubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
 }
 export interface FileRoutesById {
@@ -108,13 +132,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/archives': typeof ArchivesRoute
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
+  '/dashboard': typeof DashboardRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
+  '/submit': typeof SubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
 }
 export interface FileRouteTypes {
@@ -123,39 +150,48 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/archives'
+    | '/auth'
     | '/contact'
     | '/current-issue'
+    | '/dashboard'
     | '/editorial-board'
     | '/membership'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
+    | '/submit'
     | '/articles/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/archives'
+    | '/auth'
     | '/contact'
     | '/current-issue'
+    | '/dashboard'
     | '/editorial-board'
     | '/membership'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
+    | '/submit'
     | '/articles/$slug'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/archives'
+    | '/auth'
     | '/contact'
     | '/current-issue'
+    | '/dashboard'
     | '/editorial-board'
     | '/membership'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
+    | '/submit'
     | '/articles/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -163,18 +199,28 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ArchivesRoute: typeof ArchivesRoute
+  AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   CurrentIssueRoute: typeof CurrentIssueRoute
+  DashboardRoute: typeof DashboardRoute
   EditorialBoardRoute: typeof EditorialBoardRoute
   MembershipRoute: typeof MembershipRoute
   SearchRoute: typeof SearchRoute
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
+  SubmitRoute: typeof SubmitRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/submit': {
+      id: '/submit'
+      path: '/submit'
+      fullPath: '/submit'
+      preLoaderRoute: typeof SubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/submission-guidelines': {
       id: '/submission-guidelines'
       path: '/submission-guidelines'
@@ -210,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EditorialBoardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/current-issue': {
       id: '/current-issue'
       path: '/current-issue'
@@ -222,6 +275,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/archives': {
@@ -259,15 +319,28 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ArchivesRoute: ArchivesRoute,
+  AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   CurrentIssueRoute: CurrentIssueRoute,
+  DashboardRoute: DashboardRoute,
   EditorialBoardRoute: EditorialBoardRoute,
   MembershipRoute: MembershipRoute,
   SearchRoute: SearchRoute,
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
+  SubmitRoute: SubmitRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
