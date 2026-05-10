@@ -2,7 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { articles, cover, issues } from "@/lib/mock-data";
+import { supabase } from "@/integrations/supabase/client";
 import { Download, FileText, BookOpen, ArrowRight } from "lucide-react";
+
+const pdfUrl = (path?: string) =>
+  path ? supabase.storage.from("article-pdfs").getPublicUrl(path).data.publicUrl : null;
 
 export const Route = createFileRoute("/current-issue")({
   component: CurrentIssue,
