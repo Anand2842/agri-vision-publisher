@@ -130,7 +130,7 @@ function Article() {
               <div className="eyebrow">Related</div>
               <div className="rule-thick mt-3" />
               <ul className="mt-5 space-y-7">
-                {related.map((r) => (
+                {related.map((r: typeof a) => (
                   <li key={r.slug}>
                     <Link to="/articles/$slug" params={{ slug: r.slug }} className="group block">
                       <div className="eyebrow text-[0.6rem]">{r.category}</div>
