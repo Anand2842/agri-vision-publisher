@@ -44,11 +44,11 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [q, setQ] = useState("");
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const term = q.trim();
-    nav({ to: "/search", search: term ? { q: term } : {} });
+    navigate({ to: "/search", search: term ? { q: term } : {} });
     setOpen(false);
   };
 
