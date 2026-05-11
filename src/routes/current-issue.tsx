@@ -189,9 +189,9 @@ function CurrentIssue() {
                         <div className="hidden sm:flex col-span-3 flex-col items-end gap-2 text-xs text-foreground/55">
                           <span>{a.readTime} min read</span>
                           <span>{a.views} views</span>
-                          {pdfUrl(a.pdfPath) ? (
+                          {articlePdf(a.pdfPath) ? (
                             <a
-                              href={pdfUrl(a.pdfPath)!}
+                              href={articlePdf(a.pdfPath)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 mt-1 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] uppercase tracking-wider font-semibold"
