@@ -5,7 +5,8 @@ import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import heroTractor from "@/assets/hero-tractor.jpg";
 import heroPaddy from "@/assets/hero-paddy.jpg";
 import heroWheat from "@/assets/hero-wheat.jpg";
-import { articles, stats } from "@/lib/mock-data";
+import { stats } from "@/lib/mock-data";
+import { fetchPublishedArticles, type DBArticle } from "@/lib/data";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/")({
@@ -125,6 +126,10 @@ function Intro() {
 }
 
 function RecentBlogs() {
+  const [articles, setArticles] = useState<DBArticle[]>([]);
+  useEffect(() => {
+    fetchPublishedArticles(4).then(setArticles);
+  }, []);
   return (
     <section className="bg-paper border-y border-rule py-16 md:py-24">
       <div className="container-editorial">
