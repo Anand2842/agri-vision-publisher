@@ -1,20 +1,42 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { articles } from "@/lib/mock-data";
-import { useState } from "react";
+import { fetchPublishedArticles, type DBArticle } from "@/lib/data";
+import { useEffect, useState } from "react";
+import { z } from "zod";
 import { Search as SearchIcon } from "lucide-react";
+
+const searchSchema = z.object({ q: z.string().optional().catch("") });
 
 export const Route = createFileRoute("/search")({
   component: SearchPage,
-  head: () => ({ meta: [{ title: "Search — Agripop" }] }),
+  validateSearch: searchSchema,
+  head: () => ({ meta: [{ title: "Search — The Agriculture Magazine" }] }),
 });
 
 function SearchPage() {
-  const [q, setQ] = useState("");
-  const results = q.trim().length === 0 ? articles : articles.filter((a) =>
-    [a.title, a.author, a.category, a.abstract].join(" ").toLowerCase().includes(q.toLowerCase())
-  );
+  const { q: initialQ } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const [q, setQ] = useState(initialQ ?? "");
+  const [pool, setPool] = useState<DBArticle[]>([]);
+
+  useEffect(() => {
+    fetchPublishedArticles().then(setPool);
+  }, []);
+
+  // keep URL in sync (debounced lightly)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      navigate({ search: q.trim() ? { q: q.trim() } : {}, replace: true });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [q, navigate]);
+
+  const term = q.trim().toLowerCase();
+  const results = term.length === 0
+    ? pool
+    : pool.filter((a) => [a.title, a.author, a.category, a.abstract].join(" ").toLowerCase().includes(term));
+
   return (
     <>
       <SiteHeader />

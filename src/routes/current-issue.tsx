@@ -1,30 +1,44 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { articles, cover, issues } from "@/lib/mock-data";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchIssues, fetchPublishedArticles, articlePdf, type IssueRow, type DBArticle } from "@/lib/data";
+import { useEffect, useState } from "react";
 import { Download, FileText, BookOpen, ArrowRight } from "lucide-react";
-
-const pdfUrl = (path?: string) =>
-  path ? supabase.storage.from("article-pdfs").getPublicUrl(path).data.publicUrl : null;
 
 export const Route = createFileRoute("/current-issue")({
   component: CurrentIssue,
   head: () => ({
     meta: [
-      { title: "Current Issue · May 2026 — The Agriculture Popular Article Magazine" },
+      { title: "Current Issue — The Agriculture Magazine" },
       {
         name: "description",
         content:
-          "Volume 4, Issue 5 — May 2026. Adapting to a Warming Climate. Read or download the latest issue.",
+          "Read or download the latest peer-reviewed issue of The Agriculture Magazine.",
       },
     ],
   }),
 });
 
 function CurrentIssue() {
-  const issue = issues[0];
-  const pdfHref = "#"; // wire to Supabase Storage when issue PDFs are uploaded
+  const [issue, setIssue] = useState<IssueRow | null>(null);
+  const [articles, setArticles] = useState<DBArticle[]>([]);
+
+  useEffect(() => {
+    fetchIssues().then((rows) => setIssue(rows[0] ?? null));
+    fetchPublishedArticles().then(setArticles);
+  }, []);
+
+  if (!issue) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="container-editorial py-32 text-center text-muted-foreground">Loading…</main>
+        <SiteFooter />
+      </>
+    );
+  }
+
+  const pdfHref = issue.pdfUrl;
 
   return (
     <>
@@ -57,7 +71,7 @@ function CurrentIssue() {
             <aside className="lg:col-span-5 lg:sticky lg:top-28">
               <div className="relative">
                 <img
-                  src={cover}
+                  src={issue.cover}
                   alt={`Cover of Volume ${issue.volume}, Issue ${issue.number} — ${issue.title}`}
                   className="w-full max-w-md mx-auto shadow-2xl ring-1 ring-[oklch(var(--navy))]/10"
                 />
@@ -68,36 +82,30 @@ function CurrentIssue() {
 
               {/* Download / Read CTAs */}
               <div className="mt-8 max-w-md mx-auto space-y-3">
-                <a
-                  href={pdfHref}
-                  className="group flex items-center justify-between gap-4 bg-[oklch(var(--navy))] text-white px-5 py-4 hover:bg-[oklch(var(--navy))]/90 transition-colors"
-                >
-                  <span className="flex items-center gap-3">
-                    <Download className="h-5 w-5" />
-                    <span>
-                      <span className="block text-sm font-semibold">View / Download Full Issue</span>
-                      <span className="block text-[0.7rem] uppercase tracking-wider opacity-70">
-                        PDF · ~12.4 MB
+                {pdfHref ? (
+                  <a
+                    href={pdfHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-between gap-4 bg-[oklch(var(--navy))] text-white px-5 py-4 hover:bg-[oklch(var(--navy))]/90 transition-colors"
+                  >
+                    <span className="flex items-center gap-3">
+                      <Download className="h-5 w-5" />
+                      <span>
+                        <span className="block text-sm font-semibold">View / Download Full Issue</span>
+                        <span className="block text-[0.7rem] uppercase tracking-wider opacity-70">PDF</span>
                       </span>
                     </span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
-                </a>
-                <a
-                  href={pdfHref}
-                  className="group flex items-center justify-between gap-4 border border-[oklch(var(--navy))]/25 text-[oklch(var(--navy))] px-5 py-4 hover:bg-[oklch(var(--navy))]/5 transition-colors"
-                >
-                  <span className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-[oklch(var(--orange))]" />
-                    <span>
-                      <span className="block text-sm font-semibold">Cover & Editorial</span>
-                      <span className="block text-[0.7rem] uppercase tracking-wider opacity-60">
-                        PDF · 1.2 MB
-                      </span>
+                    <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-between gap-4 bg-[oklch(var(--navy))]/30 text-white/80 px-5 py-4 cursor-not-allowed">
+                    <span className="flex items-center gap-3">
+                      <FileText className="h-5 w-5" />
+                      <span className="text-sm font-semibold">Issue PDF coming soon</span>
                     </span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 opacity-50 group-hover:translate-x-1 transition-transform" />
-                </a>
+                  </div>
+                )}
                 <Link
                   to="/archives"
                   className="group flex items-center justify-between gap-4 border border-[oklch(var(--navy))]/25 text-[oklch(var(--navy))] px-5 py-4 hover:bg-[oklch(var(--navy))]/5 transition-colors"
@@ -181,9 +189,9 @@ function CurrentIssue() {
                         <div className="hidden sm:flex col-span-3 flex-col items-end gap-2 text-xs text-foreground/55">
                           <span>{a.readTime} min read</span>
                           <span>{a.views} views</span>
-                          {pdfUrl(a.pdfPath) ? (
+                          {articlePdf(a.pdfPath) ? (
                             <a
-                              href={pdfUrl(a.pdfPath)!}
+                              href={articlePdf(a.pdfPath)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 mt-1 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] uppercase tracking-wider font-semibold"

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { articles } from "@/lib/mock-data";
+import { fetchArticleBySlug, fetchPublishedArticles, articlePdf } from "@/lib/data";
 import { Bookmark, Share2, Download, Quote, Clock, Eye } from "lucide-react";
 
 export const Route = createFileRoute("/articles/$slug")({
@@ -16,25 +16,35 @@ export const Route = createFileRoute("/articles/$slug")({
       <SiteFooter />
     </>
   ),
-  loader: ({ params }) => {
-    const a = articles.find((x) => x.slug === params.slug);
+  loader: async ({ params }) => {
+    const a = await fetchArticleBySlug(params.slug);
     if (!a) throw notFound();
-    return a;
+    const pool = await fetchPublishedArticles();
+    const related = pool.filter((x) => x.slug !== a.slug).slice(0, 3);
+    return { a, related };
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [
-      { title: `${loaderData.title} — Agripop` },
-      { name: "description", content: loaderData.abstract },
-      { property: "og:title", content: loaderData.title },
-      { property: "og:description", content: loaderData.abstract },
-      { property: "og:image", content: loaderData.cover },
+      { title: `${loaderData.a.title} — The Agriculture Magazine` },
+      { name: "description", content: loaderData.a.abstract },
+      { property: "og:title", content: loaderData.a.title },
+      { property: "og:description", content: loaderData.a.abstract },
+      { property: "og:image", content: loaderData.a.cover },
     ] : [],
   }),
 });
 
 function Article() {
-  const a = Route.useLoaderData();
-  const related = articles.filter((x) => x.slug !== a.slug).slice(0, 3);
+  const { a, related } = Route.useLoaderData();
+  const pdfHref = articlePdf(a.pdfPath);
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const onShare = async () => {
+    if (navigator.share) {
+      try { await navigator.share({ title: a.title, text: a.abstract, url: shareUrl }); } catch {}
+    } else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(shareUrl);
+    }
+  };
   return (
     <>
       <SiteHeader />
@@ -61,10 +71,14 @@ function Article() {
 
         <div className="container-editorial grid md:grid-cols-12 gap-12 mt-14">
           <aside className="md:col-span-1 md:sticky md:top-28 self-start hidden md:flex flex-col gap-3 text-muted-foreground">
-            <button className="p-2 hover:text-primary" aria-label="Share"><Share2 className="h-4 w-4" /></button>
-            <button className="p-2 hover:text-primary" aria-label="Bookmark"><Bookmark className="h-4 w-4" /></button>
-            <button className="p-2 hover:text-primary" aria-label="Download"><Download className="h-4 w-4" /></button>
-            <button className="p-2 hover:text-primary" aria-label="Cite"><Quote className="h-4 w-4" /></button>
+            <button onClick={onShare} className="p-2 hover:text-primary" aria-label="Share / Copy link"><Share2 className="h-4 w-4" /></button>
+            {pdfHref ? (
+              <a href={pdfHref} target="_blank" rel="noopener noreferrer" className="p-2 hover:text-primary" aria-label="Download PDF"><Download className="h-4 w-4" /></a>
+            ) : (
+              <span className="p-2 opacity-30" aria-label="PDF unavailable"><Download className="h-4 w-4" /></span>
+            )}
+            <button onClick={() => navigator.clipboard?.writeText(`${a.author} (${a.date}). ${a.title}. The Agriculture Magazine.`)} className="p-2 hover:text-primary" aria-label="Copy citation"><Quote className="h-4 w-4" /></button>
+            <button onClick={() => navigator.clipboard?.writeText(shareUrl)} className="p-2 hover:text-primary" aria-label="Copy link"><Bookmark className="h-4 w-4" /></button>
           </aside>
           <article className="md:col-span-7 max-w-2xl mx-auto">
             <div className="bg-paper border-l-4 border-primary p-6 mb-10">
@@ -116,7 +130,7 @@ function Article() {
               <div className="eyebrow">Related</div>
               <div className="rule-thick mt-3" />
               <ul className="mt-5 space-y-7">
-                {related.map((r) => (
+                {related.map((r: typeof a) => (
                   <li key={r.slug}>
                     <Link to="/articles/$slug" params={{ slug: r.slug }} className="group block">
                       <div className="eyebrow text-[0.6rem]">{r.category}</div>
