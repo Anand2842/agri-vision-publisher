@@ -5,12 +5,13 @@ import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/contact")({
   component: Contact,
   head: () => ({ meta: [
-    { title: "Contact — Agripop" },
-    { name: "description", content: "Reach the editorial office of Agripop magazine." },
+    { title: "Contact — The Agriculture Magazine" },
+    { name: "description", content: "Reach the editorial office of The Agriculture Magazine." },
   ] }),
 });
 
@@ -23,13 +24,18 @@ const schema = z.object({
 
 function Contact() {
   const [sending, setSending] = useState(false);
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.currentTarget));
+    const form = e.currentTarget;
+    const data = Object.fromEntries(new FormData(form));
     const r = schema.safeParse(data);
     if (!r.success) { toast.error(r.error.issues[0].message); return; }
     setSending(true);
-    setTimeout(() => { setSending(false); toast.success("Thanks — we'll be in touch."); (e.target as HTMLFormElement).reset(); }, 600);
+    const { error } = await supabase.from("contact_messages").insert(r.data);
+    setSending(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Thanks — we'll be in touch.");
+    form.reset();
   };
   return (
     <>
