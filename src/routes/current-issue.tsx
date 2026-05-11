@@ -1,30 +1,44 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { articles, cover, issues } from "@/lib/mock-data";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchIssues, fetchPublishedArticles, articlePdf, type IssueRow, type DBArticle } from "@/lib/data";
+import { useEffect, useState } from "react";
 import { Download, FileText, BookOpen, ArrowRight } from "lucide-react";
-
-const pdfUrl = (path?: string) =>
-  path ? supabase.storage.from("article-pdfs").getPublicUrl(path).data.publicUrl : null;
 
 export const Route = createFileRoute("/current-issue")({
   component: CurrentIssue,
   head: () => ({
     meta: [
-      { title: "Current Issue · May 2026 — The Agriculture Popular Article Magazine" },
+      { title: "Current Issue — The Agriculture Magazine" },
       {
         name: "description",
         content:
-          "Volume 4, Issue 5 — May 2026. Adapting to a Warming Climate. Read or download the latest issue.",
+          "Read or download the latest peer-reviewed issue of The Agriculture Magazine.",
       },
     ],
   }),
 });
 
 function CurrentIssue() {
-  const issue = issues[0];
-  const pdfHref = "#"; // wire to Supabase Storage when issue PDFs are uploaded
+  const [issue, setIssue] = useState<IssueRow | null>(null);
+  const [articles, setArticles] = useState<DBArticle[]>([]);
+
+  useEffect(() => {
+    fetchIssues().then((rows) => setIssue(rows[0] ?? null));
+    fetchPublishedArticles().then(setArticles);
+  }, []);
+
+  if (!issue) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="container-editorial py-32 text-center text-muted-foreground">Loading…</main>
+        <SiteFooter />
+      </>
+    );
+  }
+
+  const pdfHref = issue.pdfUrl;
 
   return (
     <>
