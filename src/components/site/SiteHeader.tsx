@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, Menu, X, Phone, Facebook, Instagram, Twitter, Mail, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +43,14 @@ const nav: { to: string; label: string; children?: { to: string; label: string }
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
+  const [q, setQ] = useState("");
+  const nav = useNavigate();
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const term = q.trim();
+    nav({ to: "/search", search: term ? { q: term } : {} });
+    setOpen(false);
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
@@ -80,15 +88,17 @@ export function SiteHeader() {
         </Link>
 
         <form
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={submitSearch}
           className="hidden md:flex flex-1 max-w-md items-center border border-rule overflow-hidden"
         >
           <input
             type="search"
-            placeholder="Search…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search articles, authors…"
             className="flex-1 px-4 py-2.5 text-sm bg-transparent focus:outline-none"
           />
-          <button className="bg-orange text-white px-4 py-2.5 hover:brightness-105">
+          <button type="submit" aria-label="Search" className="bg-orange text-white px-4 py-2.5 hover:brightness-105">
             <Search className="h-4 w-4" />
           </button>
         </form>
@@ -140,9 +150,9 @@ export function SiteHeader() {
       {/* Mobile menu */}
       {open && (
         <div className="lg:hidden border-t border-rule bg-background">
-          <form onSubmit={(e) => e.preventDefault()} className="container-editorial py-3 flex items-center border-b border-rule">
-            <input type="search" placeholder="Search…" className="flex-1 px-3 py-2 text-sm bg-muted" />
-            <button className="bg-orange text-white px-4 py-2 ml-2"><Search className="h-4 w-4" /></button>
+          <form onSubmit={submitSearch} className="container-editorial py-3 flex items-center border-b border-rule">
+            <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" className="flex-1 px-3 py-2 text-sm bg-muted" />
+            <button type="submit" aria-label="Search" className="bg-orange text-white px-4 py-2 ml-2"><Search className="h-4 w-4" /></button>
           </form>
           <div className="container-editorial py-3 flex flex-col">
             {nav.map((n) => (
