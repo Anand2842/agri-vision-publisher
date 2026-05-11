@@ -71,7 +71,7 @@ function CurrentIssue() {
             <aside className="lg:col-span-5 lg:sticky lg:top-28">
               <div className="relative">
                 <img
-                  src={cover}
+                  src={issue.cover}
                   alt={`Cover of Volume ${issue.volume}, Issue ${issue.number} — ${issue.title}`}
                   className="w-full max-w-md mx-auto shadow-2xl ring-1 ring-[oklch(var(--navy))]/10"
                 />
@@ -82,36 +82,30 @@ function CurrentIssue() {
 
               {/* Download / Read CTAs */}
               <div className="mt-8 max-w-md mx-auto space-y-3">
-                <a
-                  href={pdfHref}
-                  className="group flex items-center justify-between gap-4 bg-[oklch(var(--navy))] text-white px-5 py-4 hover:bg-[oklch(var(--navy))]/90 transition-colors"
-                >
-                  <span className="flex items-center gap-3">
-                    <Download className="h-5 w-5" />
-                    <span>
-                      <span className="block text-sm font-semibold">View / Download Full Issue</span>
-                      <span className="block text-[0.7rem] uppercase tracking-wider opacity-70">
-                        PDF · ~12.4 MB
+                {pdfHref ? (
+                  <a
+                    href={pdfHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-between gap-4 bg-[oklch(var(--navy))] text-white px-5 py-4 hover:bg-[oklch(var(--navy))]/90 transition-colors"
+                  >
+                    <span className="flex items-center gap-3">
+                      <Download className="h-5 w-5" />
+                      <span>
+                        <span className="block text-sm font-semibold">View / Download Full Issue</span>
+                        <span className="block text-[0.7rem] uppercase tracking-wider opacity-70">PDF</span>
                       </span>
                     </span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
-                </a>
-                <a
-                  href={pdfHref}
-                  className="group flex items-center justify-between gap-4 border border-[oklch(var(--navy))]/25 text-[oklch(var(--navy))] px-5 py-4 hover:bg-[oklch(var(--navy))]/5 transition-colors"
-                >
-                  <span className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-[oklch(var(--orange))]" />
-                    <span>
-                      <span className="block text-sm font-semibold">Cover & Editorial</span>
-                      <span className="block text-[0.7rem] uppercase tracking-wider opacity-60">
-                        PDF · 1.2 MB
-                      </span>
+                    <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
+                  </a>
+                ) : (
+                  <div className="flex items-center justify-between gap-4 bg-[oklch(var(--navy))]/30 text-white/80 px-5 py-4 cursor-not-allowed">
+                    <span className="flex items-center gap-3">
+                      <FileText className="h-5 w-5" />
+                      <span className="text-sm font-semibold">Issue PDF coming soon</span>
                     </span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 opacity-50 group-hover:translate-x-1 transition-transform" />
-                </a>
+                  </div>
+                )}
                 <Link
                   to="/archives"
                   className="group flex items-center justify-between gap-4 border border-[oklch(var(--navy))]/25 text-[oklch(var(--navy))] px-5 py-4 hover:bg-[oklch(var(--navy))]/5 transition-colors"
