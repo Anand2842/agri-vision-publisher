@@ -62,7 +62,7 @@ export function SiteHeader() {
       {/* Logo + search + Special Issue */}
       <div className="container-editorial flex items-center justify-between gap-6 py-4 md:py-5">
         <Link to="/" className="flex items-center gap-3 shrink-0">
-          <img src={logo} alt="The Agriculture Magazine" width={140} height={140} className="h-14 md:h-20 w-auto" />
+          <img src={logo} alt="Agripop" width={140} height={140} className="h-14 md:h-20 w-auto" />
         </Link>
 
         <form
