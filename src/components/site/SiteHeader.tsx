@@ -8,36 +8,18 @@ const nav: { to: string; label: string; children?: { to: string; label: string }
   { to: "/", label: "Home" },
   { to: "/editorial-board", label: "Editorial Board" },
   { to: "/current-issue", label: "Current Issue" },
-  {
-    to: "/archives",
-    label: "Archives",
-    children: [
-      { to: "/archives", label: "Volume 5" },
-      { to: "/archives", label: "Volume 4" },
-      { to: "/archives", label: "Volume 3" },
-      { to: "/archives", label: "Volume 2" },
-      { to: "/archives", label: "Volume 1" },
-    ],
-  },
+  { to: "/archives", label: "Archives" },
   {
     to: "/submission-guidelines",
     label: "Submission",
     children: [
       { to: "/submission-guidelines", label: "Author Guidelines" },
-      { to: "/submit", label: "Submit Articles" },
+      { to: "/submit", label: "Submit Article" },
     ],
   },
-  {
-    to: "/membership",
-    label: "Publication",
-    children: [
-      { to: "/membership", label: "Publication Fees" },
-      { to: "/membership", label: "Payment" },
-    ],
-  },
-  { to: "/contact", label: "Advertise" },
-  { to: "/about", label: "Events" },
-  { to: "/current-issue", label: "Volume (05) Issue (07), Feb 2026" },
+  { to: "/membership", label: "Membership & Fees" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" },
 ];
 
 export function SiteHeader() {
