@@ -6,7 +6,7 @@ export const Route = createFileRoute("/about")({
   component: About,
   head: () => ({ meta: [
     { title: "About — Agripop" },
-    { name: "description", content: "About The Agriculture Popular Article Magazine — mission, vision and history." },
+    { name: "description", content: "About Agripop — mission, vision and history." },
   ] }),
 });
 

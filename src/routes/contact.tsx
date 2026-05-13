@@ -10,8 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/contact")({
   component: Contact,
   head: () => ({ meta: [
-    { title: "Contact — The Agriculture Magazine" },
-    { name: "description", content: "Reach the editorial office of The Agriculture Magazine." },
+    { title: "Contact — Agripop" },
+    { name: "description", content: "Reach the editorial office of Agripop." },
   ] }),
 });
 

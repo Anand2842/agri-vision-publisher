@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
   component: Home,
   head: () => ({
     meta: [
-      { title: "The Agriculture Magazine — Peer-Reviewed Open Access Monthly" },
+      { title: "Agripop — Peer-Reviewed Open Access Monthly" },
       { name: "description", content: "A peer-reviewed, open access monthly magazine on agriculture, allied sciences and the environment. Innovations, research and start-up stories." },
     ],
   }),
@@ -65,7 +65,7 @@ function HeroSlider() {
       <div className="absolute inset-0 bg-black/35" />
       <div className="relative h-full flex flex-col items-center justify-center text-center px-6">
         <h1 className="font-script text-white text-5xl sm:text-6xl md:text-8xl drop-shadow-lg">
-          Welcome to The Agriculture Magazine
+          Welcome to Agripop
         </h1>
         <Link to="/about" className="btn-outline-white mt-10">
           About Us
@@ -103,17 +103,17 @@ function Intro() {
   return (
     <section className="container-editorial py-16 md:py-24">
       <div className="hr-divider mb-8">
-        <h2 className="section-title text-2xl md:text-4xl text-center">The Agriculture Magazine</h2>
+        <h2 className="section-title text-2xl md:text-4xl text-center">Agripop</h2>
       </div>
       <p className="max-w-4xl mx-auto text-center text-foreground/75 leading-[1.9] text-[0.97rem]">
-        The Agriculture Magazine is a peer-reviewed, open access monthly magazine, initiated for the
+        Agripop is a peer-reviewed, open access monthly magazine, initiated for the
         purpose of providing information about novel innovations and techniques developed in
         agriculture and its allied sectors. Other than agriculture, it also focuses on the environmental
         aspects as it is of greater concern in the present scenario and needs to be addressed by
         agriculturists. This magazine gives a platform to researchers, scientists, students, innovative
         and progressive farmers and any other members of the scientific community to share their
         innovative ideas and to spread awareness in the agriculture sector by publishing articles
-        addressing current and future needs. The Agriculture Magazine also aims at providing a
+        addressing current and future needs. Agripop also aims at providing a
         platform to different agri and agri-tech start-ups to showcase their success stories, business
         ideas and plans, thereby enticing a sense of innovativeness among brilliant minds throughout
         the world.
@@ -175,7 +175,7 @@ function VisionMission() {
       <p className="max-w-4xl mx-auto text-center text-foreground/75 leading-[1.9] text-[0.97rem]">
         Informative, innovative and content-rich communication of information is most needed and is
         of great priority. A broad spectrum of advancement of technologies and other possibilities in
-        the farming sector has become very important; consequently, The Agriculture Magazine helps
+        the farming sector has become very important; consequently, Agripop helps
         in disseminating such information to the farming community as well as other agencies,
         institutes and organisations to provide them with the latest developments in the field of
         agriculture and environmental studies. The magazine is appealing due to its unique way of
@@ -196,7 +196,7 @@ const testimonials = [
   },
   {
     quote:
-      "The Agriculture Magazine has become required reading in our extension office. Practical, peer-reviewed, beautifully produced.",
+      "Agripop has become required reading in our extension office. Practical, peer-reviewed, beautifully produced.",
     name: "Kirstin W. Everton",
     role: "Extension Officer, Cornell",
   },
