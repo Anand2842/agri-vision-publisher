@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, Menu, X, Phone, Facebook, Instagram, Twitter, Mail, ChevronDown } from "lucide-react";
+import { Search, Menu, X, Phone, Mail, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
@@ -8,36 +8,18 @@ const nav: { to: string; label: string; children?: { to: string; label: string }
   { to: "/", label: "Home" },
   { to: "/editorial-board", label: "Editorial Board" },
   { to: "/current-issue", label: "Current Issue" },
-  {
-    to: "/archives",
-    label: "Archives",
-    children: [
-      { to: "/archives", label: "Volume 5" },
-      { to: "/archives", label: "Volume 4" },
-      { to: "/archives", label: "Volume 3" },
-      { to: "/archives", label: "Volume 2" },
-      { to: "/archives", label: "Volume 1" },
-    ],
-  },
+  { to: "/archives", label: "Archives" },
   {
     to: "/submission-guidelines",
     label: "Submission",
     children: [
       { to: "/submission-guidelines", label: "Author Guidelines" },
-      { to: "/submit", label: "Submit Articles" },
+      { to: "/submit", label: "Submit Article" },
     ],
   },
-  {
-    to: "/membership",
-    label: "Publication",
-    children: [
-      { to: "/membership", label: "Publication Fees" },
-      { to: "/membership", label: "Payment" },
-    ],
-  },
-  { to: "/contact", label: "Advertise" },
-  { to: "/about", label: "Events" },
-  { to: "/current-issue", label: "Volume (05) Issue (07), Feb 2026" },
+  { to: "/membership", label: "Membership & Fees" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" },
 ];
 
 export function SiteHeader() {
@@ -72,11 +54,7 @@ export function SiteHeader() {
             <Link to="/about" className="hover:text-orange transition-colors hidden sm:inline">About</Link>
             <Link to="/contact" className="hover:text-orange transition-colors hidden sm:inline">Contact</Link>
             <span className="hidden sm:inline w-px h-4 bg-white/20" />
-            <a href="#" aria-label="Facebook" className="hover:text-orange"><Facebook className="h-3.5 w-3.5" /></a>
-            <a href="#" aria-label="Instagram" className="hover:text-orange"><Instagram className="h-3.5 w-3.5" /></a>
-            <a href="#" aria-label="Twitter" className="hover:text-orange"><Twitter className="h-3.5 w-3.5" /></a>
-            <a href="mailto:editor@theagriculturemagazine.com" aria-label="Email" className="hover:text-orange"><Mail className="h-3.5 w-3.5" /></a>
-            <a href="#" className="hidden md:inline hover:text-orange ml-2">Researchgate</a>
+            <a href="mailto:editor@agripop.org" aria-label="Email" className="hover:text-orange"><Mail className="h-3.5 w-3.5" /></a>
           </div>
         </div>
       </div>
@@ -84,7 +62,7 @@ export function SiteHeader() {
       {/* Logo + search + Special Issue */}
       <div className="container-editorial flex items-center justify-between gap-6 py-4 md:py-5">
         <Link to="/" className="flex items-center gap-3 shrink-0">
-          <img src={logo} alt="The Agriculture Magazine" width={140} height={140} className="h-14 md:h-20 w-auto" />
+          <img src={logo} alt="Agripop" width={140} height={140} className="h-14 md:h-20 w-auto" />
         </Link>
 
         <form

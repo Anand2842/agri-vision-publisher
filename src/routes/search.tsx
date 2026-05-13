@@ -11,7 +11,7 @@ const searchSchema = z.object({ q: z.string().optional().catch("") });
 export const Route = createFileRoute("/search")({
   component: SearchPage,
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Search — The Agriculture Magazine" }] }),
+  head: () => ({ meta: [{ title: "Search — Agripop" }] }),
 });
 
 function SearchPage() {

@@ -72,10 +72,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Agripop — The Agriculture Popular Article Magazine" },
+      { title: "Agripop — Agripop" },
       { name: "description", content: "A global monthly peer-reviewed magazine for agriculture and allied sciences." },
       { name: "author", content: "Agripop Editorial Office" },
-      { property: "og:title", content: "Agripop — The Agriculture Popular Article Magazine" },
+      { property: "og:title", content: "Agripop — Agripop" },
       { property: "og:description", content: "A global monthly peer-reviewed magazine for agriculture and allied sciences." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

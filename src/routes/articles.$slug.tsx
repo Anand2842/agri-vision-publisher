@@ -25,7 +25,7 @@ export const Route = createFileRoute("/articles/$slug")({
   },
   head: ({ loaderData }) => ({
     meta: loaderData ? [
-      { title: `${loaderData.a.title} — The Agriculture Magazine` },
+      { title: `${loaderData.a.title} — Agripop` },
       { name: "description", content: loaderData.a.abstract },
       { property: "og:title", content: loaderData.a.title },
       { property: "og:description", content: loaderData.a.abstract },
@@ -77,7 +77,7 @@ function Article() {
             ) : (
               <span className="p-2 opacity-30" aria-label="PDF unavailable"><Download className="h-4 w-4" /></span>
             )}
-            <button onClick={() => navigator.clipboard?.writeText(`${a.author} (${a.date}). ${a.title}. The Agriculture Magazine.`)} className="p-2 hover:text-primary" aria-label="Copy citation"><Quote className="h-4 w-4" /></button>
+            <button onClick={() => navigator.clipboard?.writeText(`${a.author} (${a.date}). ${a.title}. Agripop.`)} className="p-2 hover:text-primary" aria-label="Copy citation"><Quote className="h-4 w-4" /></button>
             <button onClick={() => navigator.clipboard?.writeText(shareUrl)} className="p-2 hover:text-primary" aria-label="Copy link"><Bookmark className="h-4 w-4" /></button>
           </aside>
           <article className="md:col-span-7 max-w-2xl mx-auto">
