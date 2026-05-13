@@ -54,11 +54,7 @@ export function SiteHeader() {
             <Link to="/about" className="hover:text-orange transition-colors hidden sm:inline">About</Link>
             <Link to="/contact" className="hover:text-orange transition-colors hidden sm:inline">Contact</Link>
             <span className="hidden sm:inline w-px h-4 bg-white/20" />
-            <a href="#" aria-label="Facebook" className="hover:text-orange"><Facebook className="h-3.5 w-3.5" /></a>
-            <a href="#" aria-label="Instagram" className="hover:text-orange"><Instagram className="h-3.5 w-3.5" /></a>
-            <a href="#" aria-label="Twitter" className="hover:text-orange"><Twitter className="h-3.5 w-3.5" /></a>
-            <a href="mailto:editor@theagriculturemagazine.com" aria-label="Email" className="hover:text-orange"><Mail className="h-3.5 w-3.5" /></a>
-            <a href="#" className="hidden md:inline hover:text-orange ml-2">Researchgate</a>
+            <a href="mailto:editor@agripop.org" aria-label="Email" className="hover:text-orange"><Mail className="h-3.5 w-3.5" /></a>
           </div>
         </div>
       </div>
