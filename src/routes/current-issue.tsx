@@ -122,8 +122,8 @@ function CurrentIssue() {
                   How to cite
                 </div>
                 <p className="mt-2 text-xs text-foreground/65 font-mono leading-relaxed">
-                  Agripop, Vol. {issue.volume}, Iss. {issue.number}{" "}
-                  ({issue.date}). Online ISSN 2583-XXXX.
+                  Agripop, Vol. {issue.volume}, Iss. {issue.number} ({issue.date}).
+                </p>
                 </p>
               </div>
             </aside>
