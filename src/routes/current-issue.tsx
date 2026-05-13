@@ -59,8 +59,6 @@ function CurrentIssue() {
               </span>
               <span className="text-[oklch(var(--navy))]/30">·</span>
               <span>{articles.length} articles</span>
-              <span className="text-[oklch(var(--navy))]/30">·</span>
-              <span>ISSN 2583-XXXX</span>
             </div>
           </div>
         </section>
