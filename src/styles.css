@@ -5,17 +5,17 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * The Agriculture Magazine — design system
- * Inspired by theagricultureonline.com
- * Palette: deep navy nav, orange accent, brick-red, clean white body
- * Type: Fraunces (display headings) + Inter (body) + Allura (hero script)
+ * The Agriculture Popular Article Magazine — brand design system
+ * Palette: Agriculture Green #356B3A, Deep Forest #2E5130, Harvest Gold #C89B3C,
+ *          Wheat Beige #EFE6D3, Earth Brown #8A623B, Cream #F7F3EA
+ * Type: Merriweather (headings, serif) + Poppins (body, sans)
  */
 
 @theme inline {
-  --font-display: "Fraunces", "Source Serif Pro", Georgia, serif;
-  --font-sans: "Inter", "Helvetica Neue", system-ui, sans-serif;
-  --font-script: "Allura", "Pinyon Script", cursive;
-  --font-condensed: "Roboto Condensed", "Inter", sans-serif;
+  --font-display: "Merriweather", "Source Serif Pro", Georgia, serif;
+  --font-sans: "Poppins", "Helvetica Neue", system-ui, sans-serif;
+  --font-script: "Merriweather", Georgia, serif;
+  --font-condensed: "Poppins", "Inter", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -55,59 +55,60 @@
 :root {
   --radius: 0.25rem;
 
-  --background: oklch(1 0 0);
-  --paper: oklch(0.985 0.003 90);
-  --foreground: oklch(0.22 0.02 250);
-  --ink: oklch(0.18 0.025 255);
+  /* Cream White #F7F3EA backgrounds, deep ink for body text */
+  --background: oklch(0.98 0.012 90);
+  --paper: oklch(0.955 0.022 88);     /* Wheat Beige #EFE6D3 */
+  --foreground: oklch(0.25 0.02 145);
+  --ink: oklch(0.22 0.03 145);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 250);
+  --card-foreground: oklch(0.25 0.02 145);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.02 250);
+  --popover-foreground: oklch(0.25 0.02 145);
 
-  /* Deep navy (nav bar / headings) */
-  --navy: oklch(0.255 0.04 255);
-  --primary: oklch(0.255 0.04 255);
+  /* Deep Forest Green #2E5130 — nav bar / primary surfaces */
+  --navy: oklch(0.36 0.07 145);
+  --primary: oklch(0.42 0.085 145);   /* Agriculture Green #356B3A */
   --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.96 0.005 250);
-  --secondary-foreground: oklch(0.22 0.02 250);
+  --secondary: oklch(0.95 0.025 90);
+  --secondary-foreground: oklch(0.25 0.02 145);
 
-  --muted: oklch(0.95 0.005 250);
-  --muted-foreground: oklch(0.5 0.02 250);
+  --muted: oklch(0.94 0.02 90);
+  --muted-foreground: oklch(0.48 0.02 145);
 
-  /* Orange accent (Special Issue button, links) */
-  --orange: oklch(0.7 0.18 55);
-  --accent: oklch(0.7 0.18 55);
-  --accent-foreground: oklch(1 0 0);
+  /* Harvest Gold #C89B3C — accent / CTAs */
+  --orange: oklch(0.71 0.135 80);
+  --accent: oklch(0.71 0.135 80);
+  --accent-foreground: oklch(0.22 0.03 145);
 
-  /* Brick-red (top-bar phone) */
-  --brick: oklch(0.6 0.21 30);
-  /* Leaf green (logo accent) */
-  --leaf: oklch(0.55 0.15 145);
+  /* Earth Brown #8A623B — secondary highlight */
+  --brick: oklch(0.5 0.085 60);
+  /* Agriculture Green #356B3A — leaf accent */
+  --leaf: oklch(0.42 0.085 145);
 
-  --destructive: oklch(0.6 0.21 30);
+  --destructive: oklch(0.55 0.2 30);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.9 0.01 250);
-  --rule: oklch(0.88 0.01 250);
-  --input: oklch(0.9 0.01 250);
-  --ring: oklch(0.7 0.18 55);
+  --border: oklch(0.88 0.02 90);
+  --rule: oklch(0.85 0.025 90);
+  --input: oklch(0.88 0.02 90);
+  --ring: oklch(0.71 0.135 80);
 
-  --chart-1: oklch(0.255 0.04 255);
-  --chart-2: oklch(0.7 0.18 55);
-  --chart-3: oklch(0.55 0.15 145);
-  --chart-4: oklch(0.6 0.21 30);
-  --chart-5: oklch(0.5 0.04 250);
+  --chart-1: oklch(0.42 0.085 145);
+  --chart-2: oklch(0.71 0.135 80);
+  --chart-3: oklch(0.36 0.07 145);
+  --chart-4: oklch(0.5 0.085 60);
+  --chart-5: oklch(0.6 0.08 130);
 
-  --sidebar: oklch(0.985 0.003 90);
-  --sidebar-foreground: oklch(0.22 0.02 250);
-  --sidebar-primary: oklch(0.255 0.04 255);
+  --sidebar: oklch(0.955 0.022 88);
+  --sidebar-foreground: oklch(0.25 0.02 145);
+  --sidebar-primary: oklch(0.36 0.07 145);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.96 0.005 250);
-  --sidebar-accent-foreground: oklch(0.22 0.02 250);
-  --sidebar-border: oklch(0.9 0.01 250);
-  --sidebar-ring: oklch(0.7 0.18 55);
+  --sidebar-accent: oklch(0.95 0.025 90);
+  --sidebar-accent-foreground: oklch(0.25 0.02 145);
+  --sidebar-border: oklch(0.88 0.02 90);
+  --sidebar-ring: oklch(0.71 0.135 80);
 }
 
 .dark {
