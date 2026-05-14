@@ -8,7 +8,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/submit")({
   component: Submit,
-  head: () => ({ meta: [{ title: "Submit Article — Agripop" }] }),
+  head: () => ({ meta: [{ title: "Submit Article — The Agriculture Popular Article Magazine" }] }),
 });
 
 const schema = z.object({

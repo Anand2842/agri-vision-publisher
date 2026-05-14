@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
-  head: () => ({ meta: [{ title: "Author Dashboard — Agripop" }] }),
+  head: () => ({ meta: [{ title: "Author Dashboard — The Agriculture Popular Article Magazine" }] }),
 });
 
 type Submission = { id: string; title: string; status: string; plan: string; created_at: string };

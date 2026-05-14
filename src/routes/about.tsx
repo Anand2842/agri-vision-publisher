@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/about")({
   component: About,
   head: () => ({ meta: [
-    { title: "About — Agripop" },
-    { name: "description", content: "About Agripop — mission, vision and history." },
+    { title: "About — The Agriculture Popular Article Magazine" },
+    { name: "description", content: "About The Agriculture Popular Article Magazine — mission, vision and history." },
   ] }),
 });
 
@@ -31,7 +31,7 @@ function About() {
         <div className="grid md:grid-cols-12 gap-12 mt-16">
           <div className="md:col-span-7 space-y-10 text-foreground/80 leading-[1.8]">
             <p className="drop-cap text-lg">
-              Agripop exists because the world's most important industry — feeding eight billion people on a warming planet — deserves a publishing platform built for the next century, not the last one. We sit between the academic journal and the trade magazine: rigorous enough for research, accessible enough for the field officer.
+              The Agriculture Popular Article Magazine exists because the world's most important industry — feeding eight billion people on a warming planet — deserves a publishing platform built for the next century, not the last one. We sit between the academic journal and the trade magazine: rigorous enough for research, accessible enough for the field officer.
             </p>
             <p>
               Every article we publish has been reviewed by at least two specialists in its sub-field. Authors retain copyright. Readers pay nothing. Institutions and members support the work that makes the magazine possible.

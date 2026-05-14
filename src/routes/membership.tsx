@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
 export const Route = createFileRoute("/membership")({
   component: Membership,
   head: () => ({ meta: [
-    { title: "Membership & Pricing — Agripop" },
+    { title: "Membership & Pricing — The Agriculture Popular Article Magazine" },
     { name: "description", content: "Single article, annual, lifetime and institutional membership plans." },
   ] }),
 });

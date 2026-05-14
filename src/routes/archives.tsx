@@ -7,8 +7,8 @@ import { useEffect, useMemo, useState } from "react";
 export const Route = createFileRoute("/archives")({
   component: Archives,
   head: () => ({ meta: [
-    { title: "Archives — Agripop" },
-    { name: "description", content: "Browse the full archive of Agripop issues." },
+    { title: "Archives — The Agriculture Popular Article Magazine" },
+    { name: "description", content: "Browse the full archive of The Agriculture Popular Article Magazine issues." },
   ] }),
 });
 

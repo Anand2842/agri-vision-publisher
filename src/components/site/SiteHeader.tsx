@@ -54,7 +54,7 @@ export function SiteHeader() {
             <Link to="/about" className="hover:text-orange transition-colors hidden sm:inline">About</Link>
             <Link to="/contact" className="hover:text-orange transition-colors hidden sm:inline">Contact</Link>
             <span className="hidden sm:inline w-px h-4 bg-white/20" />
-            <a href="mailto:editor@agripop.org" aria-label="Email" className="hover:text-orange"><Mail className="h-3.5 w-3.5" /></a>
+            <a href="mailto:editor@agriculturepopular.com" aria-label="Email" className="hover:text-orange"><Mail className="h-3.5 w-3.5" /></a>
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@ export function SiteHeader() {
       {/* Logo + search + Special Issue */}
       <div className="container-editorial flex items-center justify-between gap-6 py-4 md:py-5">
         <Link to="/" className="flex items-center gap-3 shrink-0">
-          <img src={logo} alt="Agripop" width={140} height={140} className="h-14 md:h-20 w-auto" />
+          <img src={logo} alt="The Agriculture Popular Article Magazine" width={140} height={140} className="h-14 md:h-20 w-auto" />
         </Link>
 
         <form
