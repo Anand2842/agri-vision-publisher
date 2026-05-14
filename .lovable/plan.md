@@ -1,97 +1,117 @@
-# Focused Cleanup Pass — Data Wiring, Nav, Brand
+# Gap analysis: brand doc vs current build
 
-One pass that makes the public site honest: real DB data flowing end‑to‑end, no dead nav links, one brand name, one ISSN.
+Below is everything in `dangi_magazine.docx` that is **not yet** reflected in the site, grouped by priority. Copy + factual content first, payment + uploads second, polish last.
 
----
+## P0 — Wrong or missing facts
 
-## 1. Database — add the missing foreign keys
+### 1. About page → replace stock copy with real journal particulars
+Current `/about` shows invented founding-year text and a fake 2022–2026 timeline. Replace with the doc's three blocks:
 
-Today `articles`, `issues`, and `submissions` have **zero foreign keys**, so PostgREST embedded selects (`categories(name)`, `profiles(full_name,…)`) return HTTP 400 and the site silently falls back to mock data.
+- **About Us** paragraphs (4 paragraphs, pages 3–4)
+- **Vision** + **Mission** (6 mission bullets — disseminate / highlight / bridge / support / encourage / strengthen)
+- **Journal Particulars** table:
+  - Title: The Agriculture Popular Article Magazine
+  - Frequency: Monthly · ISSN: pending · Subject: Agriculture · Language: English / Hindi · Format: Online · Starting Year: 2026
+  - Publisher: **Ram Mangalam Agri – Rural Development Foundation (RADF)**
+  - Chief Editor: **Dr. Dileep Kumar**
+  - Address: ICAR-RRS-CAZRI, Jaisalmer 345001 · Mobile: +91 95091 64410
 
-Migration adds:
+Drop the invented timeline.
 
-- `articles.author_id → profiles.id` (on delete set null)
-- `articles.category_id → categories.id` (on delete set null)
-- `articles.issue_id → issues.id` (on delete set null)
-- `submissions.user_id → profiles.id` (on delete cascade)
-- `submissions.category_id → categories.id` (on delete set null)
+### 2. Editorial Board → swap mock people for the real masthead
+`src/lib/mock-data.ts` currently lists invented names. Replace `editorialBoard` and `reviewers` with the doc's actual roster:
 
-No data changes, no RLS changes — just constraints so PostgREST can resolve the joins already in `src/lib/data.ts`.
+- **Editor-in-Chief / Founder & Managing Editor:** Dr. Dileep Kumar (S.K.R.A.U. Bikaner; Senior Scientist, ICAR-RRS-CAZRI Jaisalmer)
+- **International Editors (4):** Dr. Dilip Kumar Jha (AFU, Nepal), Dr. Chamindri Withranga (Univ. of Colombo, Sri Lanka), Dr. Punya Prasad Regmi (VC, AFU, Nepal), Talata Colombo (Sri Lanka)
+- **Associate Editors:** Dr. R.S. Mehta (CAZRI-RRS Jaisalmer), Dr. Deepak Chaturvedi, Dr. Charu Sharma (KVK Jaisalmer), Dr. Manish Kanwat (CAZRI-RRS Bhuj), Dr. B.L. Manjunatha (CAZRI Jodhpur), Akansha Joshi (GBPUA&T Pantnagar), Dr. Rajiv Baliram Kale (ICAR-DOGR Pune), Dr. Nanda Kumar S, Dr. MotiLal Meena (KVK Pali), Dr. Letngam Touthang, Dr. Dasharath Prasad (KVK SKRAU)
+- **Reviewers (~24):** Atul Galav, Dr. Babaloo Sharma, Dr. Gajendra Singh, Dr. Anil Patidar, Gorav Singh, Dr. Ajaya Thakan, Lalit Godara, Roshan Lal Meena, Balveer, Himanshu, Rudraksh, Rahul, Dr. Bhagwan Singh, Dr. Charu Sharma, Dr. Ramniwas (KVK Pokaran), Dr. Ramniwas (NRC Pomegranate), Dr. SC Meena, Dr. Permendra, Dr. Hardev, Dr. Rajkumar Yogi, Dr. Sheran K., Dr. Ashok Yadav, Dr. Sativeer Dangi, Dr. Leela Ram Sandhu, Dr. Arvind Jhajharia, Dr. Sonalika Mahajan, Dr. Paumpi Paul, Viklas Chandra Gautam, Dr. Nanda Kumar S
+- **Add a new section: International Advisory Committee** (17 members — Dr. Pema Gyamtsho ICIMOD, Dr. Karim Maredia MSU, Dr. P. Das ICAR, Dr. Rajbir Singh ICAR, Dr. B.N. Tripathi SKUAST-Jammu, Dr. Nazir Ahmad Ganai SKUAST-Srinagar, Dr. K.D. Kokate, Dr. Arjun Kumar Shrestha AFU Nepal, Dr. Inderjeet Singh BASU Patna, Dr. P.K. Ghosh Visva-Bharati, Dr. S.K. Dwivedi DRDO, Prof. S.V. Reddy PRDIS, Dr. V.V. Sadamate, Dr. Tirtha Raj Regmi Heifer Nepal, Suresh Chandra Babu IFPRI, Shiva Sundar Shrestha NAF, Dr. Ramjee P. Ghimire MSU)
 
-## 2. Wire the remaining pages to live data
+### 3. Membership → pricing is wrong
+Current plans (₹500 / ₹2,500 / ₹15,000 / ₹40,000) do not match the doc. Replace with:
 
-`src/lib/data.ts` is the live source of truth. Three pages still import `@/lib/mock-data` directly:
+| Plan | Price | Validity |
+|---|---|---|
+| Single Article | ₹200 | 1 article |
+| Annual | ₹500 | 8 articles or 12 months |
+| Lifetime | ₹2,000 | 5 years |
+| Institute / Library | ₹5,000 | 5 years |
 
-- `src/routes/index.tsx` → use `fetchPublishedArticles(limit)` for the article rails; keep `stats` as a static block (it's marketing copy, not data).
-- `src/routes/editorial-board.tsx` → keep mock for now (no `editorial_board` table exists yet — out of scope for this pass; note in comments).
-- `src/routes/startup-spotlight.tsx` → keep mock for now (no table) — but **remove the orphan from nowhere‑linked status by either (a) leaving it unlinked or (b) noted as future work**. Out of scope for this pass.
+Also state explicitly: **annual members publish for free**; non-member co-authors / non-member authors pay a publication fee (per doc §3).
 
-After step 1's FKs land, the existing query syntax will start returning rows.
+### 4. Contact → wrong office, missing publisher block
+Current `/contact` shows a fake Pusa Delhi address and `editor@agriculturepopular.com`. Replace with:
 
-## 3. Header navigation cleanup
+- Dr. Dileep Kumar Dangi · Senior Scientist (Agriculture Extension) · ICAR-RRS-CAZRI, Jaisalmer 345001
+- Phone: 9509164410 · Email: **dkdkdangi@gmail.com**
+- Hours: Mon–Sat 08:00–20:00 IST
+- Add a **Publisher** block under the form: Ram Mangalam Agri – Rural Development Foundation (R.A.D.F.), Ajmer Road, Hirapura, Jaipur, India · +91 9509164410 · dkdkdangi@gmail.com
+- Add an **Advertise** block (verbatim from doc page 17): "Agro-based industrial and other allied sectors can advertise in The Agriculture Popular Article Magazine" + same email/phone.
 
-Edit `src/components/site/SiteHeader.tsx`:
+### 5. Submission Guidelines → rewrite to doc's 7 sections
+Replace the generic 4 sections with the doc's structure:
+1. Editorial & Review Process
+2. Membership Requirements (annual membership required for all authors; member ID + certificate issued)
+3. Publication Fees (annual members free; non-member co-authors/authors pay)
+4. Submission Requirements (Word .doc/.docx only · 2–4 pages · introduction + conclusion · monthly deadline)
+5. Formatting (Title TNR 14pt bold · Author details TNR 12pt · Corresp. email TNR 12pt bold · Headings TNR 14pt bold · Subheadings 12pt bold · Body 12pt · SI units · IUB/IUPAC abbreviations)
+6. Originality & Plagiarism
+7. Publication & Access (PDF emailed + downloadable from site; submit to dkdkdangi@gmail.com or via "Submit Article Online")
 
-- Remove fake nav entries: drop **"Advertise" → /contact**, **"Events" → /about**, **"Volume (05) Issue (07), Feb 2026"** hardcoded label.
-- Replace Archives dropdown's fake Volume 1–5 children with a single "Browse Archives" link to `/archives` (real per‑issue pages are a separate effort).
-- Replace Publication dropdown's duplicated children with one entry: "Author Guidelines" → `/submission-guidelines`, "Submit Article" → `/submit`, "Membership & Fees" → `/membership`. Drop "Payment".
-- Social icons (`href="#"` × 4): remove from header until real URLs exist. Cleaner than dead links.
+### 6. Footer / Header brand strip
+Footer currently links to fake `editor@agriculturepopular.com`. Update across header utility bar + footer to **dkdkdangi@gmail.com** and **+91 9509164410**.
 
-## 4. Brand name + ISSN unification
+## P1 — Functional gaps
 
-Pick **one** canonical name. Recommendation: **"Agripop"** (shorter, already used in 8 of 12 head titles, matches the project tone).
+### 7. Submit form → doc requires .doc/.docx upload
+Current `/submit` only accepts pasted text. The doc explicitly says "Articles must be submitted in Microsoft Word format (.doc/.docx). Submissions without the prescribed format will be rejected."
 
-- Sweep `src/routes/*.tsx`, `src/components/site/SiteFooter.tsx`, `src/components/site/SiteHeader.tsx`: replace every "The Agriculture Magazine" / "The Agriculture Popular Article Magazine" mention in titles, headings, footer brand, citation strings, og:title with **"Agripop"** (tagline "Peer‑Reviewed Open Access Monthly" stays).
-- Footer brand → "Agripop".
-- ISSN: footer says `2980-2222`, current‑issue page says `2583-XXXX` (a placeholder). Until a real ISSN exists, **remove the ISSN line entirely** from both surfaces. Better to show nothing than fake data.
+- Create a Supabase Storage bucket `manuscripts` (private; RLS so only owner + admins/moderators can read).
+- Add a file input to `/submit`, upload to `manuscripts/<user_id>/<submission_id>.docx`, store the path on `submissions.notes` or add a `manuscript_path text` column.
+- Restrict accept=".doc,.docx" + 10 MB cap.
 
-## Out of scope (deliberately)
+### 8. Payments → 4 Razorpay plans + bank/NEFT + PhonePe QR
+Doc shows "Pay Now — Secured by Razorpay" buttons on each membership card and a manual bank/NEFT block:
 
-- Per‑issue route (`/issues/$id`)
-- Author file uploads on `/submit`
-- Stripe / payment on `/membership`
-- Google OAuth + password reset on `/auth`
-- Privacy / Terms / Advertise / Events pages
-- `editorial_board` and `startups` tables
-- Toast feedback for clipboard buttons
-- Tightening the `profiles` public‑read RLS policy
+- A/c Holder: Dileep Kumar · A/c No. 32971942417 · SBI · IFSC SBIN0003877 · Branch SBI Main Jaisalmer
+- PhonePe QR (scan & pay) on +91 9509164410
 
-These are real, but each is its own focused pass. Lumping them in here turns one clean PR into a sprawl.
+Two paths — pick one before building:
 
----
+- **Path A (recommended):** wire Razorpay properly via a server function that creates an order (needs `RAZORPAY_KEY_ID` + `RAZORPAY_KEY_SECRET` secrets) and a webhook at `/api/public/webhooks/razorpay` to mark `payments` rows paid.
+- **Path B (no integration yet):** ship a static "Bank transfer / PhonePe QR / Razorpay coming soon" panel on `/membership` that mirrors the doc verbatim, and collect the transaction screenshot through the contact form. Faster, no secrets needed.
 
-## Technical notes
+### 9. Seed real Volume 1 Issue 1 (Jan 2026)
+DB is empty. Doc lists the actual launch issue articles (pages 18–37):
 
-**Migration SQL shape:**
-```sql
-ALTER TABLE public.articles
-  ADD CONSTRAINT articles_author_id_fkey
-    FOREIGN KEY (author_id) REFERENCES public.profiles(id) ON DELETE SET NULL,
-  ADD CONSTRAINT articles_category_id_fkey
-    FOREIGN KEY (category_id) REFERENCES public.categories(id) ON DELETE SET NULL,
-  ADD CONSTRAINT articles_issue_id_fkey
-    FOREIGN KEY (issue_id) REFERENCES public.issues(id) ON DELETE SET NULL;
+1. Dynamics of E-Learning — D. Kumar, R.S. Mehta, Shiran K., S.C. Meena (CAZRI Jaisalmer)
+2. Importance of MIS for Managing Agriculture in Thar Desert
+3. Conceptual Framework of Information Kiosk in Western Rajasthan
+4. Agriculture Knowledge Information System (AKIS) for Western Rajasthan
+5. Contract Farming for Remunerative Prices of Jeera, Isabgoal & Pomegranate in Western Rajasthan
+6. ICT in arid-zone agriculture (Thar Desert)
 
-ALTER TABLE public.submissions
-  ADD CONSTRAINT submissions_user_id_fkey
-    FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE,
-  ADD CONSTRAINT submissions_category_id_fkey
-    FOREIGN KEY (category_id) REFERENCES public.categories(id) ON DELETE SET NULL;
+Insert: 1 row in `issues` (volume 1, issue 1, "January 2026"), 6 rows in `articles` linked to that issue, 1 author profile (`profiles` row for Dr. Dileep Kumar). Categories already covered by current taxonomy.
 
-CREATE INDEX IF NOT EXISTS idx_articles_author_id   ON public.articles(author_id);
-CREATE INDEX IF NOT EXISTS idx_articles_category_id ON public.articles(category_id);
-CREATE INDEX IF NOT EXISTS idx_articles_issue_id    ON public.articles(issue_id);
-CREATE INDEX IF NOT EXISTS idx_submissions_user_id  ON public.submissions(user_id);
+## P2 — Polish
+
+- **Homepage:** show "Volume 1 · Issue 1 · January 2026" pulled from DB instead of hardcoded copy; small publisher line "Published by Ram Mangalam Agri – Rural Development Foundation".
+- **Logo placement:** doc page 14 also references the **RADF publisher logo** (separate from the magazine seal). If the user has it, add it to the footer's publisher block; if not, use the magazine seal there too.
+- **ISSN line:** doc has it blank. Keep ISSN out of the UI until it is assigned.
+- **Mobile no:** unify everywhere to `+91 9509164410` (header utility bar currently shows `+91-9928123930`).
+
+## Suggested execution order (one PR per group)
+
+```text
+1. Content + brand sweep        (P0 #1, #2, #3, #4, #5, #6)
+2. Submit upload + manuscripts  (P1 #7 + storage migration)
+3. Seed Volume 1 Issue 1        (P1 #9 — migration with 6 articles)
+4. Payments                     (P1 #8 — choose Path A or B)
+5. Homepage polish              (P2)
 ```
 
-**Files touched:**
-- `supabase/migrations/<new>.sql` — FKs + indexes
-- `src/routes/index.tsx` — fetchPublishedArticles wiring
-- `src/components/site/SiteHeader.tsx` — nav + social cleanup, brand
-- `src/components/site/SiteFooter.tsx` — brand + ISSN removal
-- `src/routes/__root.tsx`, `auth.tsx`, `about.tsx`, `submit.tsx`, `submission-guidelines.tsx`, `membership.tsx`, `dashboard.tsx`, `search.tsx`, `archives.tsx`, `contact.tsx`, `current-issue.tsx`, `articles.$slug.tsx`, `index.tsx` — brand + ISSN sweep
+## Decisions needed before I build
 
-**Verification after build:**
-- Open `/` → network tab shows the `/rest/v1/articles?...` call returning **200** with rows (or empty array, not 400).
-- Header shows: Home / Editorial Board / Current Issue / Archives / Submission / Publication / About / Contact. No "Advertise", "Events", or hardcoded volume label.
-- Footer + every `<title>` says "Agripop". No "2980‑2222" or "2583‑XXXX" anywhere.
+1. **Payments now or later?** Path A (Razorpay live) requires the user's `RAZORPAY_KEY_ID` + `RAZORPAY_KEY_SECRET`. Path B ships static bank/QR/Razorpay-soon copy.
+2. **Editorial Board photos:** the doc has portrait JPEGs for ~12 people. Embed them, or keep current initials-only cards?
+3. **Seed Volume 1 articles:** insert just titles + abstracts now, or wait until full PDFs are uploaded?
