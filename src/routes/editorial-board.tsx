@@ -7,11 +7,11 @@ export const Route = createFileRoute("/editorial-board")({
   component: Board,
   head: () => ({
     meta: [
-      { title: "Editorial Board — Agripop" },
+      { title: "Editorial Board — The Agriculture Popular Article Magazine" },
       {
         name: "description",
         content:
-          "The editorial board, content editors and reviewers behind Agripop — scientists from leading agricultural universities and research institutes across India and abroad.",
+          "The editorial board, content editors and reviewers behind The Agriculture Popular Article Magazine — scientists from leading agricultural universities and research institutes across India and abroad.",
       },
     ],
   }),

@@ -8,7 +8,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/auth")({
   component: Auth,
-  head: () => ({ meta: [{ title: "Sign in — Agripop" }] }),
+  head: () => ({ meta: [{ title: "Sign in — The Agriculture Popular Article Magazine" }] }),
 });
 
 const schema = z.object({
@@ -58,7 +58,7 @@ function Auth() {
     <>
       <SiteHeader />
       <main className="container-editorial py-20 max-w-md">
-        <div className="eyebrow">{mode === "signin" ? "Welcome back" : "Join Agripop"}</div>
+        <div className="eyebrow">{mode === "signin" ? "Welcome back" : "Join The Agriculture Popular Article Magazine"}</div>
         <h1 className="font-display text-4xl mt-3 text-ink">{mode === "signin" ? "Sign in" : "Create your account"}</h1>
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
           {mode === "signup" && (

@@ -1,14 +1,21 @@
 import { Link } from "@tanstack/react-router";
+import logo from "@/assets/logo.png";
 
 export function SiteFooter() {
   return (
     <footer className="mt-0 bg-navy text-white">
       <div className="container-editorial py-16 grid grid-cols-2 md:grid-cols-5 gap-10">
         <div className="col-span-2">
-          <div className="font-display text-2xl">Agripop</div>
-          <p className="text-sm text-white/70 mt-3 max-w-xs leading-relaxed">
-            A peer-reviewed, open access monthly magazine advancing agriculture through knowledge, innovation and research.
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="" width={56} height={56} className="h-14 w-14 shrink-0" loading="lazy" />
+            <div className="font-display text-xl leading-tight">The Agriculture Popular<br/>Article Magazine</div>
+          </div>
+          <p className="text-sm text-white/70 mt-4 max-w-xs leading-relaxed">
+            A peer-reviewed, open-access monthly magazine advancing agriculture through knowledge, innovation, sustainability and community.
           </p>
+          <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-[10px] uppercase tracking-[0.18em] text-orange font-semibold">
+            <span>Knowledge</span><span>·</span><span>Innovation</span><span>·</span><span>Sustainability</span><span>·</span><span>Community</span>
+          </div>
         </div>
         <FooterCol title="Magazine" links={[["Current Issue","/current-issue"],["Archives","/archives"],["Editorial Board","/editorial-board"],["About","/about"]]} />
         <FooterCol title="Authors" links={[["Submit Article","/submit"],["Submission Guidelines","/submission-guidelines"],["Membership","/membership"],["Author Dashboard","/dashboard"]]} />
@@ -16,7 +23,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-white/10">
         <div className="container-editorial py-6 flex flex-col md:flex-row justify-between text-xs text-white/60 gap-2">
-          <div>© {new Date().getFullYear()} Agripop. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} The Agriculture Popular Article Magazine. All rights reserved.</div>
           <div>Published monthly · Peer reviewed · Open access</div>
         </div>
       </div>

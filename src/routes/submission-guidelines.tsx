@@ -5,8 +5,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/submission-guidelines")({
   component: Guidelines,
   head: () => ({ meta: [
-    { title: "Submission Guidelines — Agripop" },
-    { name: "description", content: "How to submit your article to Agripop magazine." },
+    { title: "Submission Guidelines — The Agriculture Popular Article Magazine" },
+    { name: "description", content: "How to submit your article to The Agriculture Popular Article Magazine magazine." },
   ] }),
 });
 

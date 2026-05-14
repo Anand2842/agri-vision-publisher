@@ -9,11 +9,11 @@ export const Route = createFileRoute("/current-issue")({
   component: CurrentIssue,
   head: () => ({
     meta: [
-      { title: "Current Issue — Agripop" },
+      { title: "Current Issue — The Agriculture Popular Article Magazine" },
       {
         name: "description",
         content:
-          "Read or download the latest peer-reviewed issue of Agripop.",
+          "Read or download the latest peer-reviewed issue of The Agriculture Popular Article Magazine.",
       },
     ],
   }),
@@ -122,7 +122,7 @@ function CurrentIssue() {
                   How to cite
                 </div>
                 <p className="mt-2 text-xs text-foreground/65 font-mono leading-relaxed">
-                  Agripop, Vol. {issue.volume}, Iss. {issue.number} ({issue.date}).
+                  The Agriculture Popular Article Magazine, Vol. {issue.volume}, Iss. {issue.number} ({issue.date}).
                 </p>
               </div>
             </aside>

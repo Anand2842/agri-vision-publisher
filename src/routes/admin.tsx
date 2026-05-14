@@ -7,7 +7,7 @@ import { LayoutGrid, BookOpen, FileText, FolderTree, Inbox } from "lucide-react"
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
-  head: () => ({ meta: [{ title: "Admin — Agripop" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin — The Agriculture Popular Article Magazine" }, { name: "robots", content: "noindex" }] }),
 });
 
 const items = [

@@ -10,8 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/contact")({
   component: Contact,
   head: () => ({ meta: [
-    { title: "Contact — Agripop" },
-    { name: "description", content: "Reach the editorial office of Agripop." },
+    { title: "Contact — The Agriculture Popular Article Magazine" },
+    { name: "description", content: "Reach the editorial office of The Agriculture Popular Article Magazine." },
   ] }),
 });
 
@@ -49,7 +49,7 @@ function Contact() {
               For author queries, advertising and general correspondence. Editorial decisions are typically returned within 21 days.
             </p>
             <ul className="mt-10 space-y-5 text-sm">
-              <li className="flex gap-3"><Mail className="h-4 w-4 mt-1 text-primary" /> editor@agripop.org</li>
+              <li className="flex gap-3"><Mail className="h-4 w-4 mt-1 text-primary" /> editor@agriculturepopular.com</li>
               <li className="flex gap-3"><Phone className="h-4 w-4 mt-1 text-primary" /> +91 11 2345 6789</li>
               <li className="flex gap-3"><MessageCircle className="h-4 w-4 mt-1 text-primary" /> WhatsApp: +91 98765 43210</li>
               <li className="flex gap-3"><MapPin className="h-4 w-4 mt-1 text-primary" /> Plot 14, Pusa Campus, New Delhi 110012, India</li>

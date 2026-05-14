@@ -5,7 +5,7 @@ import { startups } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/startup-spotlight")({
   component: Spotlight,
-  head: () => ({ meta: [{ title: "Startup Spotlight — Agripop" }] }),
+  head: () => ({ meta: [{ title: "Startup Spotlight — The Agriculture Popular Article Magazine" }] }),
 });
 
 function Spotlight() {
