@@ -63,6 +63,11 @@ export function SiteHeader() {
       <div className="container-editorial flex items-center justify-between gap-6 py-4 md:py-5">
         <Link to="/" className="flex items-center gap-3 shrink-0">
           <img src={logo} alt="The Agriculture Popular Article Magazine" width={140} height={140} className="h-14 md:h-20 w-auto" />
+          <div className="hidden sm:block leading-tight">
+            <div className="font-display font-bold text-navy text-base md:text-lg">The Agriculture</div>
+            <div className="font-display font-bold text-navy text-base md:text-lg -mt-1">Popular Article Magazine</div>
+            <div className="text-[10px] uppercase tracking-[0.18em] text-orange font-semibold mt-1">Knowledge · Innovation · Sustainability</div>
+          </div>
         </Link>
 
         <form
