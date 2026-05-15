@@ -218,6 +218,7 @@ export type Database = {
           created_at: string
           id: string
           keywords: string | null
+          manuscript_path: string | null
           notes: string | null
           plan: Database["public"]["Enums"]["membership_plan"]
           status: Database["public"]["Enums"]["submission_status"]
@@ -232,6 +233,7 @@ export type Database = {
           created_at?: string
           id?: string
           keywords?: string | null
+          manuscript_path?: string | null
           notes?: string | null
           plan?: Database["public"]["Enums"]["membership_plan"]
           status?: Database["public"]["Enums"]["submission_status"]
@@ -246,6 +248,7 @@ export type Database = {
           created_at?: string
           id?: string
           keywords?: string | null
+          manuscript_path?: string | null
           notes?: string | null
           plan?: Database["public"]["Enums"]["membership_plan"]
           status?: Database["public"]["Enums"]["submission_status"]
