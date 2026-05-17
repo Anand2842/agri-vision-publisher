@@ -19,11 +19,19 @@ export function SiteFooter() {
         </div>
         <FooterCol title="Magazine" links={[["Current Issue","/current-issue"],["Archives","/archives"],["Editorial Board","/editorial-board"],["About","/about"]]} />
         <FooterCol title="Authors" links={[["Submit Article","/submit"],["Submission Guidelines","/submission-guidelines"],["Membership","/membership"],["Author Dashboard","/dashboard"]]} />
-        <FooterCol title="Editorial Office" links={[["Contact","/contact"]]} />
+        <div>
+          <div className="eyebrow mb-4 text-white/50">Editorial Office</div>
+          <ul className="space-y-2 text-sm text-white/80">
+            <li>Dr. Dileep Kumar</li>
+            <li className="text-white/60">ICAR–RRS–CAZRI, Jaisalmer 345001</li>
+            <li><a href="tel:+919509164410" className="hover:text-orange">+91 9509164410</a></li>
+            <li><a href="mailto:dkdkdangi@gmail.com" className="hover:text-orange break-all">dkdkdangi@gmail.com</a></li>
+          </ul>
+        </div>
       </div>
       <div className="border-t border-white/10">
         <div className="container-editorial py-6 flex flex-col md:flex-row justify-between text-xs text-white/60 gap-2">
-          <div>© {new Date().getFullYear()} The Agriculture Popular Article Magazine. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} The Agriculture Popular Article Magazine. Published by Ram Mangalam Agri – Rural Development Foundation.</div>
           <div>Published monthly · Peer reviewed · Open access</div>
         </div>
       </div>

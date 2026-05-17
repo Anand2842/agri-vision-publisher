@@ -45,16 +45,18 @@ export function SiteHeader() {
       {/* Utility bar */}
       <div className="bg-navy text-white text-xs">
         <div className="container-editorial flex items-center justify-between h-9">
-          <a href="tel:+919928123930" className="flex items-center gap-2 text-brick font-medium">
+          <a href="tel:+919509164410" className="flex items-center gap-2 text-orange font-medium">
             <Phone className="h-3.5 w-3.5" />
-            +91-9928123930
+            +91 9509164410
           </a>
           <div className="flex items-center gap-5">
             <Link to="/" className="hover:text-orange transition-colors hidden sm:inline">Home</Link>
             <Link to="/about" className="hover:text-orange transition-colors hidden sm:inline">About</Link>
             <Link to="/contact" className="hover:text-orange transition-colors hidden sm:inline">Contact</Link>
             <span className="hidden sm:inline w-px h-4 bg-white/20" />
-            <a href="mailto:editor@agriculturepopular.com" aria-label="Email" className="hover:text-orange"><Mail className="h-3.5 w-3.5" /></a>
+            <a href="mailto:dkdkdangi@gmail.com" aria-label="Email" className="hover:text-orange flex items-center gap-1.5">
+              <Mail className="h-3.5 w-3.5" /><span className="hidden sm:inline">dkdkdangi@gmail.com</span>
+            </a>
           </div>
         </div>
       </div>

@@ -110,98 +110,102 @@ export const articles: Article[] = [
   },
 ];
 
+import dileepKumar from "@/assets/board/dileep-kumar.jpg";
+import rsMehta from "@/assets/board/rs-mehta.jpg";
+import deepakChaturvedi from "@/assets/board/deepak-chaturvedi.jpg";
+import charuSharma from "@/assets/board/charu-sharma.jpg";
+import manishKanwat from "@/assets/board/manish-kanwat.jpg";
+import blManjunatha from "@/assets/board/bl-manjunatha.jpg";
+import akanshaJoshi from "@/assets/board/akansha-joshi.jpg";
+import rajivKale from "@/assets/board/rajiv-kale.jpg";
+import nandaKumar from "@/assets/board/nanda-kumar.jpg";
+import motilalMeena from "@/assets/board/motilal-meena.jpg";
+import letngamTouthang from "@/assets/board/letngam-touthang.jpg";
+import dasharathPrasad from "@/assets/board/dasharath-prasad.jpg";
+
 export type BoardMember = {
   name: string;
   role: string;
   title?: string;
   inst: string;
   country?: string;
+  photo?: string;
 };
 
 export const editorialBoard: BoardMember[] = [
-  // Leadership
-  { name: "Dr. Kartikeya Choudhary", role: "Founder & Managing Editor", title: "Assistant Professor (Agronomy)", inst: "MS Swaminathan School of Agriculture, Shoolini University, Solan (H.P.)" },
-  { name: "Dr. Anoop Kumar Devedee", role: "Co-founder", title: "Assistant Professor, Division of Agronomy", inst: "Deen Dayal Upadhyay Gorakhpur University, Gorakhpur (U.P.)" },
-  { name: "Dr. Vijay Bharti", role: "Editor-in-Chief", title: "Professor (Agronomy), Water Management Research Centre", inst: "Sher-e-Kashmir University of Agri Sciences and Technology of Jammu (J&K)" },
-  { name: "Dr. Umesh Singh", role: "Associate Editor", title: "Assistant Professor (GPB)", inst: "DKS College of Agriculture and Research Station, Bhatapara, Chhattisgarh" },
-  { name: "Dr. Bisheswar Prasad Yadav", role: "International Editor", title: "Director, Directorate of Agricultural Research", inst: "Province-2, Parwanipur, Bara, Nepal" },
+  {
+    name: "Dr. Dileep Kumar",
+    role: "Editor-in-Chief",
+    title: "Founder & Managing Editor · Senior Scientist (Agriculture Extension)",
+    inst: "ICAR–RRS–CAZRI, Jaisalmer · S.K.R.A.U. Bikaner",
+    country: "India",
+    photo: dileepKumar,
+  },
+  { name: "Dr. Dilip Kumar Jha", role: "International Editor", title: "Faculty", inst: "Agriculture and Forestry University (AFU)", country: "Nepal" },
+  { name: "Dr. Punya Prasad Regmi", role: "International Editor", title: "Vice-Chancellor", inst: "Agriculture and Forestry University (AFU)", country: "Nepal" },
+  { name: "Dr. Chamindri Withranga", role: "International Editor", title: "Faculty", inst: "University of Colombo", country: "Sri Lanka" },
+  { name: "Talata Colombo", role: "International Editor", inst: "Sri Lanka", country: "Sri Lanka" },
+  { name: "Dr. R. S. Mehta", role: "Associate Editor", title: "Principal Scientist", inst: "ICAR–CAZRI Regional Research Station, Jaisalmer", photo: rsMehta },
+  { name: "Dr. Deepak Chaturvedi", role: "Associate Editor", inst: "ICAR–CAZRI, Jodhpur", photo: deepakChaturvedi },
+  { name: "Dr. Charu Sharma", role: "Associate Editor", title: "Subject Matter Specialist", inst: "Krishi Vigyan Kendra, Jaisalmer", photo: charuSharma },
+  { name: "Dr. Manish Kanwat", role: "Associate Editor", inst: "ICAR–CAZRI Regional Research Station, Bhuj", photo: manishKanwat },
+  { name: "Dr. B. L. Manjunatha", role: "Associate Editor", inst: "ICAR–CAZRI, Jodhpur", photo: blManjunatha },
+  { name: "Akansha Joshi", role: "Associate Editor", inst: "G.B. Pant University of Agriculture & Technology, Pantnagar", photo: akanshaJoshi },
+  { name: "Dr. Rajiv Baliram Kale", role: "Associate Editor", inst: "ICAR–Directorate of Onion and Garlic Research, Pune", photo: rajivKale },
+  { name: "Dr. Nanda Kumar S.", role: "Associate Editor", inst: "ICAR", photo: nandaKumar },
+  { name: "Dr. MotiLal Meena", role: "Associate Editor", inst: "Krishi Vigyan Kendra, Pali", photo: motilalMeena },
+  { name: "Dr. Letngam Touthang", role: "Associate Editor", inst: "ICAR", photo: letngamTouthang },
+  { name: "Dr. Dasharath Prasad", role: "Associate Editor", inst: "Krishi Vigyan Kendra, S.K.R.A.U.", photo: dasharathPrasad },
+];
 
-  // Editorial Board
-  { name: "Dr. R. K. Singh", role: "Editorial Board", title: "Professor, Department of Agronomy", inst: "Institute of Agricultural Sciences, Banaras Hindu University, Varanasi (U.P.)" },
-  { name: "Dr. A. V. Dahiphale", role: "Editorial Board", title: "Agronomist, Central Experimental Station", inst: "Wakawali, Dapoli, Ratnagiri, Maharashtra" },
-  { name: "Dr. Awani Kumar Singh", role: "Editorial Board", title: "Principal Scientist (Horticulture), CPCT", inst: "Indian Agricultural Research Institute, New Delhi" },
-  { name: "Dr. R. P. Sharma", role: "Editorial Board", title: "Senior Scientist — Soil Science", inst: "ICAR-NBSS & LUP, Nagpur, Maharashtra" },
-  { name: "Dr. Sandeep Kumar", role: "Editorial Board", title: "Scientist (Seed Production), University Seed Farm, Ladhowal", inst: "Punjab Agricultural University, Ludhiana" },
-  { name: "Dr. Sunil Kumar Verma", role: "Editorial Board", title: "Assistant Professor, Department of Agronomy", inst: "Institute of Agricultural Sciences, BHU, Varanasi (U.P.)" },
-  { name: "Dr. Alok Kumar", role: "Editorial Board", title: "Senior Horticulture Officer", inst: "National Horticulture Board, Gurugram, Haryana" },
-  { name: "Dr. O. P. Garhwal", role: "Editorial Board", title: "Associate Professor (Horticulture)", inst: "Rajasthan Agri. Research Institute, Durgapura (SKN Agri. University, Jobner)" },
-  { name: "Dr. Prafulla Pralhadrao C.", role: "Editorial Board", title: "Associate Professor (Seed Pd. Officer), AICRP-NSP", inst: "Dr. PDKV, Akola, Maharashtra" },
-  { name: "Dr. Aniruddh Pratap Singh", role: "Editorial Board", title: "Asst. Professor — Olericulture & Floriculture", inst: "Nalanda College of Horticulture, Noorsarai, Bihar" },
-  { name: "Dr. Anuradha Saha", role: "Editorial Board", title: "Chief Scientist (Agronomy), AICRP (Rice)", inst: "SKUAST-Jammu, Plant Breeding & Genetics" },
-  { name: "Dr. Vikram Kumar", role: "Editorial Board", title: "Scientist-B, Central Silk Board", inst: "P-3 Seed Station, North Garo Hills, Meghalaya" },
-  { name: "Dr. Pravin Kumar Upadhyay", role: "Editorial Board", title: "Scientist, Division of Agronomy", inst: "ICAR-Indian Agricultural Research Institute, New Delhi" },
-  { name: "Dr. Shruti Godara", role: "Editorial Board", title: "Scientist-B, Biotechnology", inst: "Forest Research Institute (FRI), Dehradun" },
-  { name: "Dr. Devi Lal Bagadi", role: "Editorial Board", title: "Plant Physiologist, AICRP on Arid Zone Fruits", inst: "SKN College of Agriculture, Jobner, Rajasthan" },
-  { name: "Dr. Kumari Sunita", role: "Editorial Board", title: "Assistant Professor, Department of Botany", inst: "DDU Gorakhpur University, Gorakhpur (U.P.)" },
-  { name: "Dr. Mukul Kumar", role: "Editorial Board", title: "Asst. Professor — Biochemistry & Crop Physiology", inst: "Bihar Agricultural University, Sabour" },
-  { name: "Dr. Manish Kumar Singh", role: "Editorial Board", title: "Assistant Professor, Department of Vegetable Science", inst: "Banda University of Agriculture and Technology, Banda (U.P.)" },
-  { name: "Mr. Kamlesh Meena", role: "Editorial Board", title: "Subject Matter Specialist, KVK (ICAR-IIVR)", inst: "Deoria, Uttar Pradesh" },
-  { name: "Dr. Manoj Kumar Sharma", role: "Editorial Board", title: "Assistant Professor, Department of Plant Physiology", inst: "SKN College of Agriculture, Jobner, Rajasthan" },
-  { name: "Dr. Sanjeev Kumar", role: "Editorial Board", title: "Agricultural Economist", inst: "Punjab Agricultural University, Ludhiana" },
-  { name: "Dr. B. L. Dudwal", role: "Editorial Board", title: "Assistant Professor", inst: "SKN Agriculture University, Jobner, Jaipur (Rajasthan)" },
-  { name: "Dr. Swarnali Duary", role: "Editorial Board", title: "Assistant Professor (Agronomy)", inst: "MS Swaminathan School of Agriculture, Centurion University, Odisha" },
-  { name: "Dr. Chenesh Patel", role: "Editorial Board", title: "Department of Entomology", inst: "GB Pant University of Agriculture and Technology, Pantnagar" },
-  { name: "Dr. Vinod Bhateshwar", role: "Editorial Board", title: "Assistant Professor (LPM)", inst: "Vivekananda Global University, Jaipur (Rajasthan)" },
-  { name: "Dr. Amit Kumar", role: "Editorial Board", title: "Assistant Professor (Entomology)", inst: "GLA University, Mathura, Uttar Pradesh" },
-  { name: "Dr. Monalisa Sahoo", role: "Editorial Board", title: "Assistant Professor (Agronomy)", inst: "MS Swaminathan School of Agriculture, Centurion University, Odisha" },
-  { name: "Dr. Vikash Kumar", role: "Editorial Board", title: "Assistant Professor (Agronomy)", inst: "GLA University, Mathura, Uttar Pradesh" },
-  { name: "Gaurav Singh Vishen", role: "Editorial Board", title: "Assistant Professor (Horticulture)", inst: "National PG College, Barhalganj, Gorakhpur (U.P.)" },
-  { name: "Mr. Rahul Mishra", role: "Editorial Board", title: "Scientist", inst: "ICAR-IISS, Bhopal" },
-  { name: "Dr. Arjun Lal Ola", role: "Editorial Board", title: "Assistant Professor (Vegetable Science)", inst: "Rani Lakshmi Bai Central Agricultural University, Jhansi" },
-  { name: "Dr. Vijaykumar", role: "Editorial Board", title: "Assistant Professor, Livestock Research and Information Centre (Deoni)", inst: "Karnataka Veterinary, Animal and Fisheries University, Bidar" },
-  { name: "Mr. Avinash Kumar", role: "Editorial Board", title: "Research Scholar", inst: "Dr. Rajendra Prasad Central Agricultural University, Pusa, Bihar" },
-  { name: "Ms. Kawaljeet Kaur", role: "Editorial Board", title: "Assistant Professor (Soil Science)", inst: "CT Group of Institutions, Jalandhar, Punjab" },
-  { name: "Dr. Rajeev Kumar Srivastava", role: "Editorial Board", title: "Assoc. Professor-cum-Sr. Scientist (Agronomy)", inst: "Dr. RPCAU, Pusa, Samastipur, Bihar" },
-  { name: "Rahul Kumar", role: "Editorial Board", title: "Senior Scientist", inst: "Shoolini Lifesciences Pvt. Ltd., Shoolini University, Solan" },
-  { name: "Dr. Madhuri Arya", role: "Editorial Board", title: "Asst. Professor-cum-Scientist (PBG)", inst: "Dr. RPCAU, Pusa, Dholi, Muzaffarpur, Bihar" },
-  { name: "Dr. Gauri Jairath", role: "Editorial Board", title: "Scientist, Livestock Products Technology", inst: "ICAR-IVRI, Regional Station, Palampur, H.P." },
-  { name: "Sudhir Mishra", role: "Editorial Board", title: "Assistant Professor", inst: "National P.G. College, Barhalganj, Gorakhpur (U.P.)" },
-  { name: "Dr. Dharminder", role: "Editorial Board", title: "Associate Professor (Agronomy)", inst: "PG College of Agriculture, Dr. RPCAU, Pusa, Samastipur, Bihar" },
-
-  // Content Editors
-  { name: "Dr. Mehjabeen", role: "Content Editor", title: "Department of Soil Science & Agricultural Chemistry", inst: "Bihar Agricultural University, Sabour, Bhagalpur, Bihar" },
-  { name: "Ms. Aparnna V.P.", role: "Content Editor", title: "Department of Dairy Science and Food Technology", inst: "Institute of Agricultural Sciences, BHU, Varanasi (U.P.)" },
+export const advisoryCommittee: { name: string; inst: string; country?: string }[] = [
+  { name: "Dr. Pema Gyamtsho", inst: "ICIMOD" },
+  { name: "Dr. Karim Maredia", inst: "Michigan State University", country: "USA" },
+  { name: "Dr. P. Das", inst: "ICAR" },
+  { name: "Dr. Rajbir Singh", inst: "ICAR" },
+  { name: "Dr. B. N. Tripathi", inst: "SKUAST–Jammu" },
+  { name: "Dr. Nazir Ahmad Ganai", inst: "SKUAST–Srinagar" },
+  { name: "Dr. K. D. Kokate", inst: "Former DDG (Agricultural Extension), ICAR" },
+  { name: "Dr. Arjun Kumar Shrestha", inst: "Agriculture and Forestry University", country: "Nepal" },
+  { name: "Dr. Inderjeet Singh", inst: "Bihar Animal Sciences University, Patna" },
+  { name: "Dr. P. K. Ghosh", inst: "Visva-Bharati" },
+  { name: "Dr. S. K. Dwivedi", inst: "DRDO" },
+  { name: "Prof. S. V. Reddy", inst: "PRDIS" },
+  { name: "Dr. V. V. Sadamate", inst: "Former Adviser (Agriculture), Planning Commission" },
+  { name: "Dr. Tirtha Raj Regmi", inst: "Heifer International", country: "Nepal" },
+  { name: "Dr. Suresh Chandra Babu", inst: "IFPRI" },
+  { name: "Shiva Sundar Shrestha", inst: "Nepal Agroforestry Foundation", country: "Nepal" },
+  { name: "Dr. Ramjee P. Ghimire", inst: "Michigan State University", country: "USA" },
 ];
 
 export const reviewers: { name: string; dept?: string; inst: string }[] = [
-  { name: "Dr. Ranjeet Singh Bochalya", dept: "Division of Agronomy", inst: "SKUAST-Jammu" },
-  { name: "Mrs. Manju Netwal", dept: "Department of Horticulture", inst: "SKN College of Agriculture, Jobner" },
-  { name: "Dr. Deepak Katkani", inst: "Mahyco" },
-  { name: "Mr. Om Prakash Jitarwal", dept: "Department of Horticulture", inst: "CCSHAU, Hisar, Haryana" },
-  { name: "Mr. Peeyush Kumar Jayaswal", dept: "Research Scholar", inst: "Birsa Agricultural University, Ranchi" },
-  { name: "Mr. Aakash", dept: "Research Scholar", inst: "Institute of Agricultural Sciences, BHU" },
-  { name: "Mr. Gaurav Prakash", dept: "Soil Science & Agril. Chemistry", inst: "Agriculture University, Kota" },
-  { name: "Mr. Shankar Bijaria", dept: "Research Scholar", inst: "SKRAU, Bikaner" },
-  { name: "Dr. Shivam Kumar Singh", dept: "Department of Horticulture", inst: "PG College, Ghazipur" },
-  { name: "Mr. Nitin Yadav", dept: "Research Scholar", inst: "Institute of Agricultural Sciences, BHU" },
-  { name: "Mr. Rajkumar Jakhar", dept: "Research Scholar", inst: "Institute of Agricultural Sciences, BHU" },
-  { name: "Mr. Kartik Madankar", dept: "Research Scholar", inst: "Institute of Agricultural Sciences, BHU" },
-  { name: "Mr. Mahendra Kumar", dept: "Research Scholar", inst: "JNKVV, Jabalpur" },
-  { name: "Mr. Ayush Bahuguna", dept: "Asst. Development Officer", inst: "Dept. of Horti. & Food Processing, Dehradun" },
-  { name: "Mr. Deepak Kumar Yadav", inst: "Agriculture Technical Assistant, Mirzapur (U.P.)" },
-  { name: "Mr. Bhagchand Yadav", dept: "Department of Horticulture", inst: "SKRAU, Bikaner" },
-  { name: "Mr. Nanu Ram Sharma", dept: "Department of Entomology", inst: "SKRAU, Bikaner" },
-  { name: "Ms. Shikha Jain", dept: "Research Scholar, Division of Fruit Science", inst: "Indian Agricultural Research Institute, New Delhi" },
-  { name: "Mr. Dodiya Ravi Kumar Dhirubhai", dept: "Department of Entomology", inst: "Anand Agricultural University, Gujarat" },
-  { name: "Mr. Suresh Kumar Fagodia", dept: "Soil Science & Agricultural Chemistry", inst: "SKNAU, Jobner" },
-  { name: "Mr. Kanik Kumar Bansal", dept: "Research Scholar, Division of Agronomy", inst: "SKUAST-Jammu" },
-  { name: "Mr. Vijay Kumar", dept: "Research Scholar, Division of Agronomy", inst: "SKUAST-Jammu" },
-  { name: "Shesh Narayan Kumawat", dept: "AICRP-Weed Management, Division of Agronomy", inst: "SKUAST-Jammu" },
-  { name: "Pravallika Sree Rayanoothala", dept: "Department of Plant Pathology", inst: "CV Raman Global University, Bhubaneswar, Odisha" },
-  { name: "Mr. Veerendra Kumar Patel", dept: "Research Scholar, Soil Science", inst: "Mahatma Gandhi Chitrakoot Gramodaya University, Satna, M.P." },
-  { name: "Mr. Vishal Yadav", dept: "Research Scholar, Extension Education", inst: "ANDUA&T, Kumarganj, Ayodhya, U.P." },
-  { name: "Anushi", dept: "Research Scholar, Horticulture (Fruit Science)", inst: "CSAUAT, Kanpur, U.P." },
-  { name: "Ganesh Ram", dept: "Research Scholar, Department of Horticulture", inst: "RVSKVV, Gwalior, Madhya Pradesh" },
+  { name: "Atul Galav", inst: "" },
+  { name: "Dr. Babaloo Sharma", inst: "" },
+  { name: "Dr. Gajendra Singh", inst: "" },
+  { name: "Dr. Anil Patidar", inst: "" },
+  { name: "Gorav Singh", inst: "" },
+  { name: "Dr. Ajaya Thakan", inst: "" },
+  { name: "Lalit Godara", inst: "" },
+  { name: "Roshan Lal Meena", inst: "" },
+  { name: "Balveer", inst: "" },
+  { name: "Himanshu", inst: "" },
+  { name: "Rudraksh", inst: "" },
+  { name: "Rahul", inst: "" },
+  { name: "Dr. Bhagwan Singh", inst: "" },
+  { name: "Dr. Ramniwas", inst: "KVK Pokaran" },
+  { name: "Dr. Ramniwas", inst: "ICAR–NRC on Pomegranate" },
+  { name: "Dr. S. C. Meena", inst: "" },
+  { name: "Dr. Permendra", inst: "" },
+  { name: "Dr. Hardev", inst: "" },
+  { name: "Dr. Rajkumar Yogi", inst: "" },
+  { name: "Dr. Sheran K.", inst: "" },
+  { name: "Dr. Ashok Yadav", inst: "" },
+  { name: "Dr. Sativeer Dangi", inst: "" },
+  { name: "Dr. Leela Ram Sandhu", inst: "" },
+  { name: "Dr. Arvind Jhajharia", inst: "" },
+  { name: "Dr. Sonalika Mahajan", inst: "" },
+  { name: "Dr. Paumpi Paul", inst: "" },
+  { name: "Viklas Chandra Gautam", inst: "" },
 ];
 
 export const startups = [
