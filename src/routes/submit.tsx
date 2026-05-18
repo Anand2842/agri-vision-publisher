@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
+import { FileText, Upload } from "lucide-react";
 
 export const Route = createFileRoute("/submit")({
   component: Submit,
@@ -20,12 +21,17 @@ const schema = z.object({
   plan: z.enum(["single", "annual", "lifetime", "institute"]),
 });
 
+const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+const ALLOWED_EXT = [".doc", ".docx"];
+
 function Submit() {
   const nav = useNavigate();
   const [authChecked, setAuthChecked] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [cats, setCats] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => { setSignedIn(!!data.session); setAuthChecked(true); });
@@ -46,6 +52,14 @@ function Submit() {
     );
   }
 
+  const onFile = (f: File | null) => {
+    if (!f) { setFile(null); return; }
+    const ext = f.name.slice(f.name.lastIndexOf(".")).toLowerCase();
+    if (!ALLOWED_EXT.includes(ext)) { toast.error("Only .doc or .docx files are accepted."); return; }
+    if (f.size > MAX_BYTES) { toast.error("File must be 10 MB or smaller."); return; }
+    setFile(f);
+  };
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -60,12 +74,33 @@ function Submit() {
     };
     const r = schema.safeParse(data);
     if (!r.success) { toast.error(r.error.issues[0].message); return; }
+    if (!file) { toast.error("Please attach your manuscript (.doc or .docx)."); return; }
+
     setLoading(true);
     const { data: sess } = await supabase.auth.getUser();
     if (!sess.user) { toast.error("Please sign in"); setLoading(false); return; }
-    const { error, data: row } = await supabase.from("submissions").insert({ ...data, user_id: sess.user.id }).select().single();
+
+    const { data: row, error } = await supabase
+      .from("submissions")
+      .insert({ ...data, user_id: sess.user.id })
+      .select()
+      .single();
+    if (error || !row) { setLoading(false); toast.error(error?.message || "Failed to create submission"); return; }
+
+    const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+    const path = `${sess.user.id}/${row.id}${ext}`;
+    const { error: upErr } = await supabase.storage.from("manuscripts").upload(path, file, {
+      contentType: file.type || "application/octet-stream",
+      upsert: false,
+    });
+    if (upErr) {
+      setLoading(false);
+      toast.error(`Manuscript upload failed: ${upErr.message}`);
+      return;
+    }
+    await supabase.from("submissions").update({ manuscript_path: path }).eq("id", row.id);
+
     setLoading(false);
-    if (error) { toast.error(error.message); return; }
     toast.success(`Submitted! Ticket #${row.id.slice(0, 8).toUpperCase()}`);
     nav({ to: "/dashboard" });
   };
@@ -76,7 +111,9 @@ function Submit() {
       <main className="container-editorial py-16 max-w-3xl">
         <div className="eyebrow">Authors</div>
         <h1 className="font-display text-5xl mt-3 text-ink">Submit Your Article</h1>
-        <p className="mt-4 text-foreground/70">All submissions are reviewed within 21 days.</p>
+        <p className="mt-4 text-foreground/70">
+          Manuscripts in Microsoft Word (.doc / .docx) format only · 2–4 pages · reviewed within 21 days.
+        </p>
 
         <form onSubmit={onSubmit} className="mt-12 space-y-6">
           <Field label="Article title" name="title" required />
@@ -89,16 +126,48 @@ function Submit() {
               {cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
-          <Field label="Manuscript (paste full text)" name="content" textarea rows={10} />
+
+          <div>
+            <label className="eyebrow block mb-2">Manuscript file (.doc / .docx, up to 10 MB)</label>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              className="hidden"
+              onChange={(e) => onFile(e.target.files?.[0] ?? null)}
+            />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="w-full border border-dashed border-rule bg-paper px-4 py-6 rounded-sm text-sm flex items-center justify-center gap-3 hover:border-primary hover:bg-primary/5 transition"
+            >
+              {file ? (
+                <>
+                  <FileText className="h-5 w-5 text-primary" />
+                  <span className="font-display">{file.name}</span>
+                  <span className="text-foreground/60">({(file.size / 1024).toFixed(0)} KB)</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-5 w-5 text-primary" />
+                  <span>Click to upload your Word manuscript</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <Field label="Manuscript text (optional — paste for quick review)" name="content" textarea rows={8} />
+
           <div>
             <label className="eyebrow block mb-2">Membership plan</label>
             <select name="plan" required defaultValue="single" className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm">
-              <option value="single">Single article (₹500)</option>
-              <option value="annual">Annual (₹2,500)</option>
-              <option value="lifetime">Lifetime (₹15,000)</option>
-              <option value="institute">Institute (₹40,000)</option>
+              <option value="single">Single Article (₹200)</option>
+              <option value="annual">Annual (₹500 · 8 articles / 12 months)</option>
+              <option value="lifetime">Lifetime (₹2,000 · 5 years)</option>
+              <option value="institute">Institute / Library (₹5,000 · 5 years)</option>
             </select>
           </div>
+
           <button disabled={loading} className="w-full bg-primary text-primary-foreground px-6 py-4 rounded-sm hover:bg-primary/90 disabled:opacity-60">
             {loading ? "Submitting…" : "Submit for review"}
           </button>
