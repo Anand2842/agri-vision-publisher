@@ -1,117 +1,147 @@
-# Gap analysis: brand doc vs current build
+# Backend Architecture & Role System — Planned vs Executed
 
-Below is everything in `dangi_magazine.docx` that is **not yet** reflected in the site, grouped by priority. Copy + factual content first, payment + uploads second, polish last.
+This is an architecture briefing, not a code change. It compares what the
+brand/process documents implied the platform *should* do against what is
+actually wired in the database, RLS policies, and UI today, and ends with the
+specific gaps to close next.
 
-## P0 — Wrong or missing facts
+---
 
-### 1. About page → replace stock copy with real journal particulars
-Current `/about` shows invented founding-year text and a fake 2022–2026 timeline. Replace with the doc's three blocks:
+## 1. Identity & roles — the four-tier model
 
-- **About Us** paragraphs (4 paragraphs, pages 3–4)
-- **Vision** + **Mission** (6 mission bullets — disseminate / highlight / bridge / support / encourage / strengthen)
-- **Journal Particulars** table:
-  - Title: The Agriculture Popular Article Magazine
-  - Frequency: Monthly · ISSN: pending · Subject: Agriculture · Language: English / Hindi · Format: Online · Starting Year: 2026
-  - Publisher: **Ram Mangalam Agri – Rural Development Foundation (RADF)**
-  - Chief Editor: **Dr. Dileep Kumar**
-  - Address: ICAR-RRS-CAZRI, Jaisalmer 345001 · Mobile: +91 95091 64410
-
-Drop the invented timeline.
-
-### 2. Editorial Board → swap mock people for the real masthead
-`src/lib/mock-data.ts` currently lists invented names. Replace `editorialBoard` and `reviewers` with the doc's actual roster:
-
-- **Editor-in-Chief / Founder & Managing Editor:** Dr. Dileep Kumar (S.K.R.A.U. Bikaner; Senior Scientist, ICAR-RRS-CAZRI Jaisalmer)
-- **International Editors (4):** Dr. Dilip Kumar Jha (AFU, Nepal), Dr. Chamindri Withranga (Univ. of Colombo, Sri Lanka), Dr. Punya Prasad Regmi (VC, AFU, Nepal), Talata Colombo (Sri Lanka)
-- **Associate Editors:** Dr. R.S. Mehta (CAZRI-RRS Jaisalmer), Dr. Deepak Chaturvedi, Dr. Charu Sharma (KVK Jaisalmer), Dr. Manish Kanwat (CAZRI-RRS Bhuj), Dr. B.L. Manjunatha (CAZRI Jodhpur), Akansha Joshi (GBPUA&T Pantnagar), Dr. Rajiv Baliram Kale (ICAR-DOGR Pune), Dr. Nanda Kumar S, Dr. MotiLal Meena (KVK Pali), Dr. Letngam Touthang, Dr. Dasharath Prasad (KVK SKRAU)
-- **Reviewers (~24):** Atul Galav, Dr. Babaloo Sharma, Dr. Gajendra Singh, Dr. Anil Patidar, Gorav Singh, Dr. Ajaya Thakan, Lalit Godara, Roshan Lal Meena, Balveer, Himanshu, Rudraksh, Rahul, Dr. Bhagwan Singh, Dr. Charu Sharma, Dr. Ramniwas (KVK Pokaran), Dr. Ramniwas (NRC Pomegranate), Dr. SC Meena, Dr. Permendra, Dr. Hardev, Dr. Rajkumar Yogi, Dr. Sheran K., Dr. Ashok Yadav, Dr. Sativeer Dangi, Dr. Leela Ram Sandhu, Dr. Arvind Jhajharia, Dr. Sonalika Mahajan, Dr. Paumpi Paul, Viklas Chandra Gautam, Dr. Nanda Kumar S
-- **Add a new section: International Advisory Committee** (17 members — Dr. Pema Gyamtsho ICIMOD, Dr. Karim Maredia MSU, Dr. P. Das ICAR, Dr. Rajbir Singh ICAR, Dr. B.N. Tripathi SKUAST-Jammu, Dr. Nazir Ahmad Ganai SKUAST-Srinagar, Dr. K.D. Kokate, Dr. Arjun Kumar Shrestha AFU Nepal, Dr. Inderjeet Singh BASU Patna, Dr. P.K. Ghosh Visva-Bharati, Dr. S.K. Dwivedi DRDO, Prof. S.V. Reddy PRDIS, Dr. V.V. Sadamate, Dr. Tirtha Raj Regmi Heifer Nepal, Suresh Chandra Babu IFPRI, Shiva Sundar Shrestha NAF, Dr. Ramjee P. Ghimire MSU)
-
-### 3. Membership → pricing is wrong
-Current plans (₹500 / ₹2,500 / ₹15,000 / ₹40,000) do not match the doc. Replace with:
-
-| Plan | Price | Validity |
-|---|---|---|
-| Single Article | ₹200 | 1 article |
-| Annual | ₹500 | 8 articles or 12 months |
-| Lifetime | ₹2,000 | 5 years |
-| Institute / Library | ₹5,000 | 5 years |
-
-Also state explicitly: **annual members publish for free**; non-member co-authors / non-member authors pay a publication fee (per doc §3).
-
-### 4. Contact → wrong office, missing publisher block
-Current `/contact` shows a fake Pusa Delhi address and `editor@agriculturepopular.com`. Replace with:
-
-- Dr. Dileep Kumar Dangi · Senior Scientist (Agriculture Extension) · ICAR-RRS-CAZRI, Jaisalmer 345001
-- Phone: 9509164410 · Email: **dkdkdangi@gmail.com**
-- Hours: Mon–Sat 08:00–20:00 IST
-- Add a **Publisher** block under the form: Ram Mangalam Agri – Rural Development Foundation (R.A.D.F.), Ajmer Road, Hirapura, Jaipur, India · +91 9509164410 · dkdkdangi@gmail.com
-- Add an **Advertise** block (verbatim from doc page 17): "Agro-based industrial and other allied sectors can advertise in The Agriculture Popular Article Magazine" + same email/phone.
-
-### 5. Submission Guidelines → rewrite to doc's 7 sections
-Replace the generic 4 sections with the doc's structure:
-1. Editorial & Review Process
-2. Membership Requirements (annual membership required for all authors; member ID + certificate issued)
-3. Publication Fees (annual members free; non-member co-authors/authors pay)
-4. Submission Requirements (Word .doc/.docx only · 2–4 pages · introduction + conclusion · monthly deadline)
-5. Formatting (Title TNR 14pt bold · Author details TNR 12pt · Corresp. email TNR 12pt bold · Headings TNR 14pt bold · Subheadings 12pt bold · Body 12pt · SI units · IUB/IUPAC abbreviations)
-6. Originality & Plagiarism
-7. Publication & Access (PDF emailed + downloadable from site; submit to dkdkdangi@gmail.com or via "Submit Article Online")
-
-### 6. Footer / Header brand strip
-Footer currently links to fake `editor@agriculturepopular.com`. Update across header utility bar + footer to **dkdkdangi@gmail.com** and **+91 9509164410**.
-
-## P1 — Functional gaps
-
-### 7. Submit form → doc requires .doc/.docx upload
-Current `/submit` only accepts pasted text. The doc explicitly says "Articles must be submitted in Microsoft Word format (.doc/.docx). Submissions without the prescribed format will be rejected."
-
-- Create a Supabase Storage bucket `manuscripts` (private; RLS so only owner + admins/moderators can read).
-- Add a file input to `/submit`, upload to `manuscripts/<user_id>/<submission_id>.docx`, store the path on `submissions.notes` or add a `manuscript_path text` column.
-- Restrict accept=".doc,.docx" + 10 MB cap.
-
-### 8. Payments → 4 Razorpay plans + bank/NEFT + PhonePe QR
-Doc shows "Pay Now — Secured by Razorpay" buttons on each membership card and a manual bank/NEFT block:
-
-- A/c Holder: Dileep Kumar · A/c No. 32971942417 · SBI · IFSC SBIN0003877 · Branch SBI Main Jaisalmer
-- PhonePe QR (scan & pay) on +91 9509164410
-
-Two paths — pick one before building:
-
-- **Path A (recommended):** wire Razorpay properly via a server function that creates an order (needs `RAZORPAY_KEY_ID` + `RAZORPAY_KEY_SECRET` secrets) and a webhook at `/api/public/webhooks/razorpay` to mark `payments` rows paid.
-- **Path B (no integration yet):** ship a static "Bank transfer / PhonePe QR / Razorpay coming soon" panel on `/membership` that mirrors the doc verbatim, and collect the transaction screenshot through the contact form. Faster, no secrets needed.
-
-### 9. Seed real Volume 1 Issue 1 (Jan 2026)
-DB is empty. Doc lists the actual launch issue articles (pages 18–37):
-
-1. Dynamics of E-Learning — D. Kumar, R.S. Mehta, Shiran K., S.C. Meena (CAZRI Jaisalmer)
-2. Importance of MIS for Managing Agriculture in Thar Desert
-3. Conceptual Framework of Information Kiosk in Western Rajasthan
-4. Agriculture Knowledge Information System (AKIS) for Western Rajasthan
-5. Contract Farming for Remunerative Prices of Jeera, Isabgoal & Pomegranate in Western Rajasthan
-6. ICT in arid-zone agriculture (Thar Desert)
-
-Insert: 1 row in `issues` (volume 1, issue 1, "January 2026"), 6 rows in `articles` linked to that issue, 1 author profile (`profiles` row for Dr. Dileep Kumar). Categories already covered by current taxonomy.
-
-## P2 — Polish
-
-- **Homepage:** show "Volume 1 · Issue 1 · January 2026" pulled from DB instead of hardcoded copy; small publisher line "Published by Ram Mangalam Agri – Rural Development Foundation".
-- **Logo placement:** doc page 14 also references the **RADF publisher logo** (separate from the magazine seal). If the user has it, add it to the footer's publisher block; if not, use the magazine seal there too.
-- **ISSN line:** doc has it blank. Keep ISSN out of the UI until it is assigned.
-- **Mobile no:** unify everywhere to `+91 9509164410` (header utility bar currently shows `+91-9928123930`).
-
-## Suggested execution order (one PR per group)
+The role enum already in the database:
 
 ```text
-1. Content + brand sweep        (P0 #1, #2, #3, #4, #5, #6)
-2. Submit upload + manuscripts  (P1 #7 + storage migration)
-3. Seed Volume 1 Issue 1        (P1 #9 — migration with 6 articles)
-4. Payments                     (P1 #8 — choose Path A or B)
-5. Homepage polish              (P2)
+app_role = { admin · moderator · author · reader }
 ```
 
-## Decisions needed before I build
+| Role | Who it represents | How it's assigned today |
+|---|---|---|
+| `admin` | Chief Editor (Dr. Dileep Kumar) + delegated managing editors | First signed-in user clicks "Claim admin" → `claim_admin_if_none()`; further admins must be promoted from the DB |
+| `moderator` | Associate Editors & section editors who triage submissions | **Not assignable from the UI yet** — must be inserted directly into `user_roles` |
+| `author` | Any member who submits articles | Auto-assigned on signup via the `handle_new_user()` trigger |
+| `reader` | Members who only read / download | **Defined in the enum but never granted** — every signup currently becomes an `author` |
 
-1. **Payments now or later?** Path A (Razorpay live) requires the user's `RAZORPAY_KEY_ID` + `RAZORPAY_KEY_SECRET`. Path B ships static bank/QR/Razorpay-soon copy.
-2. **Editorial Board photos:** the doc has portrait JPEGs for ~12 people. Embed them, or keep current initials-only cards?
-3. **Seed Volume 1 articles:** insert just titles + abstracts now, or wait until full PDFs are uploaded?
+Roles live in a **separate `user_roles` table** (correct — prevents privilege
+escalation). Lookups go through the security-definer function
+`has_role(user_id, role)` which is what every RLS policy calls.
+
+---
+
+## 2. Permission matrix — planned vs executed
+
+Legend: ✓ wired · ◐ partial · ✗ missing
+
+| Capability | reader | author | moderator | admin | Status |
+|---|:-:|:-:|:-:|:-:|---|
+| Read published articles & issues | ✓ | ✓ | ✓ | ✓ | ✓ public SELECT policy |
+| Read own profile / update own profile | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Submit a manuscript (.docx upload) | ✗ | ✓ | ✓ | ✓ | ✓ via `submissions` INSERT policy + `manuscripts` bucket |
+| View own submissions in dashboard | — | ✓ | ✓ | ✓ | ✓ |
+| Triage submissions (change status, add notes) | — | — | ✓ | ✓ | ✓ RLS allows both; **no moderator UI exists** |
+| Download any submitter's manuscript | — | — | ✓ | ✓ | ✓ storage RLS |
+| Publish article from approved submission | — | — | ◐ | ✓ | ✗ no "promote submission → article" action yet |
+| CRUD issues / articles / categories | — | — | ✗ | ✓ | ✓ admin-only RLS; admin UI exists |
+| Read contact form messages | — | — | ✗ | ✓ | ✓ admin-only |
+| Manage user roles (promote / demote) | — | — | — | ✓ | ✗ **no users page in admin** |
+| Bootstrap first admin | — | — | — | self | ✓ `claim_admin_if_none()` RPC |
+
+The gap pattern is consistent: **policies are in place, the UI to use them is
+not**. Moderators have permission in Postgres but no screen, and admins can't
+manage roles or promote approved submissions into the public site.
+
+---
+
+## 3. How a request flows today
+
+```text
+Browser (TanStack route)
+  └─ supabase-js (publishable key + user JWT)
+       └─ PostgREST
+            └─ RLS policy fires has_role(auth.uid(), 'admin'|'moderator')
+                 └─ row returned / write allowed / 401-ish error
+```
+
+Three Supabase clients exist; the project uses only the first:
+
+- `@/integrations/supabase/client` — browser, RLS-bound · **used everywhere**
+- `@/integrations/supabase/auth-middleware` — server-fn, acts as user · unused
+- `@/integrations/supabase/client.server` — service-role admin · unused
+
+That's why everything works through RLS — there's no server-side bypass code
+anywhere in the app today.
+
+---
+
+## 4. Route → role map (what gates each page)
+
+| Route | Gate today | Should be |
+|---|---|---|
+| `/`, `/about`, `/archives`, `/articles/:slug`, `/current-issue`, `/editorial-board`, `/submission-guidelines`, `/contact`, `/membership` | Public | Public ✓ |
+| `/auth` | Public | Public ✓ |
+| `/submit` | Component check: signed-in | Should also require `author` or higher |
+| `/dashboard` | Component check: signed-in | OK; should show role badge |
+| `/admin/*` | Component check: `has_role(admin)` | OK, but no `moderator` console exists |
+
+All gating is currently **component-level** (`useEffect` + redirect). The
+TanStack-native pattern is a pathless `_authenticated/` layout with
+`beforeLoad` + `redirect()` — that's the recommended next refactor for both
+safety (no flash of protected UI) and code clarity.
+
+---
+
+## 5. Storage & the manuscript pipeline
+
+```text
+author /submit form
+  → INSERT into submissions  (RLS: user_id = auth.uid())
+  → upload to manuscripts/<user_id>/<submission_id>.docx
+       (RLS: owner OR admin/moderator can read; only owner can write)
+  → UPDATE submissions.manuscript_path
+```
+
+Buckets:
+- `manuscripts` — private, owner + editors only ✓
+- `article-pdfs` — public, for published-issue PDFs ✓
+
+---
+
+## 6. What's missing — concrete build items
+
+Ordered by impact:
+
+1. **Moderator console** at `/admin/queue` (or a `moderator` flag on the
+   admin sidebar). Same submissions list as admin, but scoped to status
+   transitions only — no issues/categories/articles CRUD.
+2. **User & role manager** at `/admin/users` — list profiles, attach a role
+   chip, promote/demote (admin-only). Today the only way to make someone a
+   moderator is a raw SQL insert.
+3. **"Promote submission → article"** action on the admin submissions row:
+   on `approved`, copy title/abstract/content into `articles`, attach
+   manuscript PDF, set `status = published`, link to current issue.
+4. **Route-level guards** — move `useEffect` redirects in `/admin`, `/submit`,
+   `/dashboard` into `_authenticated/` and `_authenticated/_admin/` pathless
+   layouts using `beforeLoad`.
+5. **Reader plan** — either grant `reader` on signup for non-author members,
+   or drop it from the enum. Right now it's dead weight.
+6. **Role badge** in `SiteHeader` user menu so a signed-in user can see
+   whether they're author / moderator / admin.
+
+---
+
+## Technical notes (for implementation later)
+
+- `handle_new_user()` always assigns `author`; to support a `reader` flow,
+  branch on `raw_user_meta_data->>'intent'` set at signup.
+- Promotion to admin/moderator should go through a server function using
+  `supabaseAdmin` (service role) guarded by `requireSupabaseAuth` +
+  `has_role(uid, 'admin')`, because changing your *own* role via the browser
+  client is blocked by RLS (correct — but means we need a server fn).
+- The "promote submission → article" flow is also best as a server function:
+  it's a transactional multi-table write and benefits from running as admin
+  rather than relying on the user's RLS context.
+- Audit trail is currently absent. If editorial accountability matters, add
+  a `submission_events` table written on every status change.
+
+This document is for understanding only — no files will change until you pick
+which gaps to close next.
