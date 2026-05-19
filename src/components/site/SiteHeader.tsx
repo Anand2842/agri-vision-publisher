@@ -104,6 +104,11 @@ export function SiteHeader() {
         </form>
 
         <div className="flex items-center gap-2">
+          {editorRole && (
+            <Link to="/moderate" className="hidden md:inline-flex text-xs uppercase tracking-wider font-condensed text-orange hover:brightness-110">
+              Queue
+            </Link>
+          )}
           {signedIn ? (
             <Link to="/dashboard" className="hidden md:inline-flex text-xs uppercase tracking-wider font-condensed text-foreground/70 hover:text-orange">
               Dashboard
