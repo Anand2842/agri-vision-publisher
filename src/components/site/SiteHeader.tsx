@@ -25,6 +25,7 @@ const nav: { to: string; label: string; children?: { to: string; label: string }
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
+  const [editorRole, setEditorRole] = useState<"admin" | "moderator" | null>(null);
   const [q, setQ] = useState("");
   const navigate = useNavigate();
   const submitSearch = (e: React.FormEvent) => {
@@ -35,8 +36,22 @@ export function SiteHeader() {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSignedIn(!!s));
+    const loadRole = async (userId: string | null) => {
+      if (!userId) { setEditorRole(null); return; }
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+      const list = (data || []).map((r) => r.role);
+      if (list.includes("admin")) setEditorRole("admin");
+      else if (list.includes("moderator")) setEditorRole("moderator");
+      else setEditorRole(null);
+    };
+    supabase.auth.getSession().then(({ data }) => {
+      setSignedIn(!!data.session);
+      loadRole(data.session?.user.id ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSignedIn(!!s);
+      loadRole(s?.user.id ?? null);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -89,6 +104,11 @@ export function SiteHeader() {
         </form>
 
         <div className="flex items-center gap-2">
+          {editorRole && (
+            <Link to="/moderate" className="hidden md:inline-flex text-xs uppercase tracking-wider font-condensed text-orange hover:brightness-110">
+              Queue
+            </Link>
+          )}
           {signedIn ? (
             <Link to="/dashboard" className="hidden md:inline-flex text-xs uppercase tracking-wider font-condensed text-foreground/70 hover:text-orange">
               Dashboard

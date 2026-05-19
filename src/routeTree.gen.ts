@@ -13,6 +13,7 @@ import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as SubmissionGuidelinesRouteImport } from './routes/submission-guidelines'
 import { Route as StartupSpotlightRouteImport } from './routes/startup-spotlight'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as ModerateRouteImport } from './routes/moderate'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as EditorialBoardRouteImport } from './routes/editorial-board'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -48,6 +49,11 @@ const StartupSpotlightRoute = StartupSpotlightRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModerateRoute = ModerateRouteImport.update({
+  id: '/moderate',
+  path: '/moderate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MembershipRoute = MembershipRouteImport.update({
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
+  '/moderate': typeof ModerateRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
+  '/moderate': typeof ModerateRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
+  '/moderate': typeof ModerateRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/editorial-board'
     | '/membership'
+    | '/moderate'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/editorial-board'
     | '/membership'
+    | '/moderate'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/editorial-board'
     | '/membership'
+    | '/moderate'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
@@ -276,6 +288,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   EditorialBoardRoute: typeof EditorialBoardRoute
   MembershipRoute: typeof MembershipRoute
+  ModerateRoute: typeof ModerateRoute
   SearchRoute: typeof SearchRoute
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
@@ -311,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moderate': {
+      id: '/moderate'
+      path: '/moderate'
+      fullPath: '/moderate'
+      preLoaderRoute: typeof ModerateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/membership': {
@@ -457,6 +477,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   EditorialBoardRoute: EditorialBoardRoute,
   MembershipRoute: MembershipRoute,
+  ModerateRoute: ModerateRoute,
   SearchRoute: SearchRoute,
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
@@ -466,13 +487,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
