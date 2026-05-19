@@ -210,6 +210,36 @@ export type Database = {
         }
         Relationships: []
       }
+      submission_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          from_status: Database["public"]["Enums"]["submission_status"] | null
+          id: string
+          note: string | null
+          submission_id: string
+          to_status: Database["public"]["Enums"]["submission_status"] | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          from_status?: Database["public"]["Enums"]["submission_status"] | null
+          id?: string
+          note?: string | null
+          submission_id: string
+          to_status?: Database["public"]["Enums"]["submission_status"] | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          from_status?: Database["public"]["Enums"]["submission_status"] | null
+          id?: string
+          note?: string | null
+          submission_id?: string
+          to_status?: Database["public"]["Enums"]["submission_status"] | null
+        }
+        Relationships: []
+      }
       submissions: {
         Row: {
           abstract: string
