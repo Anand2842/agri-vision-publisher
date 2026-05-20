@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle, Eye, RotateCcw, FileText, Download, History } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, RotateCcw, FileText, Download, History, User, ArrowRight, Plus, Pencil, FilePlus2 } from "lucide-react";
 
 export const Route = createFileRoute("/moderate")({
   component: ModerateLayout,
