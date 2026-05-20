@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle, Eye, RotateCcw, FileText, Download, History } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, RotateCcw, FileText, Download, History, User, ArrowRight, Plus, Pencil, FilePlus2 } from "lucide-react";
 
 export const Route = createFileRoute("/moderate")({
   component: ModerateLayout,
@@ -161,10 +161,13 @@ function Queue() {
   );
 }
 
+type ActorProfile = { id: string; full_name: string | null };
+
 function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle: () => void; onChanged: () => void }) {
   const [notes, setNotes] = useState(s.notes ?? "");
   const [saving, setSaving] = useState(false);
   const [events, setEvents] = useState<EventRow[] | null>(null);
+  const [actors, setActors] = useState<Record<string, ActorProfile>>({});
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => { if (open && events === null) loadEvents(); /* eslint-disable-next-line */ }, [open]);
@@ -172,9 +175,17 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
   const loadEvents = async () => {
     const { data, error } = await supabase
       .from("submission_events").select("*")
-      .eq("submission_id", s.id).order("created_at", { ascending: false });
+      .eq("submission_id", s.id).order("created_at", { ascending: true });
     if (error) toast.error(error.message);
-    setEvents(data || []);
+    const list = (data || []) as EventRow[];
+    setEvents(list);
+    const ids = Array.from(new Set(list.map((e) => e.actor_id).filter(Boolean))) as string[];
+    if (ids.length) {
+      const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
+      const map: Record<string, ActorProfile> = {};
+      (profs || []).forEach((p: ActorProfile) => { map[p.id] = p; });
+      setActors(map);
+    }
   };
 
   const transition = async (status: SubmissionStatus, requireNote = false) => {
@@ -282,26 +293,90 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
             </div>
 
             <div>
-              <div className="eyebrow flex items-center gap-1.5"><History className="h-3 w-3" /> History</div>
-              <ol className="mt-2 border-l border-rule pl-3 space-y-2">
-                {events === null && <li className="text-xs text-muted-foreground">Loading…</li>}
-                {events && events.length === 0 && <li className="text-xs text-muted-foreground">No activity recorded.</li>}
-                {events?.map((e) => (
-                  <li key={e.id} className="text-xs">
-                    <div className="text-foreground/85">
-                      {e.from_status ? <><span className="opacity-70">{e.from_status.replace("_"," ")}</span> → </> : null}
-                      <span className="font-medium">{(e.to_status ?? "—").replace("_"," ")}</span>
-                    </div>
-                    {e.note && <div className="text-muted-foreground mt-0.5">{e.note}</div>}
-                    <div className="text-muted-foreground/70 mt-0.5">{new Date(e.created_at).toLocaleString()}</div>
-                  </li>
-                ))}
-              </ol>
+              <div className="eyebrow flex items-center gap-1.5"><History className="h-3 w-3" /> Audit history</div>
+              {events === null && <p className="text-xs text-muted-foreground mt-2">Loading…</p>}
+              {events && events.length === 0 && <p className="text-xs text-muted-foreground mt-2">No activity recorded.</p>}
+              {events && events.length > 0 && (
+                <ol className="mt-2 border-l-2 border-rule pl-4 space-y-3">
+                  {[...events].reverse().map((e, idx, arr) => {
+                    const parsed = parseEventNote(e.note);
+                    // arr is reversed (newest first). Prior note = next item in arr (older).
+                    const prevParsed = parsed.kind === "created" ? { note: null } : parseEventNote(arr[idx + 1]?.note ?? null);
+                    const actor = e.actor_id ? actors[e.actor_id] : null;
+                    const actorLabel = actor?.full_name?.trim() || (e.actor_id ? `${e.actor_id.slice(0, 8)}…` : "System");
+                    const statusChanged = !!e.from_status && e.from_status !== e.to_status;
+                    const noteChanged = parsed.kind === "notes" || parsed.kind === "both" || parsed.kind === "created";
+                    const KindIcon = parsed.kind === "created" ? FilePlus2 : parsed.kind === "notes" ? Pencil : Plus;
+                    return (
+                      <li key={e.id} className="relative text-xs">
+                        <span className="absolute -left-[1.4rem] top-1 h-2.5 w-2.5 rounded-full bg-orange ring-2 ring-background" />
+                        <div className="flex flex-wrap items-center gap-2 text-foreground/85">
+                          <KindIcon className="h-3 w-3 text-orange" />
+                          <span className="inline-flex items-center gap-1 text-foreground/70">
+                            <User className="h-3 w-3" /> <span className="font-medium text-ink">{actorLabel}</span>
+                          </span>
+                          <span className="text-muted-foreground/70">·</span>
+                          <time className="text-muted-foreground/80" dateTime={e.created_at}>
+                            {new Date(e.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
+                          </time>
+                        </div>
+
+                        {statusChanged && (
+                          <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                            <StatusChip value={e.from_status!} />
+                            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                            <StatusChip value={e.to_status!} />
+                          </div>
+                        )}
+                        {!statusChanged && parsed.kind === "created" && e.to_status && (
+                          <div className="mt-1.5"><StatusChip value={e.to_status} /></div>
+                        )}
+
+                        {noteChanged && (
+                          <div className="mt-1.5 space-y-1">
+                            {prevParsed.note && (
+                              <div className="line-through text-rose-700/80 bg-rose-50 border border-rose-100 px-2 py-1 rounded-sm">
+                                {prevParsed.note}
+                              </div>
+                            )}
+                            {parsed.note ? (
+                              <div className="text-emerald-800 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-sm whitespace-pre-wrap">
+                                {parsed.note}
+                              </div>
+                            ) : (
+                              <div className="italic text-muted-foreground">Note cleared</div>
+                            )}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
             </div>
           </div>
         </div>
       )}
     </li>
+  );
+}
+
+function parseEventNote(raw: string | null): { kind: "created" | "status" | "notes" | "both" | "unknown"; note: string | null } {
+  if (!raw) return { kind: "unknown", note: null };
+  if (raw === "Submission created") return { kind: "created", note: null };
+  if (raw === "Status changed") return { kind: "status", note: null };
+  const both = raw.match(/^Status \+ notes updated: ([\s\S]*)$/);
+  if (both) return { kind: "both", note: both[1] || null };
+  const notes = raw.match(/^Notes updated: ([\s\S]*)$/);
+  if (notes) return { kind: "notes", note: notes[1] || null };
+  return { kind: "unknown", note: raw };
+}
+
+function StatusChip({ value }: { value: string }) {
+  return (
+    <span className={`text-[0.6rem] uppercase tracking-widest px-1.5 py-0.5 rounded-sm ${STATUS_TONE[value] || "bg-muted"}`}>
+      {value.replace("_", " ")}
+    </span>
   );
 }
 
