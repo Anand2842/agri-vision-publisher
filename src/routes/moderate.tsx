@@ -161,10 +161,13 @@ function Queue() {
   );
 }
 
+type ActorProfile = { id: string; full_name: string | null };
+
 function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle: () => void; onChanged: () => void }) {
   const [notes, setNotes] = useState(s.notes ?? "");
   const [saving, setSaving] = useState(false);
   const [events, setEvents] = useState<EventRow[] | null>(null);
+  const [actors, setActors] = useState<Record<string, ActorProfile>>({});
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => { if (open && events === null) loadEvents(); /* eslint-disable-next-line */ }, [open]);
@@ -172,9 +175,17 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
   const loadEvents = async () => {
     const { data, error } = await supabase
       .from("submission_events").select("*")
-      .eq("submission_id", s.id).order("created_at", { ascending: false });
+      .eq("submission_id", s.id).order("created_at", { ascending: true });
     if (error) toast.error(error.message);
-    setEvents(data || []);
+    const list = (data || []) as EventRow[];
+    setEvents(list);
+    const ids = Array.from(new Set(list.map((e) => e.actor_id).filter(Boolean))) as string[];
+    if (ids.length) {
+      const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
+      const map: Record<string, ActorProfile> = {};
+      (profs || []).forEach((p: ActorProfile) => { map[p.id] = p; });
+      setActors(map);
+    }
   };
 
   const transition = async (status: SubmissionStatus, requireNote = false) => {
