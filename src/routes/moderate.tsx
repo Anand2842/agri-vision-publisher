@@ -169,6 +169,9 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
   const [events, setEvents] = useState<EventRow[] | null>(null);
   const [actors, setActors] = useState<Record<string, ActorProfile>>({});
   const [downloading, setDownloading] = useState(false);
+  const [auditFilter, setAuditFilter] = useState<"all" | "status" | "notes">("all");
+
+
 
   useEffect(() => { if (open && events === null) loadEvents(); /* eslint-disable-next-line */ }, [open]);
 
