@@ -169,6 +169,9 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
   const [events, setEvents] = useState<EventRow[] | null>(null);
   const [actors, setActors] = useState<Record<string, ActorProfile>>({});
   const [downloading, setDownloading] = useState(false);
+  const [auditFilter, setAuditFilter] = useState<"all" | "status" | "notes">("all");
+
+
 
   useEffect(() => { if (open && events === null) loadEvents(); /* eslint-disable-next-line */ }, [open]);
 
@@ -293,67 +296,99 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
             </div>
 
             <div>
-              <div className="eyebrow flex items-center gap-1.5"><History className="h-3 w-3" /> Audit history</div>
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="eyebrow flex items-center gap-1.5"><History className="h-3 w-3" /> Audit history</div>
+                {events && events.length > 0 && (
+                  <div className="inline-flex border border-rule rounded-sm overflow-hidden text-[10px] uppercase tracking-wider">
+                    {(["all", "status", "notes"] as const).map((f) => (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => setAuditFilter(f)}
+                        className={`px-2 py-1 transition-colors ${auditFilter === f ? "bg-orange text-white" : "text-foreground/60 hover:text-orange"}`}
+                      >
+                        {f === "all" ? "All" : f === "status" ? "Status" : "Notes"}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               {events === null && <p className="text-xs text-muted-foreground mt-2">Loading…</p>}
               {events && events.length === 0 && <p className="text-xs text-muted-foreground mt-2">No activity recorded.</p>}
-              {events && events.length > 0 && (
-                <ol className="mt-2 border-l-2 border-rule pl-4 space-y-3">
-                  {[...events].reverse().map((e, idx, arr) => {
-                    const parsed = parseEventNote(e.note);
-                    // arr is reversed (newest first). Prior note = next item in arr (older).
-                    const prevParsed = parsed.kind === "created" ? { note: null } : parseEventNote(arr[idx + 1]?.note ?? null);
-                    const actor = e.actor_id ? actors[e.actor_id] : null;
-                    const actorLabel = actor?.full_name?.trim() || (e.actor_id ? `${e.actor_id.slice(0, 8)}…` : "System");
-                    const statusChanged = !!e.from_status && e.from_status !== e.to_status;
-                    const noteChanged = parsed.kind === "notes" || parsed.kind === "both" || parsed.kind === "created";
-                    const KindIcon = parsed.kind === "created" ? FilePlus2 : parsed.kind === "notes" ? Pencil : Plus;
-                    return (
-                      <li key={e.id} className="relative text-xs">
-                        <span className="absolute -left-[1.4rem] top-1 h-2.5 w-2.5 rounded-full bg-orange ring-2 ring-background" />
-                        <div className="flex flex-wrap items-center gap-2 text-foreground/85">
-                          <KindIcon className="h-3 w-3 text-orange" />
-                          <span className="inline-flex items-center gap-1 text-foreground/70">
-                            <User className="h-3 w-3" /> <span className="font-medium text-ink">{actorLabel}</span>
-                          </span>
-                          <span className="text-muted-foreground/70">·</span>
-                          <time className="text-muted-foreground/80" dateTime={e.created_at}>
-                            {new Date(e.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
-                          </time>
-                        </div>
-
-                        {statusChanged && (
-                          <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
-                            <StatusChip value={e.from_status!} />
-                            <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                            <StatusChip value={e.to_status!} />
+              {events && events.length > 0 && (() => {
+                const reversed = [...events].reverse();
+                const decorated = reversed.map((e, idx) => {
+                  const parsed = parseEventNote(e.note);
+                  const prevParsed = parsed.kind === "created" ? { note: null } : parseEventNote(reversed[idx + 1]?.note ?? null);
+                  const statusChanged = !!e.from_status && e.from_status !== e.to_status;
+                  const noteChanged = parsed.kind === "notes" || parsed.kind === "both" || parsed.kind === "created";
+                  return { e, parsed, prevParsed, statusChanged, noteChanged };
+                });
+                const visible = decorated.filter((d) => {
+                  if (auditFilter === "status") return d.statusChanged;
+                  if (auditFilter === "notes") return d.noteChanged && d.parsed.kind !== "created";
+                  return true;
+                });
+                if (visible.length === 0) {
+                  return <p className="text-xs text-muted-foreground mt-2">No {auditFilter === "status" ? "status changes" : "note edits"} recorded.</p>;
+                }
+                return (
+                  <ol className="mt-2 border-l-2 border-rule pl-4 space-y-3">
+                    {visible.map(({ e, parsed, prevParsed, statusChanged, noteChanged }) => {
+                      const actor = e.actor_id ? actors[e.actor_id] : null;
+                      const actorLabel = actor?.full_name?.trim() || (e.actor_id ? `${e.actor_id.slice(0, 8)}…` : "System");
+                      const KindIcon = parsed.kind === "created" ? FilePlus2 : parsed.kind === "notes" ? Pencil : Plus;
+                      const showStatus = statusChanged && auditFilter !== "notes";
+                      const showNote = noteChanged && auditFilter !== "status";
+                      return (
+                        <li key={e.id} className="relative text-xs">
+                          <span className="absolute -left-[1.4rem] top-1 h-2.5 w-2.5 rounded-full bg-orange ring-2 ring-background" />
+                          <div className="flex flex-wrap items-center gap-2 text-foreground/85">
+                            <KindIcon className="h-3 w-3 text-orange" />
+                            <span className="inline-flex items-center gap-1 text-foreground/70">
+                              <User className="h-3 w-3" /> <span className="font-medium text-ink">{actorLabel}</span>
+                            </span>
+                            <span className="text-muted-foreground/70">·</span>
+                            <time className="text-muted-foreground/80" dateTime={e.created_at}>
+                              {new Date(e.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
+                            </time>
                           </div>
-                        )}
-                        {!statusChanged && parsed.kind === "created" && e.to_status && (
-                          <div className="mt-1.5"><StatusChip value={e.to_status} /></div>
-                        )}
 
-                        {noteChanged && (
-                          <div className="mt-1.5 space-y-1">
-                            {prevParsed.note && (
-                              <div className="line-through text-rose-700/80 bg-rose-50 border border-rose-100 px-2 py-1 rounded-sm">
-                                {prevParsed.note}
-                              </div>
-                            )}
-                            {parsed.note ? (
-                              <div className="text-emerald-800 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-sm whitespace-pre-wrap">
-                                {parsed.note}
-                              </div>
-                            ) : (
-                              <div className="italic text-muted-foreground">Note cleared</div>
-                            )}
-                          </div>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ol>
-              )}
+                          {showStatus && (
+                            <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                              <StatusChip value={e.from_status!} />
+                              <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                              <StatusChip value={e.to_status!} />
+                            </div>
+                          )}
+                          {!statusChanged && parsed.kind === "created" && e.to_status && auditFilter !== "notes" && (
+                            <div className="mt-1.5"><StatusChip value={e.to_status} /></div>
+                          )}
+
+                          {showNote && (
+                            <div className="mt-1.5 space-y-1">
+                              {prevParsed.note && (
+                                <div className="line-through text-rose-700/80 bg-rose-50 border border-rose-100 px-2 py-1 rounded-sm">
+                                  {prevParsed.note}
+                                </div>
+                              )}
+                              {parsed.note ? (
+                                <div className="text-emerald-800 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-sm whitespace-pre-wrap">
+                                  {parsed.note}
+                                </div>
+                              ) : (
+                                <div className="italic text-muted-foreground">Note cleared</div>
+                              )}
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                );
+              })()}
             </div>
+
           </div>
         </div>
       )}
