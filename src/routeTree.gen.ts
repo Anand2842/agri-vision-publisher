@@ -27,6 +27,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 import { Route as AdminSubmissionsRouteImport } from './routes/admin.submissions'
+import { Route as AdminQueueRouteImport } from './routes/admin.queue'
 import { Route as AdminIssuesRouteImport } from './routes/admin.issues'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminArticlesRouteImport } from './routes/admin.articles'
@@ -121,6 +122,11 @@ const AdminSubmissionsRoute = AdminSubmissionsRouteImport.update({
   path: '/submissions',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminQueueRoute = AdminQueueRouteImport.update({
+  id: '/queue',
+  path: '/queue',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminIssuesRoute = AdminIssuesRouteImport.update({
   id: '/issues',
   path: '/issues',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/admin/articles': typeof AdminArticlesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/issues': typeof AdminIssuesRoute
+  '/admin/queue': typeof AdminQueueRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/admin/articles': typeof AdminArticlesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/issues': typeof AdminIssuesRoute
+  '/admin/queue': typeof AdminQueueRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/admin/articles': typeof AdminArticlesRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/issues': typeof AdminIssuesRoute
+  '/admin/queue': typeof AdminQueueRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/articles'
     | '/admin/categories'
     | '/admin/issues'
+    | '/admin/queue'
     | '/admin/submissions'
     | '/articles/$slug'
     | '/admin/'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin/articles'
     | '/admin/categories'
     | '/admin/issues'
+    | '/admin/queue'
     | '/admin/submissions'
     | '/articles/$slug'
     | '/admin'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/admin/articles'
     | '/admin/categories'
     | '/admin/issues'
+    | '/admin/queue'
     | '/admin/submissions'
     | '/articles/$slug'
     | '/admin/'
@@ -424,6 +436,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSubmissionsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/queue': {
+      id: '/admin/queue'
+      path: '/queue'
+      fullPath: '/admin/queue'
+      preLoaderRoute: typeof AdminQueueRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/issues': {
       id: '/admin/issues'
       path: '/issues'
@@ -452,6 +471,7 @@ interface AdminRouteChildren {
   AdminArticlesRoute: typeof AdminArticlesRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminIssuesRoute: typeof AdminIssuesRoute
+  AdminQueueRoute: typeof AdminQueueRoute
   AdminSubmissionsRoute: typeof AdminSubmissionsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -460,6 +480,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminArticlesRoute: AdminArticlesRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminIssuesRoute: AdminIssuesRoute,
+  AdminQueueRoute: AdminQueueRoute,
   AdminSubmissionsRoute: AdminSubmissionsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
