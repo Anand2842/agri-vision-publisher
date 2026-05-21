@@ -88,6 +88,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "The Agriculture Popular Article Magazine" },
+      { name: "description", content: "The Agriculture Popular Article Magazine is a peer-reviewed, open access monthly magazine, initiated for the purpose of providing information about novel innova" },
+      { property: "og:description", content: "The Agriculture Popular Article Magazine is a peer-reviewed, open access monthly magazine, initiated for the purpose of providing information about novel innova" },
+      { name: "twitter:description", content: "The Agriculture Popular Article Magazine is a peer-reviewed, open access monthly magazine, initiated for the purpose of providing information about novel innova" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
