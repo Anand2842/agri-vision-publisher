@@ -5,30 +5,38 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/dashboard")({
+import { Session } from "@supabase/supabase-js";
+
+export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
-  head: () => ({ meta: [{ title: "Author Dashboard — The Agriculture Popular Article Magazine" }] }),
+  head: () => ({
+    meta: [{ title: "Author Dashboard — The Agriculture Popular Article Magazine" }],
+  }),
 });
 
 type Submission = { id: string; title: string; status: string; plan: string; created_at: string };
 
 function Dashboard() {
   const nav = useNavigate();
-  const [email, setEmail] = useState<string | null>(null);
+  const { session } = Route.useRouteContext() as { session: Session | null };
   const [subs, setSubs] = useState<Submission[] | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) { nav({ to: "/auth" }); return; }
-      setEmail(data.session.user.email ?? null);
-      const { data: rows, error } = await supabase.from("submissions").select("id,title,status,plan,created_at").order("created_at", { ascending: false });
+    if (!session) return;
+    (async () => {
+      const { data: rows, error } = await supabase
+        .from("submissions")
+        .select("id,title,status,plan,created_at")
+        .order("created_at", { ascending: false });
       if (error) toast.error(error.message);
       setSubs(rows || []);
-    });
-  }, [nav]);
+    })();
+  }, [session]);
 
   const total = subs?.length ?? 0;
-  const pending = subs?.filter((s) => ["submitted", "under_review", "revision_requested"].includes(s.status)).length ?? 0;
+  const pending =
+    subs?.filter((s) => ["submitted", "under_review", "revision_requested"].includes(s.status))
+      .length ?? 0;
   const published = subs?.filter((s) => s.status === "published").length ?? 0;
 
   return (
@@ -39,9 +47,19 @@ function Dashboard() {
           <div>
             <div className="eyebrow">Author Dashboard</div>
             <h1 className="font-display text-5xl mt-3 text-ink">Welcome back</h1>
-            {email && <p className="text-sm text-muted-foreground mt-2">{email}</p>}
+            {session?.user?.email && (
+              <p className="text-sm text-muted-foreground mt-2">{session.user.email}</p>
+            )}
           </div>
-          <button onClick={async () => { await supabase.auth.signOut(); nav({ to: "/" }); }} className="text-sm text-foreground/70 hover:text-primary">Sign out</button>
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              nav({ to: "/" });
+            }}
+            className="text-sm text-foreground/70 hover:text-primary"
+          >
+            Sign out
+          </button>
         </div>
 
         <div className="mt-12 grid sm:grid-cols-3 gap-6">
@@ -58,7 +76,12 @@ function Dashboard() {
           ) : subs.length === 0 ? (
             <div className="py-16 text-center">
               <p className="text-muted-foreground">No submissions yet.</p>
-              <button onClick={() => nav({ to: "/submit" })} className="mt-5 bg-primary text-primary-foreground px-5 py-3 rounded-sm text-sm">Begin a submission</button>
+              <button
+                onClick={() => nav({ to: "/submit" })}
+                className="mt-5 bg-primary text-primary-foreground px-5 py-3 rounded-sm text-sm"
+              >
+                Begin a submission
+              </button>
             </div>
           ) : (
             <ul className="divide-y divide-[var(--color-rule)]">
@@ -67,7 +90,8 @@ function Dashboard() {
                   <div className="min-w-0">
                     <div className="font-display text-xl text-ink truncate">{s.title}</div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      Ticket #{s.id.slice(0, 8).toUpperCase()} · {new Date(s.created_at).toLocaleDateString()} · {s.plan}
+                      Ticket #{s.id.slice(0, 8).toUpperCase()} ·{" "}
+                      {new Date(s.created_at).toLocaleDateString()} · {s.plan}
                     </div>
                   </div>
                   <StatusBadge status={s.status} />
@@ -101,5 +125,11 @@ function StatusBadge({ status }: { status: string }) {
     rejected: "bg-destructive/15 text-destructive",
     draft: "bg-muted text-muted-foreground",
   };
-  return <span className={`text-[0.65rem] uppercase tracking-widest px-3 py-1.5 rounded-sm shrink-0 ${map[status] || "bg-muted"}`}>{status.replace("_", " ")}</span>;
+  return (
+    <span
+      className={`text-[0.65rem] uppercase tracking-widest px-3 py-1.5 rounded-sm shrink-0 ${map[status] || "bg-muted"}`}
+    >
+      {status.replace("_", " ")}
+    </span>
+  );
 }

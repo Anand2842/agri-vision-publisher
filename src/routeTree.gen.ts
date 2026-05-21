@@ -9,34 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as SubmissionGuidelinesRouteImport } from './routes/submission-guidelines'
 import { Route as StartupSpotlightRouteImport } from './routes/startup-spotlight'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ModerateRouteImport } from './routes/moderate'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as EditorialBoardRouteImport } from './routes/editorial-board'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CurrentIssueRouteImport } from './routes/current-issue'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArchivesRouteImport } from './routes/archives'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
-import { Route as AdminSubmissionsRouteImport } from './routes/admin.submissions'
-import { Route as AdminQueueRouteImport } from './routes/admin.queue'
-import { Route as AdminIssuesRouteImport } from './routes/admin.issues'
-import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
-import { Route as AdminArticlesRouteImport } from './routes/admin.articles'
+import { Route as AuthenticatedSubmitRouteImport } from './routes/_authenticated.submit'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
+import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_authenticated.admin.submissions'
+import { Route as AuthenticatedAdminQueueRouteImport } from './routes/_authenticated.admin.queue'
+import { Route as AuthenticatedAdminIssuesRouteImport } from './routes/_authenticated.admin.issues'
+import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated.admin.content'
+import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated.admin.categories'
+import { Route as AuthenticatedAdminArticlesRouteImport } from './routes/_authenticated.admin.articles'
 
-const SubmitRoute = SubmitRouteImport.update({
-  id: '/submit',
-  path: '/submit',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SubmissionGuidelinesRoute = SubmissionGuidelinesRouteImport.update({
   id: '/submission-guidelines',
   path: '/submission-guidelines',
@@ -67,11 +65,6 @@ const EditorialBoardRoute = EditorialBoardRouteImport.update({
   path: '/editorial-board',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CurrentIssueRoute = CurrentIssueRouteImport.update({
   id: '/current-issue',
   path: '/current-issue',
@@ -92,14 +85,13 @@ const ArchivesRoute = ArchivesRouteImport.update({
   path: '/archives',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -107,65 +99,97 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
 const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
   id: '/articles/$slug',
   path: '/articles/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminSubmissionsRoute = AdminSubmissionsRouteImport.update({
-  id: '/submissions',
-  path: '/submissions',
-  getParentRoute: () => AdminRoute,
+const AuthenticatedSubmitRoute = AuthenticatedSubmitRouteImport.update({
+  id: '/submit',
+  path: '/submit',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AdminQueueRoute = AdminQueueRouteImport.update({
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminSubmissionsRoute =
+  AuthenticatedAdminSubmissionsRouteImport.update({
+    id: '/submissions',
+    path: '/submissions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminQueueRoute = AuthenticatedAdminQueueRouteImport.update({
   id: '/queue',
   path: '/queue',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AdminIssuesRoute = AdminIssuesRouteImport.update({
-  id: '/issues',
-  path: '/issues',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminArticlesRoute = AdminArticlesRouteImport.update({
-  id: '/articles',
-  path: '/articles',
-  getParentRoute: () => AdminRoute,
-} as any)
+const AuthenticatedAdminIssuesRoute =
+  AuthenticatedAdminIssuesRouteImport.update({
+    id: '/issues',
+    path: '/issues',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminContentRoute =
+  AuthenticatedAdminContentRouteImport.update({
+    id: '/content',
+    path: '/content',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCategoriesRoute =
+  AuthenticatedAdminCategoriesRouteImport.update({
+    id: '/categories',
+    path: '/categories',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminArticlesRoute =
+  AuthenticatedAdminArticlesRouteImport.update({
+    id: '/articles',
+    path: '/articles',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
-  '/dashboard': typeof DashboardRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
-  '/submit': typeof SubmitRoute
-  '/admin/articles': typeof AdminArticlesRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/issues': typeof AdminIssuesRoute
-  '/admin/queue': typeof AdminQueueRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
-  '/admin/': typeof AdminIndexRoute
+  '/admin/articles': typeof AuthenticatedAdminArticlesRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/content': typeof AuthenticatedAdminContentRoute
+  '/admin/issues': typeof AuthenticatedAdminIssuesRoute
+  '/admin/queue': typeof AuthenticatedAdminQueueRoute
+  '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -174,71 +198,78 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
-  '/dashboard': typeof DashboardRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
-  '/submit': typeof SubmitRoute
-  '/admin/articles': typeof AdminArticlesRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/issues': typeof AdminIssuesRoute
-  '/admin/queue': typeof AdminQueueRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
-  '/admin': typeof AdminIndexRoute
+  '/admin/articles': typeof AuthenticatedAdminArticlesRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/content': typeof AuthenticatedAdminContentRoute
+  '/admin/issues': typeof AuthenticatedAdminIssuesRoute
+  '/admin/queue': typeof AuthenticatedAdminQueueRoute
+  '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
-  '/dashboard': typeof DashboardRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
-  '/submit': typeof SubmitRoute
-  '/admin/articles': typeof AdminArticlesRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/issues': typeof AdminIssuesRoute
-  '/admin/queue': typeof AdminQueueRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
-  '/admin/': typeof AdminIndexRoute
+  '/_authenticated/admin/articles': typeof AuthenticatedAdminArticlesRoute
+  '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
+  '/_authenticated/admin/issues': typeof AuthenticatedAdminIssuesRoute
+  '/_authenticated/admin/queue': typeof AuthenticatedAdminQueueRoute
+  '/_authenticated/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
-    | '/admin'
     | '/archives'
     | '/auth'
     | '/contact'
     | '/current-issue'
-    | '/dashboard'
     | '/editorial-board'
     | '/membership'
     | '/moderate'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
+    | '/admin'
+    | '/dashboard'
     | '/submit'
+    | '/articles/$slug'
     | '/admin/articles'
     | '/admin/categories'
+    | '/admin/content'
     | '/admin/issues'
     | '/admin/queue'
     | '/admin/submissions'
-    | '/articles/$slug'
+    | '/admin/users'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -248,75 +279,71 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/current-issue'
-    | '/dashboard'
     | '/editorial-board'
     | '/membership'
     | '/moderate'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
+    | '/dashboard'
     | '/submit'
+    | '/articles/$slug'
     | '/admin/articles'
     | '/admin/categories'
+    | '/admin/content'
     | '/admin/issues'
     | '/admin/queue'
     | '/admin/submissions'
-    | '/articles/$slug'
+    | '/admin/users'
     | '/admin'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
-    | '/admin'
     | '/archives'
     | '/auth'
     | '/contact'
     | '/current-issue'
-    | '/dashboard'
     | '/editorial-board'
     | '/membership'
     | '/moderate'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
-    | '/submit'
-    | '/admin/articles'
-    | '/admin/categories'
-    | '/admin/issues'
-    | '/admin/queue'
-    | '/admin/submissions'
+    | '/_authenticated/admin'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/submit'
     | '/articles/$slug'
-    | '/admin/'
+    | '/_authenticated/admin/articles'
+    | '/_authenticated/admin/categories'
+    | '/_authenticated/admin/content'
+    | '/_authenticated/admin/issues'
+    | '/_authenticated/admin/queue'
+    | '/_authenticated/admin/submissions'
+    | '/_authenticated/admin/users'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRouteWithChildren
   ArchivesRoute: typeof ArchivesRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   CurrentIssueRoute: typeof CurrentIssueRoute
-  DashboardRoute: typeof DashboardRoute
   EditorialBoardRoute: typeof EditorialBoardRoute
   MembershipRoute: typeof MembershipRoute
   ModerateRoute: typeof ModerateRoute
   SearchRoute: typeof SearchRoute
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
-  SubmitRoute: typeof SubmitRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/submit': {
-      id: '/submit'
-      path: '/submit'
-      fullPath: '/submit'
-      preLoaderRoute: typeof SubmitRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/submission-guidelines': {
       id: '/submission-guidelines'
       path: '/submission-guidelines'
@@ -359,13 +386,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EditorialBoardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/current-issue': {
       id: '/current-issue'
       path: '/current-issue'
@@ -394,18 +414,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArchivesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -415,13 +435,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/articles/$slug': {
       id: '/articles/$slug'
       path: '/articles/$slug'
@@ -429,82 +442,153 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArticlesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/submissions': {
-      id: '/admin/submissions'
+    '/_authenticated/submit': {
+      id: '/_authenticated/submit'
+      path: '/submit'
+      fullPath: '/submit'
+      preLoaderRoute: typeof AuthenticatedSubmitRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/submissions': {
+      id: '/_authenticated/admin/submissions'
       path: '/submissions'
       fullPath: '/admin/submissions'
-      preLoaderRoute: typeof AdminSubmissionsRouteImport
-      parentRoute: typeof AdminRoute
+      preLoaderRoute: typeof AuthenticatedAdminSubmissionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/admin/queue': {
-      id: '/admin/queue'
+    '/_authenticated/admin/queue': {
+      id: '/_authenticated/admin/queue'
       path: '/queue'
       fullPath: '/admin/queue'
-      preLoaderRoute: typeof AdminQueueRouteImport
-      parentRoute: typeof AdminRoute
+      preLoaderRoute: typeof AuthenticatedAdminQueueRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/admin/issues': {
-      id: '/admin/issues'
+    '/_authenticated/admin/issues': {
+      id: '/_authenticated/admin/issues'
       path: '/issues'
       fullPath: '/admin/issues'
-      preLoaderRoute: typeof AdminIssuesRouteImport
-      parentRoute: typeof AdminRoute
+      preLoaderRoute: typeof AuthenticatedAdminIssuesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/admin/categories': {
-      id: '/admin/categories'
+    '/_authenticated/admin/content': {
+      id: '/_authenticated/admin/content'
+      path: '/content'
+      fullPath: '/admin/content'
+      preLoaderRoute: typeof AuthenticatedAdminContentRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/categories': {
+      id: '/_authenticated/admin/categories'
       path: '/categories'
       fullPath: '/admin/categories'
-      preLoaderRoute: typeof AdminCategoriesRouteImport
-      parentRoute: typeof AdminRoute
+      preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/admin/articles': {
-      id: '/admin/articles'
+    '/_authenticated/admin/articles': {
+      id: '/_authenticated/admin/articles'
       path: '/articles'
       fullPath: '/admin/articles'
-      preLoaderRoute: typeof AdminArticlesRouteImport
-      parentRoute: typeof AdminRoute
+      preLoaderRoute: typeof AuthenticatedAdminArticlesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
   }
 }
 
-interface AdminRouteChildren {
-  AdminArticlesRoute: typeof AdminArticlesRoute
-  AdminCategoriesRoute: typeof AdminCategoriesRoute
-  AdminIssuesRoute: typeof AdminIssuesRoute
-  AdminQueueRoute: typeof AdminQueueRoute
-  AdminSubmissionsRoute: typeof AdminSubmissionsRoute
-  AdminIndexRoute: typeof AdminIndexRoute
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminArticlesRoute: typeof AuthenticatedAdminArticlesRoute
+  AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
+  AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
+  AuthenticatedAdminIssuesRoute: typeof AuthenticatedAdminIssuesRoute
+  AuthenticatedAdminQueueRoute: typeof AuthenticatedAdminQueueRoute
+  AuthenticatedAdminSubmissionsRoute: typeof AuthenticatedAdminSubmissionsRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminArticlesRoute: AdminArticlesRoute,
-  AdminCategoriesRoute: AdminCategoriesRoute,
-  AdminIssuesRoute: AdminIssuesRoute,
-  AdminQueueRoute: AdminQueueRoute,
-  AdminSubmissionsRoute: AdminSubmissionsRoute,
-  AdminIndexRoute: AdminIndexRoute,
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminArticlesRoute: AuthenticatedAdminArticlesRoute,
+  AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
+  AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
+  AuthenticatedAdminIssuesRoute: AuthenticatedAdminIssuesRoute,
+  AuthenticatedAdminQueueRoute: AuthenticatedAdminQueueRoute,
+  AuthenticatedAdminSubmissionsRoute: AuthenticatedAdminSubmissionsRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSubmitRoute: typeof AuthenticatedSubmitRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSubmitRoute: AuthenticatedSubmitRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRouteWithChildren,
   ArchivesRoute: ArchivesRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   CurrentIssueRoute: CurrentIssueRoute,
-  DashboardRoute: DashboardRoute,
   EditorialBoardRoute: EditorialBoardRoute,
   MembershipRoute: MembershipRoute,
   ModerateRoute: ModerateRoute,
   SearchRoute: SearchRoute,
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
-  SubmitRoute: SubmitRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

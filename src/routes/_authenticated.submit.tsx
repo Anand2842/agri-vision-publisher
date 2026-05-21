@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { FileText, Upload } from "lucide-react";
 
-export const Route = createFileRoute("/submit")({
+export const Route = createFileRoute("/_authenticated/submit")({
   component: Submit,
   head: () => ({ meta: [{ title: "Submit Article — The Agriculture Popular Article Magazine" }] }),
 });
@@ -26,37 +26,33 @@ const ALLOWED_EXT = [".doc", ".docx"];
 
 function Submit() {
   const nav = useNavigate();
-  const [authChecked, setAuthChecked] = useState(false);
-  const [signedIn, setSignedIn] = useState(false);
   const [cats, setCats] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => { setSignedIn(!!data.session); setAuthChecked(true); });
-    supabase.from("categories").select("id,name").order("name").then(({ data }) => setCats(data || []));
+    supabase
+      .from("categories")
+      .select("id,name")
+      .order("name")
+      .then(({ data }) => setCats(data || []));
   }, []);
 
-  if (authChecked && !signedIn) {
-    return (
-      <>
-        <SiteHeader />
-        <main className="container-editorial py-24 text-center">
-          <h1 className="font-display text-4xl text-ink">Sign in to submit</h1>
-          <p className="mt-4 text-muted-foreground">You need an author account to begin a submission.</p>
-          <button onClick={() => nav({ to: "/auth" })} className="mt-6 bg-primary text-primary-foreground px-6 py-3 rounded-sm text-sm">Sign in or create account</button>
-        </main>
-        <SiteFooter />
-      </>
-    );
-  }
-
   const onFile = (f: File | null) => {
-    if (!f) { setFile(null); return; }
+    if (!f) {
+      setFile(null);
+      return;
+    }
     const ext = f.name.slice(f.name.lastIndexOf(".")).toLowerCase();
-    if (!ALLOWED_EXT.includes(ext)) { toast.error("Only .doc or .docx files are accepted."); return; }
-    if (f.size > MAX_BYTES) { toast.error("File must be 10 MB or smaller."); return; }
+    if (!ALLOWED_EXT.includes(ext)) {
+      toast.error("Only .doc or .docx files are accepted.");
+      return;
+    }
+    if (f.size > MAX_BYTES) {
+      toast.error("File must be 10 MB or smaller.");
+      return;
+    }
     setFile(f);
   };
 
@@ -73,19 +69,33 @@ function Submit() {
       plan: String(fd.get("plan")) as "single" | "annual" | "lifetime" | "institute",
     };
     const r = schema.safeParse(data);
-    if (!r.success) { toast.error(r.error.issues[0].message); return; }
-    if (!file) { toast.error("Please attach your manuscript (.doc or .docx)."); return; }
+    if (!r.success) {
+      toast.error(r.error.issues[0].message);
+      return;
+    }
+    if (!file) {
+      toast.error("Please attach your manuscript (.doc or .docx).");
+      return;
+    }
 
     setLoading(true);
     const { data: sess } = await supabase.auth.getUser();
-    if (!sess.user) { toast.error("Please sign in"); setLoading(false); return; }
+    if (!sess.user) {
+      toast.error("Please sign in");
+      setLoading(false);
+      return;
+    }
 
     const { data: row, error } = await supabase
       .from("submissions")
       .insert({ ...data, user_id: sess.user.id })
       .select()
       .single();
-    if (error || !row) { setLoading(false); toast.error(error?.message || "Failed to create submission"); return; }
+    if (error || !row) {
+      setLoading(false);
+      toast.error(error?.message || "Failed to create submission");
+      return;
+    }
 
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
     const path = `${sess.user.id}/${row.id}${ext}`;
@@ -112,7 +122,8 @@ function Submit() {
         <div className="eyebrow">Authors</div>
         <h1 className="font-display text-5xl mt-3 text-ink">Submit Your Article</h1>
         <p className="mt-4 text-foreground/70">
-          Manuscripts in Microsoft Word (.doc / .docx) format only · 2–4 pages · reviewed within 21 days.
+          Manuscripts in Microsoft Word (.doc / .docx) format only · 2–4 pages · reviewed within 21
+          days.
         </p>
 
         <form onSubmit={onSubmit} className="mt-12 space-y-6">
@@ -121,14 +132,23 @@ function Submit() {
           <Field label="Keywords (comma separated)" name="keywords" />
           <div>
             <label className="eyebrow block mb-2">Category</label>
-            <select name="category_id" className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm">
+            <select
+              name="category_id"
+              className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm"
+            >
               <option value="">— Select —</option>
-              {cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {cats.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
             </select>
           </div>
 
           <div>
-            <label className="eyebrow block mb-2">Manuscript file (.doc / .docx, up to 10 MB)</label>
+            <label className="eyebrow block mb-2">
+              Manuscript file (.doc / .docx, up to 10 MB)
+            </label>
             <input
               ref={fileRef}
               type="file"
@@ -156,11 +176,21 @@ function Submit() {
             </button>
           </div>
 
-          <Field label="Manuscript text (optional — paste for quick review)" name="content" textarea rows={8} />
+          <Field
+            label="Manuscript text (optional — paste for quick review)"
+            name="content"
+            textarea
+            rows={8}
+          />
 
           <div>
             <label className="eyebrow block mb-2">Membership plan</label>
-            <select name="plan" required defaultValue="single" className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm">
+            <select
+              name="plan"
+              required
+              defaultValue="single"
+              className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm"
+            >
               <option value="single">Single Article (₹200)</option>
               <option value="annual">Annual (₹500 · 8 articles / 12 months)</option>
               <option value="lifetime">Lifetime (₹2,000 · 5 years)</option>
@@ -168,7 +198,10 @@ function Submit() {
             </select>
           </div>
 
-          <button disabled={loading} className="w-full bg-primary text-primary-foreground px-6 py-4 rounded-sm hover:bg-primary/90 disabled:opacity-60">
+          <button
+            disabled={loading}
+            className="w-full bg-primary text-primary-foreground px-6 py-4 rounded-sm hover:bg-primary/90 disabled:opacity-60"
+          >
             {loading ? "Submitting…" : "Submit for review"}
           </button>
         </form>
@@ -178,14 +211,35 @@ function Submit() {
   );
 }
 
-function Field({ label, name, textarea, rows, required }: { label: string; name: string; textarea?: boolean; rows?: number; required?: boolean }) {
+function Field({
+  label,
+  name,
+  textarea,
+  rows,
+  required,
+}: {
+  label: string;
+  name: string;
+  textarea?: boolean;
+  rows?: number;
+  required?: boolean;
+}) {
   return (
     <div>
       <label className="eyebrow block mb-2">{label}</label>
       {textarea ? (
-        <textarea name={name} rows={rows} required={required} className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary" />
+        <textarea
+          name={name}
+          rows={rows}
+          required={required}
+          className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
+        />
       ) : (
-        <input name={name} required={required} className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary" />
+        <input
+          name={name}
+          required={required}
+          className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
+        />
       )}
     </div>
   );

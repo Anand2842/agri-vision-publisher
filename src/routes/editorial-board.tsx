@@ -1,19 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { editorialBoard, reviewers, advisoryCommittee, type BoardMember } from "@/lib/mock-data";
+import { useSiteContent, fetchSeoMetadata } from "@/hooks/useSiteContent";
+
+export type BoardMember = {
+  name: string;
+  role?: string;
+  title?: string;
+  inst?: string;
+  country?: string;
+  photo_url?: string;
+};
 
 export const Route = createFileRoute("/editorial-board")({
   component: Board,
-  head: () => ({
-    meta: [
-      { title: "Editorial Board — The Agriculture Popular Article Magazine" },
-      {
-        name: "description",
-        content:
-          "Masthead of The Agriculture Popular Article Magazine — Editor-in-Chief Dr. Dileep Kumar, international editors, associate editors, advisory committee and peer reviewers.",
-      },
-    ],
+  loader: () => fetchSeoMetadata("editorial_board"),
+  head: ({ loaderData }) => ({
+    meta: loaderData
+      ? [
+          { title: loaderData.title },
+          { name: "description", content: loaderData.description },
+          { property: "og:title", content: loaderData.title },
+          { property: "og:description", content: loaderData.description },
+        ]
+      : [],
   }),
 });
 
@@ -35,16 +45,22 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
           large ? "text-7xl" : "text-4xl"
         } text-[oklch(var(--navy))]/30 border border-rule overflow-hidden`}
       >
-        {m.photo ? (
-          <img src={m.photo} alt={m.name} className="h-full w-full object-cover" loading="lazy" />
+        {m.photo_url ? (
+          <img src={m.photo_url} alt={m.name} className="h-full w-full object-cover" loading="lazy" />
         ) : (
           <span className="tracking-wider">{initials(m.name)}</span>
         )}
       </div>
-      <h4 className={`font-display ${large ? "text-2xl" : "text-lg"} mt-4 text-[oklch(var(--navy))] leading-tight`}>
+      <h4
+        className={`font-display ${large ? "text-2xl" : "text-lg"} mt-4 text-[oklch(var(--navy))] leading-tight`}
+      >
         {m.name}
       </h4>
-      {m.title && <div className="text-xs uppercase tracking-wide text-[oklch(var(--orange))] mt-1.5 font-medium">{m.title}</div>}
+      {m.title && (
+        <div className="text-xs uppercase tracking-wide text-[oklch(var(--orange))] mt-1.5 font-medium">
+          {m.title}
+        </div>
+      )}
       <div className="text-sm text-foreground/70 mt-1.5 leading-snug">{m.inst}</div>
       {m.country && <div className="text-xs text-foreground/55 mt-1 italic">{m.country}</div>}
     </article>
@@ -54,7 +70,9 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
 function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <header className="mt-20 mb-10">
-      <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">{eyebrow}</div>
+      <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+        {eyebrow}
+      </div>
       <h2 className="font-display text-3xl md:text-4xl mt-2 text-[oklch(var(--navy))]">{title}</h2>
       <div className="h-px bg-[oklch(var(--navy))]/20 mt-4" />
     </header>
@@ -62,6 +80,11 @@ function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
 }
 
 function Board() {
+  const { get, getJson } = useSiteContent("editorial_board");
+  const editorialBoard = getJson<"editors", "items", BoardMember[]>("editors", "items");
+  const advisoryCommittee = getJson<"advisory", "items", BoardMember[]>("advisory", "items");
+  const reviewers = getJson<"reviewers", "items", (BoardMember & { dept?: string })[]>("reviewers", "items");
+
   const groupBy = (role: string) => editorialBoard.filter((m) => m.role === role);
   const eic = groupBy("Editor-in-Chief")[0];
   const international = groupBy("International Editor");
@@ -73,21 +96,18 @@ function Board() {
       <main className="container-editorial py-16">
         <div className="border-b border-[oklch(var(--navy))]/15 pb-12">
           <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
-            Masthead · Volume 1
+            {get("hero", "eyebrow")}
           </div>
           <h1 className="font-display text-5xl md:text-6xl lg:text-7xl mt-4 text-[oklch(var(--navy))] leading-[1.05] max-w-4xl">
-            The minds behind the magazine.
+            {get("hero", "tagline")}
           </h1>
           <p className="mt-6 text-lg text-foreground/75 max-w-2xl leading-relaxed">
-            Editors, advisors and peer reviewers drawn from ICAR institutes, state agricultural
-            universities and partner laboratories across India, Nepal, Sri Lanka and the United States.
+            {get("hero", "subtitle")}
           </p>
         </div>
 
         <SectionHeader eyebrow="Leadership" title="Editor-in-Chief" />
-        <div className="grid md:grid-cols-3 gap-10">
-          {eic && <PersonCard m={eic} large />}
-        </div>
+        <div className="grid md:grid-cols-3 gap-10">{eic && <PersonCard m={eic} large />}</div>
 
         <SectionHeader eyebrow={`${international.length} Editors`} title="International Editors" />
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
@@ -103,14 +123,19 @@ function Board() {
           ))}
         </div>
 
-        <SectionHeader eyebrow={`${advisoryCommittee.length} Members`} title="International Advisory Committee" />
+        <SectionHeader
+          eyebrow={`${advisoryCommittee.length} Members`}
+          title="International Advisory Committee"
+        />
         <p className="-mt-6 mb-10 text-foreground/70 max-w-2xl">
-          Senior scientists, policy advisors and institutional leaders who guide the magazine's
-          editorial direction and international outreach.
+          {get("advisory", "description")}
         </p>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-[oklch(var(--navy))]/15">
           {advisoryCommittee.map((m) => (
-            <div key={`${m.name}-${m.inst}`} className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-baseline gap-4">
+            <div
+              key={`${m.name}-${m.inst}`}
+              className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-baseline gap-4"
+            >
               <div className="font-display text-lg text-[oklch(var(--navy))] flex-1">{m.name}</div>
               <div className="text-sm text-foreground/65 text-right max-w-[60%] leading-snug">
                 <span className="italic">{m.inst}</span>
@@ -122,12 +147,14 @@ function Board() {
 
         <SectionHeader eyebrow={`${reviewers.length} Reviewers`} title="Peer Reviewers" />
         <p className="-mt-6 mb-10 text-foreground/70 max-w-2xl">
-          Scholars and practitioners who evaluate every submission for scientific rigour,
-          originality and clarity before publication.
+          {get("reviewers", "description")}
         </p>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-[oklch(var(--navy))]/15">
           {reviewers.map((r, i) => (
-            <div key={`${r.name}-${i}`} className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-baseline gap-4">
+            <div
+              key={`${r.name}-${i}`}
+              className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-baseline gap-4"
+            >
               <div className="font-display text-lg text-[oklch(var(--navy))] flex-1">{r.name}</div>
               {r.inst && (
                 <div className="text-sm text-foreground/65 text-right max-w-[60%] leading-snug">

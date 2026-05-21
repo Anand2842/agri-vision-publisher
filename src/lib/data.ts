@@ -1,5 +1,20 @@
 import { supabase } from "@/integrations/supabase/client";
-import { articles as mockArticles, issues as mockIssues, cover as mockCover, type Article } from "@/lib/mock-data";
+import defaultCover from "@/assets/issue-cover-1.jpg";
+
+export type Article = {
+  slug: string;
+  title: string;
+  category: string;
+  author: string;
+  affiliation: string;
+  readTime: number;
+  views: string;
+  cover: string;
+  abstract: string;
+  date: string;
+  /** Path of the article PDF inside the `article-pdfs` Supabase Storage bucket. */
+  pdfPath?: string;
+};
 
 export type DBArticle = Article & { id?: string };
 
@@ -35,16 +50,7 @@ export async function fetchIssues(): Promise<IssueRow[]> {
     .select("id,volume,issue_number,title,description,published_at,cover_url,pdf_url")
     .order("published_at", { ascending: false });
   if (!data || data.length === 0) {
-    return mockIssues.map((i, idx) => ({
-      id: `mock-${idx}`,
-      volume: i.volume,
-      number: i.number,
-      title: i.title,
-      desc: i.desc,
-      date: i.date,
-      cover: mockCover,
-      pdfUrl: null,
-    }));
+    return [];
   }
   return data.map((r) => ({
     id: r.id,
@@ -53,7 +59,7 @@ export async function fetchIssues(): Promise<IssueRow[]> {
     title: r.title,
     desc: r.description ?? "",
     date: fmtDate(r.published_at),
-    cover: r.cover_url || mockCover,
+    cover: r.cover_url || defaultCover,
     pdfUrl: r.pdf_url ?? null,
   }));
 }
@@ -93,13 +99,13 @@ export async function fetchPublishedArticles(limit?: number): Promise<DBArticle[
   let q = supabase
     .from("articles")
     .select(
-      "id,slug,title,abstract,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)"
+      "id,slug,title,abstract,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)",
     )
     .eq("status", "published")
     .order("published_at", { ascending: false });
   if (limit) q = q.limit(limit);
   const { data } = await q;
-  if (!data || data.length === 0) return limit ? mockArticles.slice(0, limit) : mockArticles;
+  if (!data || data.length === 0) return [];
   return (data as unknown as ArticleJoin[]).map(mapArticle);
 }
 
@@ -107,13 +113,13 @@ export async function fetchArticleBySlug(slug: string): Promise<DBArticle | null
   const { data } = await supabase
     .from("articles")
     .select(
-      "id,slug,title,abstract,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)"
+      "id,slug,title,abstract,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)",
     )
     .eq("slug", slug)
     .eq("status", "published")
     .maybeSingle();
   if (data) return mapArticle(data as unknown as ArticleJoin);
-  return mockArticles.find((a) => a.slug === slug) ?? null;
+  return null;
 }
 
 export { issuePdf, articlePdf };

@@ -2,25 +2,53 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
-  CheckCircle2, XCircle, Eye, RotateCcw, FileText, Download, History,
-  User, ArrowRight, Plus, Pencil, FilePlus2,
+  CheckCircle2,
+  XCircle,
+  Eye,
+  RotateCcw,
+  FileText,
+  Download,
+  History,
+  User,
+  ArrowRight,
+  Plus,
+  Pencil,
+  FilePlus2,
 } from "lucide-react";
 
 type SubmissionStatus =
-  | "draft" | "submitted" | "under_review" | "revision_requested"
-  | "approved" | "rejected" | "published";
+  | "draft"
+  | "submitted"
+  | "under_review"
+  | "revision_requested"
+  | "approved"
+  | "rejected"
+  | "published";
 
 type Sub = {
-  id: string; title: string; abstract: string; keywords: string | null;
-  status: SubmissionStatus; plan: string; user_id: string; category_id: string | null;
-  notes: string | null; content: string | null; manuscript_path: string | null;
-  created_at: string; updated_at: string;
+  id: string;
+  title: string;
+  abstract: string;
+  keywords: string | null;
+  status: SubmissionStatus;
+  plan: string;
+  user_id: string;
+  category_id: string | null;
+  notes: string | null;
+  content: string | null;
+  manuscript_path: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 type EventRow = {
-  id: string; submission_id: string; actor_id: string | null;
-  from_status: string | null; to_status: string | null;
-  note: string | null; created_at: string;
+  id: string;
+  submission_id: string;
+  actor_id: string | null;
+  from_status: string | null;
+  to_status: string | null;
+  note: string | null;
+  created_at: string;
 };
 
 const FILTERS: { value: SubmissionStatus | ""; label: string }[] = [
@@ -50,15 +78,21 @@ export function QueueConsole() {
 
   const load = async () => {
     const { data, error } = await supabase
-      .from("submissions").select("*").order("created_at", { ascending: false });
+      .from("submissions")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
     setRows((data || []) as Sub[]);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
-    (rows || []).forEach((r) => { c[r.status] = (c[r.status] || 0) + 1; });
+    (rows || []).forEach((r) => {
+      c[r.status] = (c[r.status] || 0) + 1;
+    });
     return c;
   }, [rows]);
 
@@ -68,14 +102,16 @@ export function QueueConsole() {
     <div>
       <div className="flex flex-wrap gap-1.5">
         {FILTERS.map((f) => {
-          const n = f.value ? (counts[f.value] || 0) : (rows?.length || 0);
+          const n = f.value ? counts[f.value] || 0 : rows?.length || 0;
           const active = filter === f.value;
           return (
             <button
               key={f.value || "all"}
               onClick={() => setFilter(f.value)}
               className={`px-3 py-1.5 text-xs uppercase tracking-wider font-condensed border transition-colors ${
-                active ? "bg-navy text-white border-navy" : "bg-background border-rule hover:border-orange text-foreground/70"
+                active
+                  ? "bg-navy text-white border-navy"
+                  : "bg-background border-rule hover:border-orange text-foreground/70"
               }`}
             >
               {f.label} <span className="opacity-70 ml-1">({n})</span>
@@ -85,14 +121,24 @@ export function QueueConsole() {
       </div>
 
       <div className="mt-6 border border-rule">
-        {rows === null && <div className="p-10 text-center text-muted-foreground">Loading submissions…</div>}
+        {rows === null && (
+          <div className="p-10 text-center text-muted-foreground">Loading submissions…</div>
+        )}
         {rows !== null && filtered.length === 0 && (
-          <div className="p-10 text-center text-muted-foreground">No submissions in this status.</div>
+          <div className="p-10 text-center text-muted-foreground">
+            No submissions in this status.
+          </div>
         )}
         {rows !== null && filtered.length > 0 && (
           <ul className="divide-y divide-rule">
             {filtered.map((s) => (
-              <Row key={s.id} s={s} open={open === s.id} onToggle={() => setOpen(open === s.id ? null : s.id)} onChanged={load} />
+              <Row
+                key={s.id}
+                s={s}
+                open={open === s.id}
+                onToggle={() => setOpen(open === s.id ? null : s.id)}
+                onChanged={load}
+              />
             ))}
           </ul>
         )}
@@ -103,7 +149,17 @@ export function QueueConsole() {
 
 type ActorProfile = { id: string; full_name: string | null };
 
-function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle: () => void; onChanged: () => void }) {
+function Row({
+  s,
+  open,
+  onToggle,
+  onChanged,
+}: {
+  s: Sub;
+  open: boolean;
+  onToggle: () => void;
+  onChanged: () => void;
+}) {
   const [notes, setNotes] = useState(s.notes ?? "");
   const [saving, setSaving] = useState(false);
   const [events, setEvents] = useState<EventRow[] | null>(null);
@@ -111,12 +167,16 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
   const [downloading, setDownloading] = useState(false);
   const [auditFilter, setAuditFilter] = useState<"all" | "status" | "notes">("all");
 
-  useEffect(() => { if (open && events === null) loadEvents(); /* eslint-disable-next-line */ }, [open]);
+  useEffect(() => {
+    if (open && events === null) loadEvents(); /* eslint-disable-next-line */
+  }, [open]);
 
   const loadEvents = async () => {
     const { data, error } = await supabase
-      .from("submission_events").select("*")
-      .eq("submission_id", s.id).order("created_at", { ascending: true });
+      .from("submission_events")
+      .select("*")
+      .eq("submission_id", s.id)
+      .order("created_at", { ascending: true });
     if (error) toast.error(error.message);
     const list = (data || []) as EventRow[];
     setEvents(list);
@@ -124,7 +184,9 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
     if (ids.length) {
       const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
       const map: Record<string, ActorProfile> = {};
-      (profs || []).forEach((p: ActorProfile) => { map[p.id] = p; });
+      (profs || []).forEach((p: ActorProfile) => {
+        map[p.id] = p;
+      });
       setActors(map);
     }
   };
@@ -149,7 +211,10 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
   const saveNotesOnly = async () => {
     if ((notes ?? "") === (s.notes ?? "")) return;
     setSaving(true);
-    const { error } = await supabase.from("submissions").update({ notes: notes.trim() || null }).eq("id", s.id);
+    const { error } = await supabase
+      .from("submissions")
+      .update({ notes: notes.trim() || null })
+      .eq("id", s.id);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Note saved");
@@ -160,7 +225,9 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
   const downloadManuscript = async () => {
     if (!s.manuscript_path) return;
     setDownloading(true);
-    const { data, error } = await supabase.storage.from("manuscripts").createSignedUrl(s.manuscript_path, 300);
+    const { data, error } = await supabase.storage
+      .from("manuscripts")
+      .createSignedUrl(s.manuscript_path, 300);
     setDownloading(false);
     if (error || !data) return toast.error(error?.message ?? "Could not generate download link");
     window.open(data.signedUrl, "_blank", "noopener");
@@ -172,15 +239,21 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
         <div className="min-w-0">
           <div className="font-display text-lg text-ink truncate">{s.title}</div>
           <div className="text-xs text-muted-foreground mt-1">
-            #{s.id.slice(0, 8).toUpperCase()} · submitted {new Date(s.created_at).toLocaleDateString()} · plan {s.plan}
+            #{s.id.slice(0, 8).toUpperCase()} · submitted{" "}
+            {new Date(s.created_at).toLocaleDateString()} · plan {s.plan}
           </div>
         </div>
-        <span className={`text-[0.65rem] uppercase tracking-widest px-2 py-1 rounded-sm shrink-0 ${STATUS_TONE[s.status] || "bg-muted"}`}>
+        <span
+          className={`text-[0.65rem] uppercase tracking-widest px-2 py-1 rounded-sm shrink-0 ${STATUS_TONE[s.status] || "bg-muted"}`}
+        >
           {s.status.replace("_", " ")}
         </span>
       </div>
 
-      <button onClick={onToggle} className="mt-3 text-xs uppercase tracking-wider text-orange inline-flex items-center gap-1.5">
+      <button
+        onClick={onToggle}
+        className="mt-3 text-xs uppercase tracking-wider text-orange inline-flex items-center gap-1.5"
+      >
         <Eye className="h-3.5 w-3.5" /> {open ? "Close" : "Open for review"}
       </button>
 
@@ -204,7 +277,9 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
                   <Download className="h-3.5 w-3.5" />
                   {downloading ? "Generating…" : "Download manuscript"}
                 </button>
-                <span className="ml-3 text-xs text-muted-foreground inline-flex items-center gap-1"><FileText className="h-3 w-3" /> {s.manuscript_path.split("/").pop()}</span>
+                <span className="ml-3 text-xs text-muted-foreground inline-flex items-center gap-1">
+                  <FileText className="h-3 w-3" /> {s.manuscript_path.split("/").pop()}
+                </span>
               </div>
             )}
           </div>
@@ -225,17 +300,50 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
             <div className="space-y-2">
               <div className="eyebrow">Decisions</div>
               <div className="grid grid-cols-2 gap-2">
-                <ActionButton onClick={() => transition("under_review")} disabled={saving} icon={Eye} tone="default">Mark reviewing</ActionButton>
-                <ActionButton onClick={() => transition("revision_requested", true)} disabled={saving} icon={RotateCcw} tone="warn">Request revision</ActionButton>
-                <ActionButton onClick={() => transition("approved")} disabled={saving} icon={CheckCircle2} tone="ok">Approve</ActionButton>
-                <ActionButton onClick={() => transition("rejected", true)} disabled={saving} icon={XCircle} tone="danger">Reject</ActionButton>
+                <ActionButton
+                  onClick={() => transition("under_review")}
+                  disabled={saving}
+                  icon={Eye}
+                  tone="default"
+                >
+                  Mark reviewing
+                </ActionButton>
+                <ActionButton
+                  onClick={() => transition("revision_requested", true)}
+                  disabled={saving}
+                  icon={RotateCcw}
+                  tone="warn"
+                >
+                  Request revision
+                </ActionButton>
+                <ActionButton
+                  onClick={() => transition("approved")}
+                  disabled={saving}
+                  icon={CheckCircle2}
+                  tone="ok"
+                >
+                  Approve
+                </ActionButton>
+                <ActionButton
+                  onClick={() => transition("rejected", true)}
+                  disabled={saving}
+                  icon={XCircle}
+                  tone="danger"
+                >
+                  Reject
+                </ActionButton>
               </div>
-              <p className="text-[11px] text-muted-foreground">Approval keeps the article in queue. An admin then promotes it to a published article in an issue.</p>
+              <p className="text-[11px] text-muted-foreground">
+                Approval keeps the article in queue. An admin then promotes it to a published
+                article in an issue.
+              </p>
             </div>
 
             <div>
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="eyebrow flex items-center gap-1.5"><History className="h-3 w-3" /> Audit history</div>
+                <div className="eyebrow flex items-center gap-1.5">
+                  <History className="h-3 w-3" /> Audit history
+                </div>
                 {events && events.length > 0 && (
                   <div className="inline-flex border border-rule rounded-sm overflow-hidden text-[10px] uppercase tracking-wider">
                     {(["all", "status", "notes"] as const).map((f) => (
@@ -252,79 +360,110 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
                 )}
               </div>
               {events === null && <p className="text-xs text-muted-foreground mt-2">Loading…</p>}
-              {events && events.length === 0 && <p className="text-xs text-muted-foreground mt-2">No activity recorded.</p>}
-              {events && events.length > 0 && (() => {
-                const reversed = [...events].reverse();
-                const decorated = reversed.map((e, idx) => {
-                  const parsed = parseEventNote(e.note);
-                  const prevParsed = parsed.kind === "created" ? { note: null } : parseEventNote(reversed[idx + 1]?.note ?? null);
-                  const statusChanged = !!e.from_status && e.from_status !== e.to_status;
-                  const noteChanged = parsed.kind === "notes" || parsed.kind === "both" || parsed.kind === "created";
-                  return { e, parsed, prevParsed, statusChanged, noteChanged };
-                });
-                const visible = decorated.filter((d) => {
-                  if (auditFilter === "status") return d.statusChanged;
-                  if (auditFilter === "notes") return d.noteChanged && d.parsed.kind !== "created";
-                  return true;
-                });
-                if (visible.length === 0) {
-                  return <p className="text-xs text-muted-foreground mt-2">No {auditFilter === "status" ? "status changes" : "note edits"} recorded.</p>;
-                }
-                return (
-                  <ol className="mt-2 border-l-2 border-rule pl-4 space-y-3">
-                    {visible.map(({ e, parsed, prevParsed, statusChanged, noteChanged }) => {
-                      const actor = e.actor_id ? actors[e.actor_id] : null;
-                      const actorLabel = actor?.full_name?.trim() || (e.actor_id ? `${e.actor_id.slice(0, 8)}…` : "System");
-                      const KindIcon = parsed.kind === "created" ? FilePlus2 : parsed.kind === "notes" ? Pencil : Plus;
-                      const showStatus = statusChanged && auditFilter !== "notes";
-                      const showNote = noteChanged && auditFilter !== "status";
-                      return (
-                        <li key={e.id} className="relative text-xs">
-                          <span className="absolute -left-[1.4rem] top-1 h-2.5 w-2.5 rounded-full bg-orange ring-2 ring-background" />
-                          <div className="flex flex-wrap items-center gap-2 text-foreground/85">
-                            <KindIcon className="h-3 w-3 text-orange" />
-                            <span className="inline-flex items-center gap-1 text-foreground/70">
-                              <User className="h-3 w-3" /> <span className="font-medium text-ink">{actorLabel}</span>
-                            </span>
-                            <span className="text-muted-foreground/70">·</span>
-                            <time className="text-muted-foreground/80" dateTime={e.created_at}>
-                              {new Date(e.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
-                            </time>
-                          </div>
-
-                          {showStatus && (
-                            <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
-                              <StatusChip value={e.from_status!} />
-                              <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                              <StatusChip value={e.to_status!} />
+              {events && events.length === 0 && (
+                <p className="text-xs text-muted-foreground mt-2">No activity recorded.</p>
+              )}
+              {events &&
+                events.length > 0 &&
+                (() => {
+                  const reversed = [...events].reverse();
+                  const decorated = reversed.map((e, idx) => {
+                    const parsed = parseEventNote(e.note);
+                    const prevParsed =
+                      parsed.kind === "created"
+                        ? { note: null }
+                        : parseEventNote(reversed[idx + 1]?.note ?? null);
+                    const statusChanged = !!e.from_status && e.from_status !== e.to_status;
+                    const noteChanged =
+                      parsed.kind === "notes" ||
+                      parsed.kind === "both" ||
+                      parsed.kind === "created";
+                    return { e, parsed, prevParsed, statusChanged, noteChanged };
+                  });
+                  const visible = decorated.filter((d) => {
+                    if (auditFilter === "status") return d.statusChanged;
+                    if (auditFilter === "notes")
+                      return d.noteChanged && d.parsed.kind !== "created";
+                    return true;
+                  });
+                  if (visible.length === 0) {
+                    return (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        No {auditFilter === "status" ? "status changes" : "note edits"} recorded.
+                      </p>
+                    );
+                  }
+                  return (
+                    <ol className="mt-2 border-l-2 border-rule pl-4 space-y-3">
+                      {visible.map(({ e, parsed, prevParsed, statusChanged, noteChanged }) => {
+                        const actor = e.actor_id ? actors[e.actor_id] : null;
+                        const actorLabel =
+                          actor?.full_name?.trim() ||
+                          (e.actor_id ? `${e.actor_id.slice(0, 8)}…` : "System");
+                        const KindIcon =
+                          parsed.kind === "created"
+                            ? FilePlus2
+                            : parsed.kind === "notes"
+                              ? Pencil
+                              : Plus;
+                        const showStatus = statusChanged && auditFilter !== "notes";
+                        const showNote = noteChanged && auditFilter !== "status";
+                        return (
+                          <li key={e.id} className="relative text-xs">
+                            <span className="absolute -left-[1.4rem] top-1 h-2.5 w-2.5 rounded-full bg-orange ring-2 ring-background" />
+                            <div className="flex flex-wrap items-center gap-2 text-foreground/85">
+                              <KindIcon className="h-3 w-3 text-orange" />
+                              <span className="inline-flex items-center gap-1 text-foreground/70">
+                                <User className="h-3 w-3" />{" "}
+                                <span className="font-medium text-ink">{actorLabel}</span>
+                              </span>
+                              <span className="text-muted-foreground/70">·</span>
+                              <time className="text-muted-foreground/80" dateTime={e.created_at}>
+                                {new Date(e.created_at).toLocaleString(undefined, {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                })}
+                              </time>
                             </div>
-                          )}
-                          {!statusChanged && parsed.kind === "created" && e.to_status && auditFilter !== "notes" && (
-                            <div className="mt-1.5"><StatusChip value={e.to_status} /></div>
-                          )}
 
-                          {showNote && (
-                            <div className="mt-1.5 space-y-1">
-                              {prevParsed.note && (
-                                <div className="line-through text-rose-700/80 bg-rose-50 border border-rose-100 px-2 py-1 rounded-sm">
-                                  {prevParsed.note}
+                            {showStatus && (
+                              <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                                <StatusChip value={e.from_status!} />
+                                <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                                <StatusChip value={e.to_status!} />
+                              </div>
+                            )}
+                            {!statusChanged &&
+                              parsed.kind === "created" &&
+                              e.to_status &&
+                              auditFilter !== "notes" && (
+                                <div className="mt-1.5">
+                                  <StatusChip value={e.to_status} />
                                 </div>
                               )}
-                              {parsed.note ? (
-                                <div className="text-emerald-800 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-sm whitespace-pre-wrap">
-                                  {parsed.note}
-                                </div>
-                              ) : (
-                                <div className="italic text-muted-foreground">Note cleared</div>
-                              )}
-                            </div>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ol>
-                );
-              })()}
+
+                            {showNote && (
+                              <div className="mt-1.5 space-y-1">
+                                {prevParsed.note && (
+                                  <div className="line-through text-rose-700/80 bg-rose-50 border border-rose-100 px-2 py-1 rounded-sm">
+                                    {prevParsed.note}
+                                  </div>
+                                )}
+                                {parsed.note ? (
+                                  <div className="text-emerald-800 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-sm whitespace-pre-wrap">
+                                    {parsed.note}
+                                  </div>
+                                ) : (
+                                  <div className="italic text-muted-foreground">Note cleared</div>
+                                )}
+                              </div>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  );
+                })()}
             </div>
           </div>
         </div>
@@ -333,7 +472,10 @@ function Row({ s, open, onToggle, onChanged }: { s: Sub; open: boolean; onToggle
   );
 }
 
-function parseEventNote(raw: string | null): { kind: "created" | "status" | "notes" | "both" | "unknown"; note: string | null } {
+function parseEventNote(raw: string | null): {
+  kind: "created" | "status" | "notes" | "both" | "unknown";
+  note: string | null;
+} {
   if (!raw) return { kind: "unknown", note: null };
   if (raw === "Submission created") return { kind: "created", note: null };
   if (raw === "Status changed") return { kind: "status", note: null };
@@ -346,7 +488,9 @@ function parseEventNote(raw: string | null): { kind: "created" | "status" | "not
 
 function StatusChip({ value }: { value: string }) {
   return (
-    <span className={`text-[0.6rem] uppercase tracking-widest px-1.5 py-0.5 rounded-sm ${STATUS_TONE[value] || "bg-muted"}`}>
+    <span
+      className={`text-[0.6rem] uppercase tracking-widest px-1.5 py-0.5 rounded-sm ${STATUS_TONE[value] || "bg-muted"}`}
+    >
       {value.replace("_", " ")}
     </span>
   );
@@ -362,16 +506,26 @@ function Block({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function ActionButton({
-  onClick, disabled, icon: Icon, tone, children,
+  onClick,
+  disabled,
+  icon: Icon,
+  tone,
+  children,
 }: {
-  onClick: () => void; disabled?: boolean; icon: React.ComponentType<{ className?: string }>;
-  tone: "default" | "ok" | "warn" | "danger"; children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+  tone: "default" | "ok" | "warn" | "danger";
+  children: React.ReactNode;
 }) {
   const toneCls =
-    tone === "ok" ? "border-emerald-600 text-emerald-700 hover:bg-emerald-50"
-    : tone === "warn" ? "border-amber-600 text-amber-700 hover:bg-amber-50"
-    : tone === "danger" ? "border-rose-600 text-rose-700 hover:bg-rose-50"
-    : "border-rule text-foreground/80 hover:border-orange hover:text-orange";
+    tone === "ok"
+      ? "border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+      : tone === "warn"
+        ? "border-amber-600 text-amber-700 hover:bg-amber-50"
+        : tone === "danger"
+          ? "border-rose-600 text-rose-700 hover:bg-rose-50"
+          : "border-rule text-foreground/80 hover:border-orange hover:text-orange";
   return (
     <button
       onClick={onClick}

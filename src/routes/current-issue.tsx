@@ -1,27 +1,36 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { fetchIssues, fetchPublishedArticles, articlePdf, type IssueRow, type DBArticle } from "@/lib/data";
+import {
+  fetchIssues,
+  fetchPublishedArticles,
+  articlePdf,
+  type IssueRow,
+  type DBArticle,
+} from "@/lib/data";
 import { useEffect, useState } from "react";
 import { Download, FileText, BookOpen, ArrowRight } from "lucide-react";
+import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 
 export const Route = createFileRoute("/current-issue")({
   component: CurrentIssue,
-  head: () => ({
-    meta: [
-      { title: "Current Issue — The Agriculture Popular Article Magazine" },
-      {
-        name: "description",
-        content:
-          "Read or download the latest peer-reviewed issue of The Agriculture Popular Article Magazine.",
-      },
-    ],
+  loader: () => fetchSeoMetadata("current_issue"),
+  head: ({ loaderData }) => ({
+    meta: loaderData
+      ? [
+          { title: loaderData.title },
+          { name: "description", content: loaderData.description },
+          { property: "og:title", content: loaderData.title },
+          { property: "og:description", content: loaderData.description },
+        ]
+      : [],
   }),
 });
 
 function CurrentIssue() {
   const [issue, setIssue] = useState<IssueRow | null>(null);
   const [articles, setArticles] = useState<DBArticle[]>([]);
+  const { get } = useSiteContent("current_issue");
 
   useEffect(() => {
     fetchIssues().then((rows) => setIssue(rows[0] ?? null));
@@ -32,7 +41,9 @@ function CurrentIssue() {
     return (
       <>
         <SiteHeader />
-        <main className="container-editorial py-32 text-center text-muted-foreground">Loading…</main>
+        <main className="container-editorial py-32 text-center text-muted-foreground">
+          Loading…
+        </main>
         <SiteFooter />
       </>
     );
@@ -90,8 +101,12 @@ function CurrentIssue() {
                     <span className="flex items-center gap-3">
                       <Download className="h-5 w-5" />
                       <span>
-                        <span className="block text-sm font-semibold">View / Download Full Issue</span>
-                        <span className="block text-[0.7rem] uppercase tracking-wider opacity-70">PDF</span>
+                        <span className="block text-sm font-semibold">
+                          View / Download Full Issue
+                        </span>
+                        <span className="block text-[0.7rem] uppercase tracking-wider opacity-70">
+                          PDF
+                        </span>
                       </span>
                     </span>
                     <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
@@ -122,7 +137,8 @@ function CurrentIssue() {
                   How to cite
                 </div>
                 <p className="mt-2 text-xs text-foreground/65 font-mono leading-relaxed">
-                  The Agriculture Popular Article Magazine, Vol. {issue.volume}, Iss. {issue.number} ({issue.date}).
+                  The Agriculture Popular Article Magazine, Vol. {issue.volume}, Iss. {issue.number}{" "}
+                  ({issue.date}).
                 </p>
               </div>
             </aside>
@@ -165,11 +181,7 @@ function CurrentIssue() {
                           <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
                             {a.category}
                           </div>
-                          <Link
-                            to="/articles/$slug"
-                            params={{ slug: a.slug }}
-                            className="block"
-                          >
+                          <Link to="/articles/$slug" params={{ slug: a.slug }} className="block">
                             <h4 className="font-display text-xl md:text-2xl mt-1.5 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] transition-colors leading-snug">
                               {a.title}
                             </h4>
@@ -178,7 +190,9 @@ function CurrentIssue() {
                             </p>
                           </Link>
                           <div className="mt-3 text-xs text-foreground/60">
-                            <span className="text-[oklch(var(--navy))] font-medium">{a.author}</span>
+                            <span className="text-[oklch(var(--navy))] font-medium">
+                              {a.author}
+                            </span>
                             <span className="mx-2 text-[oklch(var(--navy))]/30">·</span>
                             <span className="italic">{a.affiliation}</span>
                           </div>
@@ -211,14 +225,13 @@ function CurrentIssue() {
               <div className="mt-16 border border-[oklch(var(--navy))]/15 bg-[oklch(var(--navy))]/[0.03] p-8 flex flex-col md:flex-row md:items-center gap-6 justify-between">
                 <div>
                   <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
-                    Call for Papers
+                    {get("call_for_papers", "heading")}
                   </div>
                   <h4 className="font-display text-2xl mt-2 text-[oklch(var(--navy))]">
-                    Submit to the next issue
+                    {get("call_for_papers", "subheading")}
                   </h4>
                   <p className="mt-2 text-sm text-foreground/70 max-w-md">
-                    Original research, field reports and short reviews from agricultural scientists,
-                    extension officers and research scholars are welcome year-round.
+                    {get("call_for_papers", "body")}
                   </p>
                 </div>
                 <Link

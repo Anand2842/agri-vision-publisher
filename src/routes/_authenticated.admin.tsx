@@ -1,49 +1,95 @@
-import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutGrid, BookOpen, FileText, FolderTree, Inbox, ListChecks } from "lucide-react";
+import { LayoutGrid, BookOpen, FileText, FolderTree, Inbox, ListChecks, Users, LayoutTemplate } from "lucide-react";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/_authenticated/admin")({
+  beforeLoad: async ({ location }) => {
+    if (typeof window === "undefined") return;
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      throw redirect({
+        to: "/auth",
+        search: { redirect: location.href },
+      });
+    }
+
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id);
+
+    const list = (roles || []).map((r) => r.role);
+    const isAdmin = list.includes("admin");
+    const isModerator = list.includes("moderator");
+
+    if (!isAdmin && !isModerator) {
+      return { role: null };
+    }
+
+    const role = isAdmin ? "admin" : "moderator";
+
+    // If moderator and trying to access root /admin, redirect to /admin/queue
+    if (
+      role === "moderator" &&
+      (location.pathname === "/admin" || location.pathname === "/admin/")
+    ) {
+      throw redirect({
+        to: "/admin/queue",
+        replace: true,
+      });
+    }
+
+    return { role };
+  },
   component: AdminLayout,
-  head: () => ({ meta: [{ title: "Admin — The Agriculture Popular Article Magazine" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [
+      { title: "Admin — The Agriculture Popular Article Magazine" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
 type EditorRole = "admin" | "moderator";
 
-const items: { to: string; label: string; icon: typeof LayoutGrid; exact?: boolean; roles: EditorRole[] }[] = [
+const items: {
+  to: string;
+  label: string;
+  icon: typeof LayoutGrid;
+  exact?: boolean;
+  roles: EditorRole[];
+}[] = [
   { to: "/admin", label: "Overview", icon: LayoutGrid, exact: true, roles: ["admin"] },
   { to: "/admin/queue", label: "Queue", icon: ListChecks, roles: ["admin", "moderator"] },
   { to: "/admin/submissions", label: "Submissions", icon: Inbox, roles: ["admin"] },
+  { to: "/admin/users", label: "Users & Roles", icon: Users, roles: ["admin"] },
   { to: "/admin/issues", label: "Issues", icon: BookOpen, roles: ["admin"] },
   { to: "/admin/articles", label: "Articles", icon: FileText, roles: ["admin"] },
   { to: "/admin/categories", label: "Categories", icon: FolderTree, roles: ["admin"] },
+  { to: "/admin/content", label: "Site Content", icon: LayoutTemplate, roles: ["admin"] },
 ];
 
 function AdminLayout() {
-  const nav = useNavigate();
+  const { role } = Route.useRouteContext() as { role: EditorRole | null | undefined };
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const [state, setState] = useState<"loading" | "ok" | "denied">("loading");
-  const [role, setRole] = useState<EditorRole | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) { nav({ to: "/auth" }); return; }
-      const { data: roles } = await supabase
-        .from("user_roles").select("role").eq("user_id", data.session.user.id);
-      const list = (roles || []).map((r) => r.role);
-      if (list.includes("admin")) { setRole("admin"); setState("ok"); }
-      else if (list.includes("moderator")) {
-        setRole("moderator"); setState("ok");
-        if (path === "/admin") nav({ to: "/admin/queue", replace: true });
-      } else {
-        setState("denied");
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nav]);
+  // On server rendering or before hydration completes, show checking access
+  if (typeof window === "undefined" || role === undefined) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="container-editorial py-10">
+          <div className="py-20 text-center text-muted-foreground">Checking access…</div>
+        </main>
+        <SiteFooter />
+      </>
+    );
+  }
 
   const visibleItems = items.filter((it) => role && it.roles.includes(role));
 
@@ -58,28 +104,33 @@ function AdminLayout() {
               {role === "moderator" ? "Editor" : "Admin"}
             </h1>
             {role && (
-              <p className="text-xs uppercase tracking-widest text-orange mt-2">Signed in as {role}</p>
+              <p className="text-xs uppercase tracking-widest text-orange mt-2">
+                Signed in as {role}
+              </p>
             )}
           </div>
-          <Link to="/dashboard" className="text-xs uppercase tracking-wider text-foreground/60 hover:text-orange">
+          <Link
+            to="/dashboard"
+            className="text-xs uppercase tracking-wider text-foreground/60 hover:text-orange"
+          >
             Back to dashboard
           </Link>
         </div>
         <div className="rule-thick mt-4" />
 
-        {state === "loading" && <div className="py-20 text-center text-muted-foreground">Checking access…</div>}
-        {state === "denied" && (
+        {role === null ? (
           <div className="py-20 max-w-xl">
             <h2 className="font-display text-2xl text-ink">Access restricted</h2>
             <p className="mt-3 text-sm text-muted-foreground">
-              Your account does not have editorial privileges. If this is the first run of the platform, an
-              admin can be claimed from the <Link to="/admin" className="underline">Overview</Link> once
-              available; otherwise contact an existing admin.
+              Your account does not have editorial privileges. If this is the first run of the
+              platform, an admin can be claimed from the{" "}
+              <Link to="/admin" className="underline">
+                Overview
+              </Link>{" "}
+              once available; otherwise contact an existing admin.
             </p>
           </div>
-        )}
-
-        {state === "ok" && (
+        ) : (
           <div className="mt-8 grid grid-cols-12 gap-8">
             <aside className="col-span-12 md:col-span-3">
               <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible">

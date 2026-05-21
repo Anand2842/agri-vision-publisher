@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { QueueConsole } from "@/components/moderator/QueueConsole";
 
-export const Route = createFileRoute("/admin/queue")({
+export const Route = createFileRoute("/_authenticated/admin/queue")({
   component: AdminQueue,
 });
 
@@ -12,7 +12,8 @@ function AdminQueue() {
         <div>
           <h2 className="font-display text-2xl text-ink">Editorial Queue</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            Review submissions, move them between statuses, and leave editorial notes for authors. No catalog edits.
+            Review submissions, move them between statuses, and leave editorial notes for authors.
+            No catalog edits.
           </p>
         </div>
       </div>

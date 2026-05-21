@@ -73,10 +73,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "The Agriculture Popular Article Magazine" },
-      { name: "description", content: "A monthly peer-reviewed, open-access magazine for agriculture and allied sciences." },
+      {
+        name: "description",
+        content:
+          "A monthly peer-reviewed, open-access magazine for agriculture and allied sciences.",
+      },
       { name: "author", content: "The Agriculture Popular Article Magazine — Editorial Office" },
       { property: "og:title", content: "The Agriculture Popular Article Magazine" },
-      { property: "og:description", content: "A monthly peer-reviewed, open-access magazine for agriculture and allied sciences." },
+      {
+        property: "og:description",
+        content:
+          "A monthly peer-reviewed, open-access magazine for agriculture and allied sciences.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
