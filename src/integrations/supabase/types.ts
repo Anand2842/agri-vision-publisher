@@ -266,6 +266,55 @@ export type Database = {
           to_status?: Database["public"]["Enums"]["submission_status"] | null
         }
         Relationships: []
+      membership_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          notes: string | null
+          payment_method: "upi" | "bank"
+          plan: Database["public"]["Enums"]["membership_plan"]
+          receipt_path: string | null
+          status: "pending" | "approved" | "rejected"
+          transaction_ref: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_method: "upi" | "bank"
+          plan: Database["public"]["Enums"]["membership_plan"]
+          receipt_path?: string | null
+          status?: "pending" | "approved" | "rejected"
+          transaction_ref: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_method?: "upi" | "bank"
+          plan?: Database["public"]["Enums"]["membership_plan"]
+          receipt_path?: string | null
+          status?: "pending" | "approved" | "rejected"
+          transaction_ref?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "membership_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       submissions: {
         Row: {

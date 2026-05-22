@@ -25,22 +25,21 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   beforeLoad: async ({ location }) => {
-    if (typeof window === "undefined") return;
-
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
       throw redirect({
         to: "/auth",
-        search: { redirect: location.href },
+        search: { redirect: location.pathname + location.search + location.hash },
       });
     }
 
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", session.user.id);
+      .eq("user_id", user.id);
 
     const list = (roles || []).map((r) => r.role);
     if (!list.includes("admin")) {

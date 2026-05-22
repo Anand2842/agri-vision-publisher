@@ -2,54 +2,70 @@ import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tansta
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutGrid, BookOpen, FileText, FolderTree, Inbox, ListChecks, Users, LayoutTemplate } from "lucide-react";
+import { LayoutGrid, BookOpen, FileText, FolderTree, Inbox, ListChecks, Users, LayoutTemplate, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ location }) => {
-    if (typeof window === "undefined") return;
-
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
       throw redirect({
         to: "/auth",
-        search: { redirect: location.href },
+        search: { redirect: location.pathname + location.search + location.hash },
       });
     }
 
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", session.user.id);
+      .eq("user_id", user.id);
 
     const list = (roles || []).map((r) => r.role);
     const isAdmin = list.includes("admin");
     const isModerator = list.includes("moderator");
 
     if (!isAdmin && !isModerator) {
-      return { role: null };
+      // Check if there are any admins in the system
+      const { count } = await supabase
+        .from("user_roles")
+        .select("id", { count: "exact", head: true })
+        .eq("role", "admin");
+
+      if (count === 0) {
+        if (location.pathname === "/admin" || location.pathname === "/admin/") {
+          return { role: null };
+        }
+      }
+
+      throw redirect({
+        to: "/dashboard",
+        replace: true,
+      });
     }
 
     const role = isAdmin ? "admin" : "moderator";
 
-    // If moderator and trying to access root /admin, redirect to /admin/queue
-    if (
-      role === "moderator" &&
-      (location.pathname === "/admin" || location.pathname === "/admin/")
-    ) {
-      throw redirect({
-        to: "/admin/queue",
-        replace: true,
-      });
+    if (role === "moderator") {
+      const allowedPaths = ["/admin/queue", "/admin/memberships"];
+      const isPathAllowed = allowedPaths.some(
+        (p) => location.pathname === p || location.pathname.startsWith(p + "/")
+      );
+      if (!isPathAllowed) {
+        throw redirect({
+          to: "/admin/queue",
+          replace: true,
+        });
+      }
     }
 
     return { role };
   },
   component: AdminLayout,
   head: () => ({
+    title: "Admin — The Agriculture Popular Article Magazine",
     meta: [
-      { title: "Admin — The Agriculture Popular Article Magazine" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -66,6 +82,7 @@ const items: {
 }[] = [
   { to: "/admin", label: "Overview", icon: LayoutGrid, exact: true, roles: ["admin"] },
   { to: "/admin/queue", label: "Queue", icon: ListChecks, roles: ["admin", "moderator"] },
+  { to: "/admin/memberships", label: "Membership Claims", icon: ShieldCheck, roles: ["admin", "moderator"] },
   { to: "/admin/submissions", label: "Submissions", icon: Inbox, roles: ["admin"] },
   { to: "/admin/users", label: "Users & Roles", icon: Users, roles: ["admin"] },
   { to: "/admin/issues", label: "Issues", icon: BookOpen, roles: ["admin"] },

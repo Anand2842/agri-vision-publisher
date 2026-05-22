@@ -12,9 +12,9 @@ export const Route = createFileRoute("/contact")({
   component: Contact,
   loader: () => fetchSeoMetadata("contact"),
   head: ({ loaderData }) => ({
+    title: loaderData?.title || "Contact — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
-          { title: loaderData.title },
           { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },

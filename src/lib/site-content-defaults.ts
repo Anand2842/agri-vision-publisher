@@ -55,7 +55,7 @@ export type SiteContentKeys = {
   membership: {
     hero: "heading" | "subtext";
     plans: "items";
-    payment: "bank_holder" | "bank_account" | "bank_name" | "bank_ifsc" | "bank_branch" | "upi_number" | "contact_email" | "heading" | "body";
+    payment: "bank_holder" | "bank_account" | "bank_name" | "bank_ifsc" | "bank_branch" | "upi_number" | "upi_qr_url" | "contact_email" | "heading" | "body";
   };
   guidelines: {
     hero: "heading" | "intro";
@@ -346,6 +346,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       bank_ifsc: "SBIN0003877",
       bank_branch: "SBI Main Jaisalmer",
       upi_number: "+91 9509164410",
+      upi_qr_url: "",
       contact_email: "dkdkdangi@gmail.com",
       heading: "Payment Details",
       body: "We support direct bank transfers (NEFT/IMPS) and UPI mobile payments. Please find the credentials below.",

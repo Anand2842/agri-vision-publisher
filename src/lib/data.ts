@@ -109,6 +109,25 @@ export async function fetchPublishedArticles(limit?: number): Promise<DBArticle[
   return (data as unknown as ArticleJoin[]).map(mapArticle);
 }
 
+export async function searchArticles(term: string, limit: number = 50): Promise<DBArticle[]> {
+  if (!term.trim()) {
+    return fetchPublishedArticles(limit);
+  }
+  const cleanTerm = `%${term.trim()}%`;
+  const { data } = await supabase
+    .from("articles")
+    .select(
+      "id,slug,title,abstract,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)",
+    )
+    .eq("status", "published")
+    .or(`title.ilike.${cleanTerm},abstract.ilike.${cleanTerm}`)
+    .order("published_at", { ascending: false })
+    .limit(limit);
+
+  if (!data || data.length === 0) return [];
+  return (data as unknown as ArticleJoin[]).map(mapArticle);
+}
+
 export async function fetchArticleBySlug(slug: string): Promise<DBArticle | null> {
   const { data } = await supabase
     .from("articles")

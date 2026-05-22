@@ -14,7 +14,7 @@ const authSearchSchema = z.object({
 export const Route = createFileRoute("/auth")({
   validateSearch: (search) => authSearchSchema.parse(search),
   component: Auth,
-  head: () => ({ meta: [{ title: "Sign in — The Agriculture Popular Article Magazine" }] }),
+  head: () => ({ title: "Sign in — The Agriculture Popular Article Magazine" }),
 });
 
 const schema = z.object({
@@ -29,6 +29,7 @@ function Auth() {
   const { redirect: redirectUrl } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
+  const [signUpPending, setSignUpPending] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -48,7 +49,7 @@ function Auth() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email: data.email,
           password: data.password,
           options: {
@@ -57,6 +58,13 @@ function Auth() {
           },
         });
         if (error) throw error;
+        
+        if (!signUpData.session) {
+          toast.success("Signup successful! Please check your email.");
+          setSignUpPending(true);
+          return;
+        }
+
         toast.success("Account created");
         nav({ to: redirectUrl || "/dashboard" });
       } else {
@@ -70,6 +78,28 @@ function Auth() {
       setLoading(false);
     }
   };
+
+  if (signUpPending) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="container-editorial py-20 max-w-md text-center">
+          <div className="eyebrow text-primary">Verification Required</div>
+          <h1 className="font-display text-4xl mt-3 text-ink">Check your email</h1>
+          <p className="mt-6 text-sm text-muted-foreground leading-relaxed">
+            We have sent a verification link to your email address. Please click the link to confirm your account and sign in.
+          </p>
+          <button
+            onClick={() => setSignUpPending(false)}
+            className="mt-8 w-full bg-primary text-primary-foreground px-6 py-3 rounded-sm text-sm hover:bg-primary/90 transition-colors"
+          >
+            Back to Sign In
+          </button>
+        </main>
+        <SiteFooter />
+      </>
+    );
+  }
 
   return (
     <>
@@ -85,7 +115,8 @@ function Auth() {
           {mode === "signup" && (
             <input
               name="full_name"
-              placeholder="Full name"
+              required
+              placeholder="Full name *"
               className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
             />
           )}
@@ -119,7 +150,7 @@ function Auth() {
         </button>
         <div className="mt-10 text-xs text-muted-foreground">
           By continuing you agree to our{" "}
-          <Link to="/about" className="underline">
+          <Link to="/submission-guidelines" className="underline">
             terms
           </Link>
           .

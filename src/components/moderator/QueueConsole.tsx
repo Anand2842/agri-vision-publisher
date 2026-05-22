@@ -75,18 +75,28 @@ export function QueueConsole() {
   const [rows, setRows] = useState<Sub[] | null>(null);
   const [filter, setFilter] = useState<SubmissionStatus | "">("submitted");
   const [open, setOpen] = useState<string | null>(null);
+  const [limit, setLimit] = useState(50);
+  const [hasMore, setHasMore] = useState(false);
 
   const load = async () => {
     const { data, error } = await supabase
       .from("submissions")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(limit + 1);
     if (error) toast.error(error.message);
-    setRows((data || []) as Sub[]);
+    const results = (data || []) as Sub[];
+    if (results.length > limit) {
+      setHasMore(true);
+      setRows(results.slice(0, limit));
+    } else {
+      setHasMore(false);
+      setRows(results);
+    }
   };
   useEffect(() => {
     load();
-  }, []);
+  }, [limit]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -143,6 +153,17 @@ export function QueueConsole() {
           </ul>
         )}
       </div>
+
+      {hasMore && (
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => setLimit((l) => l + 50)}
+            className="px-6 py-2.5 bg-background border border-rule text-xs uppercase tracking-wider font-semibold hover:border-orange hover:text-orange transition-colors"
+          >
+            Load More Submissions
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -479,10 +500,12 @@ function parseEventNote(raw: string | null): {
   if (!raw) return { kind: "unknown", note: null };
   if (raw === "Submission created") return { kind: "created", note: null };
   if (raw === "Status changed") return { kind: "status", note: null };
-  const both = raw.match(/^Status \+ notes updated: ([\s\S]*)$/);
-  if (both) return { kind: "both", note: both[1] || null };
-  const notes = raw.match(/^Notes updated: ([\s\S]*)$/);
-  if (notes) return { kind: "notes", note: notes[1] || null };
+  if (raw.startsWith("Status + notes updated: ")) {
+    return { kind: "both", note: raw.slice("Status + notes updated: ".length) || null };
+  }
+  if (raw.startsWith("Notes updated: ")) {
+    return { kind: "notes", note: raw.slice("Notes updated: ".length) || null };
+  }
   return { kind: "unknown", note: raw };
 }
 

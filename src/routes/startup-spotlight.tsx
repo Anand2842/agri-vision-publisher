@@ -7,9 +7,9 @@ export const Route = createFileRoute("/startup-spotlight")({
   component: Spotlight,
   loader: () => fetchSeoMetadata("startup_spotlight"),
   head: ({ loaderData }) => ({
+    title: loaderData?.title || "Startup Spotlight — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
-          { title: loaderData.title },
           { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },

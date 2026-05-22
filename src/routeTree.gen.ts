@@ -30,6 +30,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_authenticated.admin.submissions'
 import { Route as AuthenticatedAdminQueueRouteImport } from './routes/_authenticated.admin.queue'
+import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated.admin.memberships'
 import { Route as AuthenticatedAdminIssuesRouteImport } from './routes/_authenticated.admin.issues'
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated.admin.content'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated.admin.categories'
@@ -140,6 +141,12 @@ const AuthenticatedAdminQueueRoute = AuthenticatedAdminQueueRouteImport.update({
   path: '/queue',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminMembershipsRoute =
+  AuthenticatedAdminMembershipsRouteImport.update({
+    id: '/memberships',
+    path: '/memberships',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminIssuesRoute =
   AuthenticatedAdminIssuesRouteImport.update({
     id: '/issues',
@@ -186,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/issues': typeof AuthenticatedAdminIssuesRoute
+  '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/queue': typeof AuthenticatedAdminQueueRoute
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -211,6 +219,7 @@ export interface FileRoutesByTo {
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/issues': typeof AuthenticatedAdminIssuesRoute
+  '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/queue': typeof AuthenticatedAdminQueueRoute
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -239,6 +248,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/issues': typeof AuthenticatedAdminIssuesRoute
+  '/_authenticated/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/_authenticated/admin/queue': typeof AuthenticatedAdminQueueRoute
   '/_authenticated/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/content'
     | '/admin/issues'
+    | '/admin/memberships'
     | '/admin/queue'
     | '/admin/submissions'
     | '/admin/users'
@@ -292,6 +303,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/content'
     | '/admin/issues'
+    | '/admin/memberships'
     | '/admin/queue'
     | '/admin/submissions'
     | '/admin/users'
@@ -319,6 +331,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/issues'
+    | '/_authenticated/admin/memberships'
     | '/_authenticated/admin/queue'
     | '/_authenticated/admin/submissions'
     | '/_authenticated/admin/users'
@@ -491,6 +504,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminQueueRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/memberships': {
+      id: '/_authenticated/admin/memberships'
+      path: '/memberships'
+      fullPath: '/admin/memberships'
+      preLoaderRoute: typeof AuthenticatedAdminMembershipsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/issues': {
       id: '/_authenticated/admin/issues'
       path: '/issues'
@@ -527,6 +547,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
   AuthenticatedAdminIssuesRoute: typeof AuthenticatedAdminIssuesRoute
+  AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
   AuthenticatedAdminQueueRoute: typeof AuthenticatedAdminQueueRoute
   AuthenticatedAdminSubmissionsRoute: typeof AuthenticatedAdminSubmissionsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -538,6 +559,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
   AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
   AuthenticatedAdminIssuesRoute: AuthenticatedAdminIssuesRoute,
+  AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,
   AuthenticatedAdminQueueRoute: AuthenticatedAdminQueueRoute,
   AuthenticatedAdminSubmissionsRoute: AuthenticatedAdminSubmissionsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
@@ -582,3 +604,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

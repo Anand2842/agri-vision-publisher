@@ -27,9 +27,9 @@ export const Route = createFileRoute("/articles/$slug")({
     return { a, related };
   },
   head: ({ loaderData }) => ({
+    title: loaderData ? `${loaderData.a.title} — The Agriculture Popular Article Magazine` : "Article — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
-          { title: `${loaderData.a.title} — The Agriculture Popular Article Magazine` },
           { name: "description", content: loaderData.a.abstract },
           { property: "og:title", content: loaderData.a.title },
           { property: "og:description", content: loaderData.a.abstract },

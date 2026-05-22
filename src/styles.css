@@ -50,6 +50,7 @@
   --color-paper: var(--paper);
   --color-rule: var(--rule);
   --color-ink: var(--ink);
+  --color-ochre: var(--ochre);
 }
 
 :root {
@@ -94,6 +95,7 @@
   --rule: oklch(0.85 0.025 90);
   --input: oklch(0.88 0.02 90);
   --ring: oklch(0.71 0.135 80);
+  --ochre: oklch(0.71 0.135 80);
 
   --chart-1: oklch(0.42 0.085 145);
   --chart-2: oklch(0.71 0.135 80);
@@ -134,6 +136,7 @@
   --rule: oklch(1 0 0 / 18%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.7 0.18 55);
+  --ochre: oklch(0.7 0.18 55);
 }
 
 @layer base {

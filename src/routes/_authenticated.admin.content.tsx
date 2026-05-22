@@ -346,7 +346,8 @@ function MembershipCms() {
         <TextFieldEditor page="membership" section="payment" contentKey="bank_name" label="Bank Name" initialValue={get("payment", "bank_name")} />
         <TextFieldEditor page="membership" section="payment" contentKey="bank_ifsc" label="IFSC Code" initialValue={get("payment", "bank_ifsc")} />
         <TextFieldEditor page="membership" section="payment" contentKey="bank_branch" label="Branch" initialValue={get("payment", "bank_branch")} />
-        <TextFieldEditor page="membership" section="payment" contentKey="upi_number" label="UPI Phone Number" initialValue={get("payment", "upi_number")} />
+        <TextFieldEditor page="membership" section="payment" contentKey="upi_number" label="UPI Phone Number / ID" initialValue={get("payment", "upi_number")} />
+        <ImageUploadEditor page="membership" section="payment" contentKey="upi_qr_url" label="UPI / PhonePe QR Code Image" initialValue={get("payment", "upi_qr_url")} />
         <TextFieldEditor page="membership" section="payment" contentKey="contact_email" label="Contact Email" initialValue={get("payment", "contact_email")} />
       </CmsSection>
     </div>

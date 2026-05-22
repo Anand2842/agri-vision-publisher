@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { fetchPublishedArticles, type DBArticle } from "@/lib/data";
+import { searchArticles, type DBArticle } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Search as SearchIcon } from "lucide-react";
@@ -15,9 +15,9 @@ export const Route = createFileRoute("/search")({
   validateSearch: searchSchema,
   loader: () => fetchSeoMetadata("search"),
   head: ({ loaderData }) => ({
+    title: loaderData?.title || "Search Articles — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
-          { title: loaderData.title },
           { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },
@@ -30,28 +30,39 @@ function SearchPage() {
   const { q: initialQ } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [q, setQ] = useState(initialQ ?? "");
-  const [pool, setPool] = useState<DBArticle[]>([]);
+  const [results, setResults] = useState<DBArticle[]>([]);
+  const [loading, setLoading] = useState(false);
   const { get } = useSiteContent("search_page");
 
   useEffect(() => {
-    fetchPublishedArticles().then(setPool);
-  }, []);
+    let active = true;
+    const term = q.trim();
 
-  // keep URL in sync (debounced lightly)
-  useEffect(() => {
+    async function performSearch() {
+      setLoading(true);
+      try {
+        const data = await searchArticles(term, 50);
+        if (active) {
+          setResults(data);
+        }
+      } catch (err) {
+        console.error("Search fetch error:", err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
     const t = setTimeout(() => {
-      navigate({ search: q.trim() ? { q: q.trim() } : {}, replace: true });
+      // keep URL in sync
+      navigate({ search: term ? { q: term } : {}, replace: true });
+      performSearch();
     }, 250);
-    return () => clearTimeout(t);
-  }, [q, navigate]);
 
-  const term = q.trim().toLowerCase();
-  const results =
-    term.length === 0
-      ? pool
-      : pool.filter((a) =>
-          [a.title, a.author, a.category, a.abstract].join(" ").toLowerCase().includes(term),
-        );
+    return () => {
+      active = false;
+      clearTimeout(t);
+    };
+  }, [q, navigate]);
 
   return (
     <>
@@ -61,20 +72,35 @@ function SearchPage() {
         <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink">
           {get("hero", "headline")}
         </h1>
-        <div className="mt-10 flex items-center gap-3 border-b-2 border-foreground pb-3">
-          <SearchIcon className="h-5 w-5" />
-          <input
-            autoFocus
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="e.g. soil carbon, paddy, vertical farming"
-            className="flex-1 bg-transparent text-2xl font-display outline-none placeholder:text-muted-foreground/60"
-          />
+        <div className="mt-10">
+          <label htmlFor="search-input" className="sr-only">
+            Search published articles
+          </label>
+          <div className="flex items-center gap-3 border-b-2 border-foreground pb-3">
+            <SearchIcon className="h-5 w-5 text-muted-foreground" />
+            <input
+              id="search-input"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="e.g. soil carbon, paddy, vertical farming"
+              className="flex-1 bg-transparent text-2xl font-display outline-none placeholder:text-muted-foreground/60"
+            />
+            {loading && (
+              <span className="text-xs text-muted-foreground animate-pulse font-mono shrink-0">
+                Searching...
+              </span>
+            )}
+          </div>
         </div>
         <div className="mt-3 text-xs text-muted-foreground">
-          {results.length} result{results.length !== 1 && "s"}
+          {loading ? "Refreshing..." : `${results.length} result${results.length !== 1 ? "s" : ""}`}
         </div>
         <ul className="mt-10 divide-y divide-[var(--color-rule)]">
+          {!loading && results.length === 0 && (
+            <li className="py-12 text-center text-muted-foreground text-sm font-sans">
+              No matching articles found. Try different keywords.
+            </li>
+          )}
           {results.map((a) => (
             <li key={a.slug} className="py-7">
               <Link to="/articles/$slug" params={{ slug: a.slug }} className="group block">

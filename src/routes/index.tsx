@@ -10,9 +10,9 @@ export const Route = createFileRoute("/")({
   component: Home,
   loader: () => fetchSeoMetadata("home"),
   head: ({ loaderData }) => ({
+    title: loaderData?.title || "The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
-          { title: loaderData.title },
           {
             name: "description",
             content: loaderData.description,
@@ -128,55 +128,85 @@ function Intro() {
 
 function RecentBlogs() {
   const [articles, setArticles] = useState<DBArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
   useEffect(() => {
-    fetchPublishedArticles(4).then(setArticles);
+    fetchPublishedArticles(4)
+      .then((data) => {
+        setArticles(data);
+        setError(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch published articles:", err);
+        setError(true);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
+
   return (
     <section className="bg-paper border-y border-rule py-16 md:py-24">
       <div className="container-editorial">
         <div className="hr-divider mb-12">
           <h2 className="section-title text-2xl md:text-4xl text-center">Recent Blogs</h2>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-7">
-          {articles.slice(0, 4).map((a) => (
-            <article key={a.slug} className="bg-white border border-rule hover-lift flex flex-col">
-              <Link
-                to="/articles/$slug"
-                params={{ slug: a.slug }}
-                className="block aspect-[4/3] overflow-hidden"
-              >
-                <img
-                  src={a.cover}
-                  alt={a.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-                  loading="lazy"
-                />
-              </Link>
-              <div className="p-5 flex flex-col flex-1">
-                <div className="eyebrow text-orange">{a.category}</div>
-                <h3 className="font-display text-lg md:text-xl mt-2 leading-snug text-navy">
-                  <Link
-                    to="/articles/$slug"
-                    params={{ slug: a.slug }}
-                    className="hover:text-orange transition-colors"
-                  >
-                    {a.title}
-                  </Link>
-                </h3>
-                <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3 flex-1">
-                  {a.abstract}
-                </p>
+
+        {loading ? (
+          <div className="py-12 text-center text-muted-foreground text-sm">
+            Loading recent articles...
+          </div>
+        ) : error ? (
+          <div className="py-12 text-center text-muted-foreground text-sm border border-dashed border-rule bg-white max-w-lg mx-auto">
+            Articles are temporarily unavailable. Please try again later.
+          </div>
+        ) : articles.length === 0 ? (
+          <div className="py-12 text-center text-muted-foreground text-sm border border-dashed border-rule bg-white max-w-lg mx-auto">
+            No published articles found.
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-7">
+            {articles.slice(0, 4).map((a) => (
+              <article key={a.slug} className="bg-white border border-rule hover-lift flex flex-col">
                 <Link
                   to="/articles/$slug"
                   params={{ slug: a.slug }}
-                  className="mt-5 inline-flex items-center text-xs uppercase font-condensed tracking-widest text-orange hover:text-navy"
+                  className="block aspect-[4/3] overflow-hidden"
                 >
-                  Read More →
+                  <img
+                    src={a.cover}
+                    alt={a.title}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                    loading="lazy"
+                  />
                 </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+                <div className="p-5 flex flex-col flex-1">
+                  <div className="eyebrow text-orange">{a.category}</div>
+                  <h3 className="font-display text-lg md:text-xl mt-2 leading-snug text-navy">
+                    <Link
+                      to="/articles/$slug"
+                      params={{ slug: a.slug }}
+                      className="hover:text-orange transition-colors"
+                    >
+                      {a.title}
+                    </Link>
+                  </h3>
+                  <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3 flex-1">
+                    {a.abstract}
+                  </p>
+                  <Link
+                    to="/articles/$slug"
+                    params={{ slug: a.slug }}
+                    className="mt-5 inline-flex items-center text-xs uppercase font-condensed tracking-widest text-orange hover:text-navy"
+                  >
+                    Read More →
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

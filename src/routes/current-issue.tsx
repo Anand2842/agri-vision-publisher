@@ -16,9 +16,9 @@ export const Route = createFileRoute("/current-issue")({
   component: CurrentIssue,
   loader: () => fetchSeoMetadata("current_issue"),
   head: ({ loaderData }) => ({
+    title: loaderData?.title || "Current Issue — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
-          { title: loaderData.title },
           { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },

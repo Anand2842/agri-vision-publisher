@@ -56,11 +56,25 @@ function AdminArticles() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const title = String(fd.get("title"));
-    const slug = (String(fd.get("slug") || "") || title)
+    const baseSlug = (String(fd.get("slug") || "") || title)
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
+      
+    // Deduplicate slug using a fast single check and random suffix fallback
+    let slug = baseSlug;
+    const { data: existing } = await supabase
+      .from("articles")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (existing && existing.id !== editing?.id) {
+      const suffix = Math.random().toString(36).substring(2, 6);
+      slug = `${baseSlug}-${suffix}`;
+    }
+
     const status = String(fd.get("status")) as "draft" | "published" | "archived";
     const payload = {
       title,
@@ -125,6 +139,7 @@ function AdminArticles() {
 
       {editing && (
         <form
+          key={editing.id || "new"}
           onSubmit={save}
           className="mt-6 border border-rule bg-paper p-6 grid sm:grid-cols-2 gap-4"
         >
