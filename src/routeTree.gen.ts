@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SubmissionGuidelinesRouteImport } from './routes/submission-guidelines'
 import { Route as StartupSpotlightRouteImport } from './routes/startup-spotlight'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as PublicationEthicsRouteImport } from './routes/publication-ethics'
 import { Route as ModerateRouteImport } from './routes/moderate'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as EditorialBoardRouteImport } from './routes/editorial-board'
@@ -19,6 +20,7 @@ import { Route as CurrentIssueRouteImport } from './routes/current-issue'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArchivesRouteImport } from './routes/archives'
+import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -49,6 +51,11 @@ const StartupSpotlightRoute = StartupSpotlightRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicationEthicsRoute = PublicationEthicsRouteImport.update({
+  id: '/publication-ethics',
+  path: '/publication-ethics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModerateRoute = ModerateRouteImport.update({
@@ -84,6 +91,11 @@ const AuthRoute = AuthRouteImport.update({
 const ArchivesRoute = ArchivesRouteImport.update({
   id: '/archives',
   path: '/archives',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdvertiseRoute = AdvertiseRouteImport.update({
+  id: '/advertise',
+  path: '/advertise',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -175,6 +187,7 @@ const AuthenticatedAdminArticlesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/advertise': typeof AdvertiseRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -182,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
+  '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
@@ -202,6 +216,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/advertise': typeof AdvertiseRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -209,6 +224,7 @@ export interface FileRoutesByTo {
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
+  '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
@@ -230,6 +246,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
+  '/advertise': typeof AdvertiseRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -237,6 +254,7 @@ export interface FileRoutesById {
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
+  '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
@@ -259,6 +277,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/advertise'
     | '/archives'
     | '/auth'
     | '/contact'
@@ -266,6 +285,7 @@ export interface FileRouteTypes {
     | '/editorial-board'
     | '/membership'
     | '/moderate'
+    | '/publication-ethics'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
@@ -286,6 +306,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/advertise'
     | '/archives'
     | '/auth'
     | '/contact'
@@ -293,6 +314,7 @@ export interface FileRouteTypes {
     | '/editorial-board'
     | '/membership'
     | '/moderate'
+    | '/publication-ethics'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
@@ -313,6 +335,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/about'
+    | '/advertise'
     | '/archives'
     | '/auth'
     | '/contact'
@@ -320,6 +343,7 @@ export interface FileRouteTypes {
     | '/editorial-board'
     | '/membership'
     | '/moderate'
+    | '/publication-ethics'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
@@ -342,6 +366,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  AdvertiseRoute: typeof AdvertiseRoute
   ArchivesRoute: typeof ArchivesRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
@@ -349,6 +374,7 @@ export interface RootRouteChildren {
   EditorialBoardRoute: typeof EditorialBoardRoute
   MembershipRoute: typeof MembershipRoute
   ModerateRoute: typeof ModerateRoute
+  PublicationEthicsRoute: typeof PublicationEthicsRoute
   SearchRoute: typeof SearchRoute
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
@@ -376,6 +402,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/publication-ethics': {
+      id: '/publication-ethics'
+      path: '/publication-ethics'
+      fullPath: '/publication-ethics'
+      preLoaderRoute: typeof PublicationEthicsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/moderate': {
@@ -425,6 +458,13 @@ declare module '@tanstack/react-router' {
       path: '/archives'
       fullPath: '/archives'
       preLoaderRoute: typeof ArchivesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/advertise': {
+      id: '/advertise'
+      path: '/advertise'
+      fullPath: '/advertise'
+      preLoaderRoute: typeof AdvertiseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -589,6 +629,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
+  AdvertiseRoute: AdvertiseRoute,
   ArchivesRoute: ArchivesRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
@@ -596,6 +637,7 @@ const rootRouteChildren: RootRouteChildren = {
   EditorialBoardRoute: EditorialBoardRoute,
   MembershipRoute: MembershipRoute,
   ModerateRoute: ModerateRoute,
+  PublicationEthicsRoute: PublicationEthicsRoute,
   SearchRoute: SearchRoute,
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
@@ -604,13 +646,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

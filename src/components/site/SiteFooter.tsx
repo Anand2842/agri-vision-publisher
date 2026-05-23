@@ -50,7 +50,9 @@ export function SiteFooter() {
           links={[
             ["Submit Article", "/submit"],
             ["Submission Guidelines", "/submission-guidelines"],
+            ["Publication Ethics", "/publication-ethics"],
             ["Membership", "/membership"],
+            ["Advertise", "/advertise"],
             ["Author Dashboard", "/dashboard"],
           ]}
         />

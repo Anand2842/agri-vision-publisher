@@ -143,9 +143,11 @@ export function SiteHeader() {
           {editorRole && (
             <Link
               to="/admin/queue"
-              className="hidden md:inline-flex text-xs uppercase tracking-wider font-condensed text-orange hover:brightness-110"
+              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 border border-orange/40 bg-orange/10 text-[10px] uppercase tracking-[0.18em] font-condensed font-semibold text-orange hover:bg-orange hover:text-white transition-colors"
+              title={`Signed in as ${editorRole}`}
             >
-              Queue
+              <span className="h-1.5 w-1.5 rounded-full bg-orange" />
+              {editorRole}
             </Link>
           )}
           {signedIn ? (

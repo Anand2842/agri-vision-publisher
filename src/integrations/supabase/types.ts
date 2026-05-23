@@ -177,6 +177,48 @@ export type Database = {
         }
         Relationships: []
       }
+      membership_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          notes: string | null
+          payment_method: string
+          plan: Database["public"]["Enums"]["membership_plan"]
+          receipt_path: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+          transaction_ref: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_method: string
+          plan: Database["public"]["Enums"]["membership_plan"]
+          receipt_path?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          transaction_ref: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          plan?: Database["public"]["Enums"]["membership_plan"]
+          receipt_path?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          transaction_ref?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -266,55 +308,6 @@ export type Database = {
           to_status?: Database["public"]["Enums"]["submission_status"] | null
         }
         Relationships: []
-      membership_payments: {
-        Row: {
-          amount: number
-          created_at: string
-          id: string
-          notes: string | null
-          payment_method: "upi" | "bank"
-          plan: Database["public"]["Enums"]["membership_plan"]
-          receipt_path: string | null
-          status: "pending" | "approved" | "rejected"
-          transaction_ref: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          id?: string
-          notes?: string | null
-          payment_method: "upi" | "bank"
-          plan: Database["public"]["Enums"]["membership_plan"]
-          receipt_path?: string | null
-          status?: "pending" | "approved" | "rejected"
-          transaction_ref: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          id?: string
-          notes?: string | null
-          payment_method?: "upi" | "bank"
-          plan?: Database["public"]["Enums"]["membership_plan"]
-          receipt_path?: string | null
-          status?: "pending" | "approved" | "rejected"
-          transaction_ref?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "membership_payments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       submissions: {
         Row: {
@@ -418,6 +411,7 @@ export type Database = {
       app_role: "admin" | "moderator" | "author" | "reader"
       article_status: "draft" | "published" | "archived"
       membership_plan: "single" | "annual" | "lifetime" | "institute"
+      payment_status: "pending" | "approved" | "rejected"
       submission_status:
         | "draft"
         | "submitted"
@@ -556,6 +550,7 @@ export const Constants = {
       app_role: ["admin", "moderator", "author", "reader"],
       article_status: ["draft", "published", "archived"],
       membership_plan: ["single", "annual", "lifetime", "institute"],
+      payment_status: ["pending", "approved", "rejected"],
       submission_status: [
         "draft",
         "submitted",

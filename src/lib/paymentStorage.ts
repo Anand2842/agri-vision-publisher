@@ -4,7 +4,7 @@ export interface PaymentClaim {
   plan: "single" | "annual" | "lifetime" | "institute";
   amount: number;
   transaction_ref: string;
-  payment_method: "upi" | "bank";
+  payment_method: string;
   receipt_path: string | null;
   status: "pending" | "approved" | "rejected";
   notes: string | null;
