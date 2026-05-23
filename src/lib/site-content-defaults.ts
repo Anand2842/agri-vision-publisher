@@ -158,7 +158,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       para1: "The Agriculture Popular Article Magazine is a monthly, online, peer-reviewed publication dedicated to advancing Indian agriculture through knowledge, innovation, sustainability and community. It is published by the Ram Mangalam Agri – Rural Development Foundation (RADF) and edited by Dr. Dileep Kumar, Senior Scientist (Agriculture Extension) at ICAR–RRS–CAZRI, Jaisalmer.",
       para2: "We sit between the academic journal and the trade magazine: rigorous enough for research, accessible enough for the field officer, the KVK scientist and the progressive farmer. Every article is reviewed by qualified specialists before it reaches our readers.",
       para3: "Our pages cover agronomy, horticulture, soil and water management, animal sciences, agri-business, extension and allied disciplines — with a particular focus on the arid and semi-arid systems of western India and on the smallholder economies of South Asia.",
-      para4: "The magazine is open-access. Authors retain copyright. Readers pay nothing. Members and institutional partners support the work that makes the magazine possible.",
+      para4: "The magazine is open-access. Copyright of accepted articles is transferred to the publisher upon acceptance. Readers pay nothing. Members and institutional partners support the work that makes the magazine possible.",
     },
     vision: {
       heading: "Vision",
@@ -374,7 +374,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       items: '[{"l":"Title","v":"Times New Roman 14 pt · Bold · Centered"},{"l":"Author details","v":"TNR 12 pt — name, designation, affiliation"},{"l":"Corresponding email","v":"TNR 12 pt · Bold"},{"l":"Headings","v":"TNR 14 pt · Bold"},{"l":"Sub-headings","v":"TNR 12 pt · Bold"},{"l":"Body text","v":"TNR 12 pt · Justified · 1.5 line spacing"},{"l":"Units & abbreviations","v":"SI units · IUB / IUPAC nomenclature"},{"l":"File format","v":"Microsoft Word (.doc / .docx) only"}]',
     },
     originality: {
-      items: '["Submissions must be the authors\' own original work and not under review elsewhere.","Plagiarism is screened on every submission; manuscripts above 15% similarity are returned.","Proper attribution must be given to all data, figures and ideas borrowed from other sources.","Authors retain copyright; articles are released under CC BY 4.0."]',
+      items: '["Submissions must be the authors\' own original work and not under review elsewhere.","Plagiarism is screened on every submission; manuscripts above 15% similarity are returned.","Proper attribution must be given to all data, figures and ideas borrowed from other sources.","Copyright of the accepted article is transferred to the publisher (Ram Mangalam Agri–Rural Development Foundation) upon acceptance."]',
     },
     publication: {
       body: "Published articles are made available as a downloadable PDF on the magazine's website and are also e-mailed directly to the corresponding author. Each author receives a digital publication certificate for the article.",

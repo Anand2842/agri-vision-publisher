@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Session } from "@supabase/supabase-js";
 import { saveLocalStorageClaim, getLocalStorageClaims } from "@/lib/paymentStorage";
+import { logSimulatedEmail } from "@/lib/notificationLogs";
 
 export const Route = createFileRoute("/membership")({
   component: Membership,
@@ -202,6 +203,20 @@ function Membership() {
       setSubmitSuccess(true);
       toast.success("Payment verification claim registered in database!");
       
+      // Dispatch simulated email notification to editors
+      const { data: dbProfile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", session.user.id)
+        .single();
+      const authorName = dbProfile?.full_name || "Agri Author";
+
+      logSimulatedEmail(
+        "New Payment Claim Submitted",
+        "dkdkdangi@gmail.com",
+        `Dear Editor-in-Chief,\n\nA new online payment claim has been submitted for review:\n\nAuthor Name: ${authorName}\nPlan: ${selectedPlan.toUpperCase()}\nAmount: ₹${numAmount}\nPayment Method: ${activeTab.toUpperCase()}\nTransaction UTR Ref: ${transactionRef.trim()}\nClaim ID: ${claimData.id}\n\nPlease review and approve this claim in the administrative board console.\n\nWarm regards,\nAgri Magazine Notification System`
+      );
+
       // Clear form inputs
       setTransactionRef("");
       setReceiptFile(null);
@@ -231,6 +246,13 @@ function Membership() {
         setSubmitSuccess(true);
         toast.info("Offline Mode: Claim registered successfully in local storage!");
         
+        // Log simulated email dispatch
+        logSimulatedEmail(
+          "New Payment Claim Submitted (Offline)",
+          "dkdkdangi@gmail.com",
+          `Dear Editor-in-Chief,\n\nA new payment claim has been submitted offline (Local Storage fallback):\n\nAuthor Name: Dr. Anand Kumar (Test Author)\nPlan: ${selectedPlan.toUpperCase()}\nAmount: ₹${numAmount}\nPayment Method: ${activeTab.toUpperCase()}\nTransaction UTR Ref: ${transactionRef.trim()}\nClaim ID: ${mockClaim.id}\n\nPlease review and approve this claim in the administrative board console.\n\nWarm regards,\nAgri Magazine Notification System`
+        );
+
         // Clear form inputs
         setTransactionRef("");
         setReceiptFile(null);

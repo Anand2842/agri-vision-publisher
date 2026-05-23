@@ -23,6 +23,7 @@ export const Route = createFileRoute("/archives")({
 function Archives() {
   const [issues, setIssues] = useState<IssueRow[]>([]);
   const [year, setYear] = useState<string>("all");
+  const [month, setMonth] = useState<string>("all");
   const { get } = useSiteContent("archives");
 
   useEffect(() => {
@@ -38,7 +39,29 @@ function Archives() {
     return ["all", ...Array.from(set).sort().reverse()];
   }, [issues]);
 
-  const filtered = issues.filter((i) => year === "all" || i.date.includes(year));
+  const months = useMemo(() => {
+    const set = new Set<string>();
+    issues.forEach((i) => {
+      const parts = i.date.split(" ");
+      if (parts.length > 0 && parts[0]) {
+        if (isNaN(Number(parts[0]))) {
+          set.add(parts[0]);
+        }
+      }
+    });
+    const monthOrder = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const list = Array.from(set).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
+    return ["all", ...list];
+  }, [issues]);
+
+  const filtered = issues.filter((i) => {
+    const yearMatch = year === "all" || i.date.includes(year);
+    const monthMatch = month === "all" || i.date.includes(month);
+    return yearMatch && monthMatch;
+  });
 
   return (
     <>
@@ -50,16 +73,41 @@ function Archives() {
           {get("hero", "subtitle")}
         </p>
 
-        <div className="mt-10 flex gap-2 flex-wrap">
-          {years.map((y) => (
-            <button
-              key={y}
-              onClick={() => setYear(y)}
-              className={`text-xs px-4 py-2 rounded-sm border ${year === y ? "bg-foreground text-background border-foreground" : "border-rule hover:border-primary"}`}
-            >
-              {y === "all" ? "All Years" : y}
-            </button>
-          ))}
+        <div className="mt-10 space-y-6">
+          <div>
+            <span className="text-xs uppercase tracking-wider text-foreground/50 font-bold block mb-2 font-sans">Filter by Year</span>
+            <div className="flex gap-2 flex-wrap">
+              {years.map((y) => (
+                <button
+                  key={y}
+                  onClick={() => {
+                    setYear(y);
+                    setMonth("all"); // Reset month when year changes to prevent zero-result states
+                  }}
+                  className={`text-xs px-4 py-2 rounded-sm border font-sans ${year === y ? "bg-primary text-white border-primary" : "border-rule bg-paper hover:border-primary text-foreground/80"}`}
+                >
+                  {y === "all" ? "All Years" : y}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {months.length > 1 && (
+            <div>
+              <span className="text-xs uppercase tracking-wider text-foreground/50 font-bold block mb-2 font-sans">Filter by Month</span>
+              <div className="flex gap-2 flex-wrap">
+                {months.map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setMonth(m)}
+                    className={`text-xs px-4 py-2 rounded-sm border font-sans ${month === m ? "bg-primary text-white border-primary" : "border-rule bg-paper hover:border-primary text-foreground/80"}`}
+                  >
+                    {m === "all" ? "All Months" : m}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {filtered.length === 0 && (
@@ -69,11 +117,11 @@ function Archives() {
         <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
           {filtered.map((i) => (
             <div key={i.id} className="hover-lift">
-              <div className="bg-muted aspect-[3/4] overflow-hidden">
+              <div className="bg-paper border border-rule aspect-[3/4] overflow-hidden flex items-center justify-center">
                 <img
                   src={i.cover}
                   alt={i.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-stone-50/50 p-2"
                   loading="lazy"
                 />
               </div>

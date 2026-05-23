@@ -24,12 +24,57 @@ export const Route = createFileRoute("/")({
   }),
 });
 
+function getDeadlineText() {
+  const now = new Date();
+  const day = now.getDate();
+  let monthIndex = now.getMonth();
+  let year = now.getFullYear();
+
+  if (day > 25) {
+    monthIndex = (monthIndex + 1) % 12;
+    if (monthIndex === 0) {
+      year += 1;
+    }
+  }
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  return `25th ${monthNames[monthIndex]}, ${year}`;
+}
+
 function Home() {
   return (
     <>
       <SiteHeader />
       <main>
         <HeroSlider />
+        
+        {/* Submission Deadline Banner */}
+        <section className="bg-primary/5 border-b border-rule py-4">
+          <div className="container-editorial flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <span className="inline-flex items-center justify-center bg-orange text-white text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-sm font-sans shrink-0">
+                Next Deadline
+              </span>
+              <p className="text-sm font-sans text-foreground/80 leading-normal">
+                Submissions for the upcoming monthly issue close on{" "}
+                <span className="text-primary font-bold font-display">{getDeadlineText()}</span>.
+              </p>
+            </div>
+            <div className="flex gap-4 items-center shrink-0">
+              <Link to="/submit" className="text-xs uppercase tracking-wider font-semibold text-primary hover:text-orange transition-colors font-sans">
+                Submit Online →
+              </Link>
+              <span className="h-3 w-px bg-rule hidden sm:inline" />
+              <Link to="/submission-guidelines" className="text-xs uppercase tracking-wider font-semibold text-foreground/60 hover:text-ink transition-colors font-sans">
+                Author Guidelines
+              </Link>
+            </div>
+          </div>
+        </section>
+
         <Intro />
         <RecentBlogs />
         <VisionMission />
@@ -56,7 +101,7 @@ function HeroSlider() {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative h-[68vh] min-h-[480px] max-h-[760px] w-full overflow-hidden bg-navy">
+    <section className="relative w-full overflow-hidden bg-navy aspect-[16/10] sm:aspect-[16/9] md:h-[65vh] md:min-h-[460px] md:max-h-[700px]">
       {slides.map((s, idx) => (
         <img
           key={idx}
@@ -68,15 +113,7 @@ function HeroSlider() {
           loading={idx === 0 ? "eager" : "lazy"}
         />
       ))}
-      <div className="absolute inset-0 bg-black/35" />
-      <div className="relative h-full flex flex-col items-center justify-center text-center px-6">
-        <h1 className="font-script text-white text-5xl sm:text-6xl md:text-8xl drop-shadow-lg">
-          {get("hero", "headline")}
-        </h1>
-        <Link to="/about" className="btn-outline-white mt-10">
-          About Us
-        </Link>
-      </div>
+      <div className="absolute inset-0 bg-black/10" />
       <button
         onClick={() => setI((p) => (p - 1 + slides.length) % slides.length)}
         aria-label="Previous slide"
@@ -177,7 +214,7 @@ function RecentBlogs() {
                   <img
                     src={a.cover}
                     alt={a.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                    className="w-full h-full object-contain bg-stone-50/50 p-1 border-b border-rule hover:scale-105 transition-transform duration-700"
                     loading="lazy"
                   />
                 </Link>

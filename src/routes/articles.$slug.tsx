@@ -86,7 +86,7 @@ function Article() {
           <img
             src={a.cover}
             alt={a.title}
-            className="w-full aspect-[16/9] object-cover rounded-sm"
+            className="w-full aspect-[16/9] object-contain bg-stone-50/50 p-2 border border-rule rounded-sm"
           />
         </div>
 

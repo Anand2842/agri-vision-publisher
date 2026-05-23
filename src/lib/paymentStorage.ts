@@ -7,6 +7,7 @@ export interface PaymentClaim {
   payment_method: string;
   receipt_path: string | null;
   status: "pending" | "approved" | "rejected";
+  member_id?: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -104,7 +105,8 @@ export function saveLocalStorageClaim(claim: Omit<PaymentClaim, "id" | "created_
 export function updateLocalStorageClaimStatus(
   claimId: string,
   status: "approved" | "rejected",
-  notes: string
+  notes: string,
+  memberId?: string | null
 ): PaymentClaim | null {
   const claims = getLocalStorageClaims();
   const index = claims.findIndex(c => c.id === claimId);
@@ -114,6 +116,7 @@ export function updateLocalStorageClaimStatus(
     ...claims[index],
     status,
     notes: notes || null,
+    member_id: memberId !== undefined ? memberId : (status === "approved" ? claims[index].member_id || `TAPAM-2026-${String(claims.filter(c => c.status === "approved" || c.member_id).length + 1).padStart(4, "0")}` : null),
     updated_at: new Date().toISOString()
   };
   

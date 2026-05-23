@@ -7,7 +7,8 @@ import logo from "@/assets/logo.png";
 
 const nav: { to: string; label: string; children?: { to: string; label: string }[] }[] = [
   { to: "/", label: "Home" },
-  { to: "/editorial-board", label: "Editorial Board" },
+  { to: "/about", label: "About" },
+  { to: "/editorial-board", label: "Editorial" },
   { to: "/current-issue", label: "Current Issue" },
   { to: "/archives", label: "Archives" },
   {
@@ -18,9 +19,16 @@ const nav: { to: string; label: string; children?: { to: string; label: string }
       { to: "/submit", label: "Submit Article" },
     ],
   },
-  { to: "/membership", label: "Membership & Fees" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact" },
+  { to: "/membership", label: "Membership" },
+  {
+    to: "/startup-spotlight",
+    label: "More",
+    children: [
+      { to: "/startup-spotlight", label: "Startup Spotlight" },
+      { to: "/advertise", label: "Advertise" },
+      { to: "/contact", label: "Contact" },
+    ],
+  },
 ];
 
 export function SiteHeader() {
@@ -188,12 +196,12 @@ export function SiteHeader() {
                 {n.children && <ChevronDown className="h-3 w-3" />}
               </Link>
               {n.children && (
-                <div className="absolute left-0 top-full hidden group-hover:block bg-navy border-t border-white/10 min-w-[220px] z-50 shadow-xl">
+                <div className="absolute left-0 top-full hidden group-hover:block bg-navy border-t border-white/10 min-w-[180px] z-50 shadow-xl">
                   {n.children.map((c) => (
                     <Link
                       key={c.label}
                       to={c.to}
-                      className="block px-5 py-3 text-xs uppercase tracking-wider font-condensed text-white/85 hover:text-orange hover:bg-white/5"
+                      className="block px-4.5 py-2.5 text-xs uppercase tracking-wider font-condensed text-white/85 hover:text-orange hover:bg-white/5"
                     >
                       {c.label}
                     </Link>
@@ -227,16 +235,32 @@ export function SiteHeader() {
               <Search className="h-4 w-4" />
             </button>
           </form>
-          <div className="container-editorial py-3 flex flex-col">
+          <div className="container-editorial py-3 flex flex-col space-y-1">
             {nav.map((n) => (
-              <Link
-                key={n.label}
-                to={n.to}
-                onClick={() => setOpen(false)}
-                className="text-sm font-condensed uppercase tracking-wider py-2.5 border-b border-rule/60 text-navy hover:text-orange"
-              >
-                {n.label}
-              </Link>
+              <div key={n.label} className="flex flex-col">
+                <Link
+                  to={n.to}
+                  onClick={() => !n.children && setOpen(false)}
+                  className="text-sm font-condensed uppercase tracking-wider py-2.5 border-b border-rule/60 text-navy hover:text-orange flex items-center justify-between"
+                >
+                  <span>{n.label}</span>
+                  {n.children && <ChevronDown className="h-3 w-3 opacity-60" />}
+                </Link>
+                {n.children && (
+                  <div className="pl-4 bg-muted/40 border-l border-primary/20 flex flex-col py-1.5 space-y-2">
+                    {n.children.map((c) => (
+                      <Link
+                        key={c.label}
+                        to={c.to}
+                        onClick={() => setOpen(false)}
+                        className="text-xs uppercase tracking-wider py-1.5 text-foreground/75 hover:text-orange"
+                      >
+                        {c.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>

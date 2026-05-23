@@ -42,6 +42,7 @@ export function SiteFooter() {
             ["Current Issue", "/current-issue"],
             ["Archives", "/archives"],
             ["Editorial Board", "/editorial-board"],
+            ["Advertise", "/advertise"],
             ["About", "/about"],
           ]}
         />

@@ -13,8 +13,18 @@ import {
   ArrowRight, 
   CheckCircle2, 
   XCircle, 
-  CreditCard 
+  CreditCard,
+  Award
 } from "lucide-react";
+
+function getClaimMemberId(claim: { member_id?: string | null; notes?: string | null }) {
+  if (claim.member_id) return claim.member_id;
+  if (claim.notes) {
+    const match = claim.notes.match(/\[MEMBER_ID:\s*(TAPAM-2026-\d{4})\]/);
+    if (match) return match[1];
+  }
+  return null;
+}
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -226,16 +236,21 @@ function Dashboard() {
             </div>
           ) : activeMembership ? (
             // User is a premium active member
-            <div className="bg-sage/10 border border-green-300 p-6 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+            <div className="bg-sage/10 border border-green-300 p-6 rounded flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-sm">
               <div className="flex items-start gap-4">
                 <div className="bg-green-100 p-3 rounded-full text-green-700 shrink-0">
                   <ShieldCheck className="h-6 w-6 animate-pulse" />
                 </div>
                 <div>
-                  <h3 className="font-display text-lg text-ink font-bold flex items-center gap-2">
+                  <h3 className="font-display text-lg text-ink font-bold flex items-center gap-2.5 flex-wrap">
                     Active Premium Member
+                    {getClaimMemberId(activeMembership) && (
+                      <span className="bg-primary/10 text-primary text-[10px] uppercase font-sans font-bold px-2 py-0.5 rounded-sm">
+                        ID: {getClaimMemberId(activeMembership)}
+                      </span>
+                    )}
                   </h3>
-                  <p className="text-xs text-foreground/80 mt-1">
+                  <p className="text-xs text-foreground/80 mt-1 font-sans">
                     Your {getPlanName(activeMembership.plan)} is verified and fully active. Settle manuscript submissions for priority reviews.
                   </p>
                   {activeMembership.notes && (
@@ -245,12 +260,22 @@ function Dashboard() {
                   )}
                 </div>
               </div>
-              <Link
-                to="/submit"
-                className="bg-green-700 hover:bg-green-800 text-white text-xs px-4 py-2.5 rounded font-semibold uppercase tracking-wider shrink-0 transition"
-              >
-                Submit Manuscript
-              </Link>
+              <div className="flex gap-3 flex-wrap w-full lg:w-auto shrink-0">
+                <Link
+                  to="/membership/certificate/$claimId"
+                  params={{ claimId: activeMembership.id }}
+                  target="_blank"
+                  className="bg-primary hover:bg-primary/95 text-white text-xs px-4 py-2.5 rounded font-semibold uppercase tracking-wider transition inline-flex items-center gap-1.5 cursor-pointer font-sans"
+                >
+                  <Award className="h-3.5 w-3.5" /> Download Certificate
+                </Link>
+                <Link
+                  to="/submit"
+                  className="bg-green-700 hover:bg-green-800 text-white text-xs px-4 py-2.5 rounded font-semibold uppercase tracking-wider transition font-sans text-center flex-1 lg:flex-initial"
+                >
+                  Submit Manuscript
+                </Link>
+              </div>
             </div>
           ) : pendingMembership ? (
             // Membership claim is pending review
@@ -323,12 +348,27 @@ function Dashboard() {
                 <li key={s.id} className="py-6 flex items-start justify-between gap-6">
                   <div className="min-w-0">
                     <div className="font-display text-xl text-ink truncate">{s.title}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Ticket #{s.id.slice(0, 8).toUpperCase()} ·{" "}
-                      {new Date(s.created_at).toLocaleDateString()} · {s.plan}
+                    <div className="text-xs text-muted-foreground mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span>Ticket #{s.id.slice(0, 8).toUpperCase()}</span>
+                      <span>·</span>
+                      <span>{new Date(s.created_at).toLocaleDateString()}</span>
+                      <span>·</span>
+                      <span className="uppercase text-[10px] bg-secondary/80 text-foreground px-1.5 py-0.5 rounded-sm font-semibold">{s.plan}</span>
                     </div>
                   </div>
-                  <StatusBadge status={s.status} />
+                  <div className="flex items-center gap-3 shrink-0">
+                    <StatusBadge status={s.status} />
+                    {s.status === "published" && (
+                      <Link
+                        to="/article/certificate/$submissionId"
+                        params={{ submissionId: s.id }}
+                        target="_blank"
+                        className="bg-primary/10 hover:bg-primary/20 text-primary text-[10px] uppercase font-sans font-bold px-3 py-1.5 rounded-sm transition inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <Award className="h-3.5 w-3.5" /> Certificate
+                      </Link>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>

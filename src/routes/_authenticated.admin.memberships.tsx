@@ -8,6 +8,7 @@ import {
   updateLocalStorageClaimNotes, 
   MOCK_PROFILES 
 } from "@/lib/paymentStorage";
+import { logSimulatedEmail } from "@/lib/notificationLogs";
 import { 
   Check, 
   X, 
@@ -36,6 +37,7 @@ type PaymentClaim = {
   payment_method: string;
   receipt_path: string | null;
   status: "pending" | "approved" | "rejected";
+  member_id?: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -47,6 +49,32 @@ type Profile = {
   institution: string | null;
   country: string | null;
 };
+
+export function getClaimMemberId(claim: { member_id?: string | null; notes?: string | null }) {
+  if (claim.member_id) return claim.member_id;
+  if (claim.notes) {
+    const match = claim.notes.match(/\[MEMBER_ID:\s*(TAPAM-2026-\d{4})\]/);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+export function generateNextMemberId(existingClaims: PaymentClaim[]) {
+  let maxSeq = 0;
+  existingClaims.forEach((c) => {
+    const mid = getClaimMemberId(c);
+    if (mid) {
+      const parts = mid.split("-");
+      const seqStr = parts[parts.length - 1];
+      const seqNum = parseInt(seqStr, 10);
+      if (!isNaN(seqNum) && seqNum > maxSeq) {
+        maxSeq = seqNum;
+      }
+    }
+  });
+  const nextSeq = maxSeq + 1;
+  return `TAPAM-2026-${String(nextSeq).padStart(4, "0")}`;
+}
 
 function AdminMemberships() {
   const [claims, setClaims] = useState<PaymentClaim[] | null>(null);
@@ -168,11 +196,36 @@ function AdminMemberships() {
 
   const handleUpdateStatus = async (id: string, status: "approved" | "rejected") => {
     const claim = claims?.find((c) => c.id === id);
-    const notes = claim?.notes || "";
+    if (!claim) return;
+    
+    let notes = claim.notes || "";
+    let memberId: string | null = null;
+    
+    if (status === "approved") {
+      const existing = getClaimMemberId(claim);
+      if (existing) {
+        memberId = existing;
+      } else {
+        memberId = generateNextMemberId(claims || []);
+        // Append it as fallback prefix in notes
+        const cleanNotes = notes.replace(/\[MEMBER_ID:\s*TAPAM-2026-\d{4}\]/g, "").trim();
+        notes = `[MEMBER_ID: ${memberId}] ${cleanNotes}`.trim();
+      }
+    }
+    
     if (isOfflineMode) {
       try {
-        updateLocalStorageClaimStatus(id, status, notes);
+        updateLocalStorageClaimStatus(id, status, notes, memberId);
         toast.success(`Claim status updated to ${status} (Local Storage)`);
+        
+        // Log simulated email dispatch
+        const profile = MOCK_PROFILES[claim.user_id] || { full_name: "Test Author" };
+        logSimulatedEmail(
+          status === "approved" ? "Membership Verified" : "Membership Rejected",
+          profile.full_name,
+          `Dear ${profile.full_name},\n\nYour offline bank/UPI transfer payment claim for the ${claim.plan.toUpperCase()} Membership plan has been reviewed and ${status.toUpperCase()}.\n\n${status === "approved" ? `Your sequential Member ID is: ${memberId}. You can now download your certificate and submit manuscripts in your author dashboard.` : `Moderator feedback: ${notes || "None provided"}`}\n\nWarm regards,\nDr. Dileep Kumar Dangi\nEditor-in-Chief\nAgri Popular Article Magazine`
+        );
+
         loadData();
       } catch (err: any) {
         toast.error("Failed to update status in local storage");
@@ -181,14 +234,53 @@ function AdminMemberships() {
     }
     
     try {
+      const updatePayload: any = { 
+        status, 
+        notes, 
+        updated_at: new Date().toISOString() 
+      };
+      
+      if (status === "approved" && memberId) {
+        updatePayload.member_id = memberId;
+      } else if (status === "rejected") {
+        updatePayload.member_id = null;
+      }
+
       const { error } = await supabase
         .from("membership_payments")
-        .update({ status, notes, updated_at: new Date().toISOString() })
+        .update(updatePayload)
         .eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        if (error.message && error.message.includes("member_id")) {
+          console.warn("member_id column missing on remote Supabase. Retrying update with notes fallback.");
+          const { error: retryError } = await supabase
+            .from("membership_payments")
+            .update({ status, notes, updated_at: new Date().toISOString() })
+            .eq("id", id);
+            
+          if (retryError) throw retryError;
+        } else {
+          throw error;
+        }
+      }
 
       toast.success(`Claim status updated to ${status}`);
+      
+      // Log simulated email dispatch
+      const { data: dbProfile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", claim.user_id)
+        .single();
+      const authorName = dbProfile?.full_name || "Agri Author";
+
+      logSimulatedEmail(
+        status === "approved" ? "Membership Verified" : "Membership Rejected",
+        authorName,
+        `Dear ${authorName},\n\nYour online membership verification claim for the ${claim.plan.toUpperCase()} Membership plan has been reviewed and ${status.toUpperCase()}.\n\n${status === "approved" ? `Your sequential Member ID is: ${memberId || getClaimMemberId({ notes })}. You can now download your certificate and submit manuscripts in your author dashboard.` : `Moderator feedback: ${notes || "None provided"}`}\n\nWarm regards,\nDr. Dileep Kumar Dangi\nEditor-in-Chief\nAgri Popular Article Magazine`
+      );
+
       loadData();
     } catch (err: any) {
       toast.error(err.message || "Failed to update claim");
@@ -426,6 +518,11 @@ function AdminMemberships() {
                         <span className="text-xs text-muted-foreground font-mono block mt-0.5 select-all">
                           Ref / UTR: {claim.transaction_ref}
                         </span>
+                        {getClaimMemberId(claim) && (
+                          <span className="inline-flex items-center bg-primary/10 text-primary text-[10px] font-semibold px-2 py-0.5 rounded-sm mt-1.5 font-sans">
+                            Member ID: {getClaimMemberId(claim)}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

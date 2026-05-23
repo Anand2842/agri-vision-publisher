@@ -182,11 +182,12 @@ export type Database = {
           amount: number
           created_at: string
           id: string
+          member_id: string | null
           notes: string | null
-          payment_method: string
+          payment_method: "upi" | "bank"
           plan: Database["public"]["Enums"]["membership_plan"]
           receipt_path: string | null
-          status: Database["public"]["Enums"]["payment_status"]
+          status: "pending" | "approved" | "rejected"
           transaction_ref: string
           updated_at: string
           user_id: string
@@ -195,11 +196,12 @@ export type Database = {
           amount: number
           created_at?: string
           id?: string
+          member_id?: string | null
           notes?: string | null
-          payment_method: string
+          payment_method: "upi" | "bank"
           plan: Database["public"]["Enums"]["membership_plan"]
           receipt_path?: string | null
-          status?: Database["public"]["Enums"]["payment_status"]
+          status?: "pending" | "approved" | "rejected"
           transaction_ref: string
           updated_at?: string
           user_id: string
@@ -208,16 +210,25 @@ export type Database = {
           amount?: number
           created_at?: string
           id?: string
+          member_id?: string | null
           notes?: string | null
-          payment_method?: string
+          payment_method?: "upi" | "bank"
           plan?: Database["public"]["Enums"]["membership_plan"]
           receipt_path?: string | null
-          status?: Database["public"]["Enums"]["payment_status"]
+          status?: "pending" | "approved" | "rejected"
           transaction_ref?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "membership_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

@@ -26,6 +26,7 @@ export const Route = createFileRoute("/contact")({
 const schema = z.object({
   name: z.string().trim().min(2).max(100),
   email: z.string().trim().email().max(255),
+  phone: z.string().trim().min(8).max(20),
   subject: z.string().trim().min(2).max(200),
   message: z.string().trim().min(10).max(2000),
 });
@@ -43,7 +44,13 @@ function Contact() {
       return;
     }
     setSending(true);
-    const { error } = await supabase.from("contact_messages").insert(r.data);
+    const payload = {
+      name: r.data.name,
+      email: r.data.email,
+      subject: r.data.subject,
+      message: `[Phone: ${r.data.phone}]\n\n${r.data.message}`,
+    };
+    const { error } = await supabase.from("contact_messages").insert(payload);
     setSending(false);
     if (error) {
       toast.error(error.message);
@@ -100,7 +107,10 @@ function Contact() {
               <Field name="name" label="Your name" />
               <Field name="email" label="Email" type="email" />
             </div>
-            <Field name="subject" label="Subject" />
+            <div className="grid sm:grid-cols-2 gap-5">
+              <Field name="phone" label="Phone number" type="tel" />
+              <Field name="subject" label="Subject" />
+            </div>
             <div>
               <label className="eyebrow block mb-2">Message</label>
               <textarea

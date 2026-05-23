@@ -290,9 +290,22 @@ function Submit() {
             </select>
           </div>
 
+          <div className="flex items-start gap-3 border border-rule bg-paper p-4 rounded-sm">
+            <input
+              type="checkbox"
+              id="copyright_transfer"
+              name="copyright_transfer"
+              required
+              className="mt-1 h-4 w-4 text-primary border-rule focus:ring-primary shrink-0"
+            />
+            <label htmlFor="copyright_transfer" className="text-sm text-foreground/80 leading-normal font-sans select-none">
+              I confirm this is original, unpublished work and I agree to transfer the copyright of the accepted article to the publisher (Ram Mangalam Agri–Rural Development Foundation) upon acceptance.
+            </label>
+          </div>
+
           <button
             disabled={loading}
-            className="w-full bg-primary text-primary-foreground px-6 py-4 rounded-sm hover:bg-primary/90 disabled:opacity-60"
+            className="w-full bg-primary text-primary-foreground px-6 py-4 rounded-sm hover:bg-primary/90 disabled:opacity-60 font-sans font-semibold uppercase tracking-wider text-xs"
           >
             {loading ? "Submitting…" : "Submit for review"}
           </button>

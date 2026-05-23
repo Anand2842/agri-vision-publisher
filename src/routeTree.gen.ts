@@ -29,6 +29,8 @@ import { Route as AuthenticatedSubmitRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
+import { Route as MembershipCertificateClaimIdRouteImport } from './routes/membership.certificate.$claimId'
+import { Route as ArticleCertificateSubmissionIdRouteImport } from './routes/article.certificate.$submissionId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_authenticated.admin.submissions'
 import { Route as AuthenticatedAdminQueueRouteImport } from './routes/_authenticated.admin.queue'
@@ -137,6 +139,18 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const MembershipCertificateClaimIdRoute =
+  MembershipCertificateClaimIdRouteImport.update({
+    id: '/certificate/$claimId',
+    path: '/certificate/$claimId',
+    getParentRoute: () => MembershipRoute,
+  } as any)
+const ArticleCertificateSubmissionIdRoute =
+  ArticleCertificateSubmissionIdRouteImport.update({
+    id: '/article/certificate/$submissionId',
+    path: '/article/certificate/$submissionId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -193,7 +207,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
-  '/membership': typeof MembershipRoute
+  '/membership': typeof MembershipRouteWithChildren
   '/moderate': typeof ModerateRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
@@ -211,6 +225,8 @@ export interface FileRoutesByFullPath {
   '/admin/queue': typeof AuthenticatedAdminQueueRoute
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
+  '/membership/certificate/$claimId': typeof MembershipCertificateClaimIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -222,7 +238,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
-  '/membership': typeof MembershipRoute
+  '/membership': typeof MembershipRouteWithChildren
   '/moderate': typeof ModerateRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
@@ -239,6 +255,8 @@ export interface FileRoutesByTo {
   '/admin/queue': typeof AuthenticatedAdminQueueRoute
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
+  '/membership/certificate/$claimId': typeof MembershipCertificateClaimIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -252,7 +270,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
-  '/membership': typeof MembershipRoute
+  '/membership': typeof MembershipRouteWithChildren
   '/moderate': typeof ModerateRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
@@ -270,6 +288,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/queue': typeof AuthenticatedAdminQueueRoute
   '/_authenticated/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
+  '/membership/certificate/$claimId': typeof MembershipCertificateClaimIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -301,6 +321,8 @@ export interface FileRouteTypes {
     | '/admin/queue'
     | '/admin/submissions'
     | '/admin/users'
+    | '/article/certificate/$submissionId'
+    | '/membership/certificate/$claimId'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -329,6 +351,8 @@ export interface FileRouteTypes {
     | '/admin/queue'
     | '/admin/submissions'
     | '/admin/users'
+    | '/article/certificate/$submissionId'
+    | '/membership/certificate/$claimId'
     | '/admin'
   id:
     | '__root__'
@@ -359,6 +383,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/queue'
     | '/_authenticated/admin/submissions'
     | '/_authenticated/admin/users'
+    | '/article/certificate/$submissionId'
+    | '/membership/certificate/$claimId'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -372,13 +398,14 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CurrentIssueRoute: typeof CurrentIssueRoute
   EditorialBoardRoute: typeof EditorialBoardRoute
-  MembershipRoute: typeof MembershipRoute
+  MembershipRoute: typeof MembershipRouteWithChildren
   ModerateRoute: typeof ModerateRoute
   PublicationEthicsRoute: typeof PublicationEthicsRoute
   SearchRoute: typeof SearchRoute
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
+  ArticleCertificateSubmissionIdRoute: typeof ArticleCertificateSubmissionIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -523,6 +550,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/membership/certificate/$claimId': {
+      id: '/membership/certificate/$claimId'
+      path: '/certificate/$claimId'
+      fullPath: '/membership/certificate/$claimId'
+      preLoaderRoute: typeof MembershipCertificateClaimIdRouteImport
+      parentRoute: typeof MembershipRoute
+    }
+    '/article/certificate/$submissionId': {
+      id: '/article/certificate/$submissionId'
+      path: '/article/certificate/$submissionId'
+      fullPath: '/article/certificate/$submissionId'
+      preLoaderRoute: typeof ArticleCertificateSubmissionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -625,6 +666,18 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface MembershipRouteChildren {
+  MembershipCertificateClaimIdRoute: typeof MembershipCertificateClaimIdRoute
+}
+
+const MembershipRouteChildren: MembershipRouteChildren = {
+  MembershipCertificateClaimIdRoute: MembershipCertificateClaimIdRoute,
+}
+
+const MembershipRouteWithChildren = MembershipRoute._addFileChildren(
+  MembershipRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -635,13 +688,14 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CurrentIssueRoute: CurrentIssueRoute,
   EditorialBoardRoute: EditorialBoardRoute,
-  MembershipRoute: MembershipRoute,
+  MembershipRoute: MembershipRouteWithChildren,
   ModerateRoute: ModerateRoute,
   PublicationEthicsRoute: PublicationEthicsRoute,
   SearchRoute: SearchRoute,
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
+  ArticleCertificateSubmissionIdRoute: ArticleCertificateSubmissionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
