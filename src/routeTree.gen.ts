@@ -20,6 +20,7 @@ import { Route as CurrentIssueRouteImport } from './routes/current-issue'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArchivesRouteImport } from './routes/archives'
+import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -90,6 +91,11 @@ const AuthRoute = AuthRouteImport.update({
 const ArchivesRoute = ArchivesRouteImport.update({
   id: '/archives',
   path: '/archives',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdvertiseRoute = AdvertiseRouteImport.update({
+  id: '/advertise',
+  path: '/advertise',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -181,6 +187,7 @@ const AuthenticatedAdminArticlesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/advertise': typeof AdvertiseRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/advertise': typeof AdvertiseRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
+  '/advertise': typeof AdvertiseRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -268,6 +277,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/advertise'
     | '/archives'
     | '/auth'
     | '/contact'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/advertise'
     | '/archives'
     | '/auth'
     | '/contact'
@@ -324,6 +335,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/about'
+    | '/advertise'
     | '/archives'
     | '/auth'
     | '/contact'
@@ -354,6 +366,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  AdvertiseRoute: typeof AdvertiseRoute
   ArchivesRoute: typeof ArchivesRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
@@ -445,6 +458,13 @@ declare module '@tanstack/react-router' {
       path: '/archives'
       fullPath: '/archives'
       preLoaderRoute: typeof ArchivesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/advertise': {
+      id: '/advertise'
+      path: '/advertise'
+      fullPath: '/advertise'
+      preLoaderRoute: typeof AdvertiseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -609,6 +629,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
+  AdvertiseRoute: AdvertiseRoute,
   ArchivesRoute: ArchivesRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
@@ -625,3 +646,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
