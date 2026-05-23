@@ -9,7 +9,7 @@ import { FileText, Upload, LockKeyhole } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/submit")({
   component: Submit,
-  head: () => ({ title: "Submit Article — The Agriculture Popular Article Magazine" }),
+  head: () => ({ meta: [{ title: "Submit Article — The Agriculture Popular Article Magazine" }] }),
 });
 
 const schema = z.object({
