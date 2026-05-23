@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SubmissionGuidelinesRouteImport } from './routes/submission-guidelines'
 import { Route as StartupSpotlightRouteImport } from './routes/startup-spotlight'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as PublicationEthicsRouteImport } from './routes/publication-ethics'
 import { Route as ModerateRouteImport } from './routes/moderate'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as EditorialBoardRouteImport } from './routes/editorial-board'
@@ -49,6 +50,11 @@ const StartupSpotlightRoute = StartupSpotlightRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicationEthicsRoute = PublicationEthicsRouteImport.update({
+  id: '/publication-ethics',
+  path: '/publication-ethics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModerateRoute = ModerateRouteImport.update({
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
+  '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
+  '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
@@ -237,6 +245,7 @@ export interface FileRoutesById {
   '/editorial-board': typeof EditorialBoardRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
+  '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/editorial-board'
     | '/membership'
     | '/moderate'
+    | '/publication-ethics'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/editorial-board'
     | '/membership'
     | '/moderate'
+    | '/publication-ethics'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
@@ -320,6 +331,7 @@ export interface FileRouteTypes {
     | '/editorial-board'
     | '/membership'
     | '/moderate'
+    | '/publication-ethics'
     | '/search'
     | '/startup-spotlight'
     | '/submission-guidelines'
@@ -349,6 +361,7 @@ export interface RootRouteChildren {
   EditorialBoardRoute: typeof EditorialBoardRoute
   MembershipRoute: typeof MembershipRoute
   ModerateRoute: typeof ModerateRoute
+  PublicationEthicsRoute: typeof PublicationEthicsRoute
   SearchRoute: typeof SearchRoute
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
@@ -376,6 +389,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/publication-ethics': {
+      id: '/publication-ethics'
+      path: '/publication-ethics'
+      fullPath: '/publication-ethics'
+      preLoaderRoute: typeof PublicationEthicsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/moderate': {
@@ -596,6 +616,7 @@ const rootRouteChildren: RootRouteChildren = {
   EditorialBoardRoute: EditorialBoardRoute,
   MembershipRoute: MembershipRoute,
   ModerateRoute: ModerateRoute,
+  PublicationEthicsRoute: PublicationEthicsRoute,
   SearchRoute: SearchRoute,
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
