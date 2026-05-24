@@ -184,10 +184,10 @@ export type Database = {
           id: string
           member_id: string | null
           notes: string | null
-          payment_method: "upi" | "bank"
+          payment_method: string
           plan: Database["public"]["Enums"]["membership_plan"]
           receipt_path: string | null
-          status: "pending" | "approved" | "rejected"
+          status: Database["public"]["Enums"]["payment_status"]
           transaction_ref: string
           updated_at: string
           user_id: string
@@ -198,10 +198,10 @@ export type Database = {
           id?: string
           member_id?: string | null
           notes?: string | null
-          payment_method: "upi" | "bank"
+          payment_method: string
           plan: Database["public"]["Enums"]["membership_plan"]
           receipt_path?: string | null
-          status?: "pending" | "approved" | "rejected"
+          status?: Database["public"]["Enums"]["payment_status"]
           transaction_ref: string
           updated_at?: string
           user_id: string
@@ -212,23 +212,15 @@ export type Database = {
           id?: string
           member_id?: string | null
           notes?: string | null
-          payment_method?: "upi" | "bank"
+          payment_method?: string
           plan?: Database["public"]["Enums"]["membership_plan"]
           receipt_path?: string | null
-          status?: "pending" | "approved" | "rejected"
+          status?: Database["public"]["Enums"]["payment_status"]
           transaction_ref?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "membership_payments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
