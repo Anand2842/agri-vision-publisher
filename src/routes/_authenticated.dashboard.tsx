@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Session } from "@supabase/supabase-js";
-import { getLocalStorageClaims, type PaymentClaim } from "@/lib/paymentStorage";
+import { getLocalStorageClaims, syncOfflineClaims, type PaymentClaim } from "@/lib/paymentStorage";
 import { 
   ShieldCheck, 
   Clock, 
@@ -143,7 +143,9 @@ function Dashboard() {
 
   useEffect(() => {
     if (session) {
-      loadData();
+      syncOfflineClaims(session.user.id).then(() => {
+        loadData();
+      });
     } else {
       setSubs([]);
       setPayments([]);
@@ -174,7 +176,7 @@ function Dashboard() {
   return (
     <>
       <SiteHeader />
-      <main className="container-editorial py-16">
+      <main className="container-dashboard py-16 font-sans">
         {/* Welcome Section */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>

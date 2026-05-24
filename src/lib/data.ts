@@ -14,6 +14,8 @@ export type Article = {
   date: string;
   /** Path of the article PDF inside the `article-pdfs` Supabase Storage bucket. */
   pdfPath?: string;
+  content?: string;
+  authorBio?: string;
 };
 
 export type DBArticle = Article & { id?: string };
@@ -76,6 +78,8 @@ type ArticleJoin = {
   published_at: string | null;
   categories: { name: string } | null;
   profiles: { full_name: string | null; institution: string | null } | null;
+  content: string | null;
+  author_bio: string | null;
 };
 
 function mapArticle(r: ArticleJoin): DBArticle {
@@ -92,6 +96,8 @@ function mapArticle(r: ArticleJoin): DBArticle {
     views: String(r.views ?? 0),
     date: fmtDate(r.published_at),
     pdfPath: r.pdf_url ?? undefined,
+    content: r.content ?? undefined,
+    authorBio: r.author_bio ?? undefined,
   };
 }
 
@@ -99,7 +105,7 @@ export async function fetchPublishedArticles(limit?: number): Promise<DBArticle[
   let q = supabase
     .from("articles")
     .select(
-      "id,slug,title,abstract,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)",
+      "id,slug,title,abstract,content,author_bio,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)",
     )
     .eq("status", "published")
     .order("published_at", { ascending: false });
@@ -117,7 +123,7 @@ export async function searchArticles(term: string, limit: number = 50): Promise<
   const { data } = await supabase
     .from("articles")
     .select(
-      "id,slug,title,abstract,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)",
+      "id,slug,title,abstract,content,author_bio,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)",
     )
     .eq("status", "published")
     .or(`title.ilike.${cleanTerm},abstract.ilike.${cleanTerm}`)
@@ -132,7 +138,7 @@ export async function fetchArticleBySlug(slug: string): Promise<DBArticle | null
   const { data } = await supabase
     .from("articles")
     .select(
-      "id,slug,title,abstract,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)",
+      "id,slug,title,abstract,content,author_bio,cover_url,read_time,views,pdf_url,published_at,categories(name),profiles(full_name,institution)",
     )
     .eq("slug", slug)
     .eq("status", "published")

@@ -4,11 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { getLocalStorageClaims, MOCK_PROFILES, PaymentClaim } from "@/lib/paymentStorage";
 import { getClaimMemberId } from "./_authenticated.admin.memberships";
 import { Printer, ArrowLeft, Loader2, Award, ShieldCheck } from "lucide-react";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 export const Route = createFileRoute("/membership/certificate/$claimId")({
   component: MembershipCertificate,
   head: () => ({
     title: "Membership Certificate — The Agriculture Popular Article Magazine",
+    meta: [],
   }),
 });
 
@@ -39,6 +41,7 @@ function MembershipCertificate() {
   const [data, setData] = useState<CertificateData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { get: getCert } = useSiteContent("certificate");
 
   useEffect(() => {
     const loadCertificateData = async () => {
@@ -190,10 +193,10 @@ function MembershipCertificate() {
           {/* Header */}
           <div className="space-y-2">
             <div className="text-[11px] font-sans font-semibold text-primary uppercase tracking-[0.3em] font-semibold">
-              The Agriculture Popular Article Magazine
+              {getCert("branding", "magazine_name")}
             </div>
             <div className="text-[9px] font-sans font-bold text-muted-foreground uppercase tracking-widest">
-              Published by: Ram Mangalam Agri–Rural Development Foundation (RADF)
+              Published by: {getCert("branding", "publisher")}
             </div>
             <div className="w-40 h-px bg-gradient-to-r from-transparent via-[#8C6D3E]/40 to-transparent mx-auto mt-2" />
           </div>
@@ -210,10 +213,10 @@ function MembershipCertificate() {
 
           {/* Member Name */}
           <div className="my-2">
-            <div className="font-serif italic text-4xl md:text-5xl font-bold text-navy px-12 border-b border-[#8C6D3E]/30 pb-2 inline-block min-w-[360px] drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)]">
+            <div className="font-serif italic text-4xl md:text-5xl font-bold text-navy px-12 border-b border-[#8C6D3E]/30 pb-2 inline-block min-w-[360px] max-w-[650px] break-words leading-tight drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)]">
               {authorName}
             </div>
-            <div className="text-[11px] font-sans font-semibold text-foreground/60 uppercase tracking-widest mt-2">
+            <div className="text-[11px] font-sans font-semibold text-foreground/60 uppercase tracking-widest mt-2 max-w-[600px] break-words leading-normal mx-auto">
               {institution ? `${institution}, ${country}` : "Registered Agricultural Researcher"}
             </div>
           </div>
@@ -239,15 +242,15 @@ function MembershipCertificate() {
             {/* Chief Editor Signature */}
             <div className="flex flex-col items-center">
               {/* Simulated Signature */}
-              <div className="font-serif italic text-navy font-bold text-lg leading-none -rotate-2 select-none mb-1 opacity-90 h-8 flex items-end">
-                Dileep K. Dangi
+              <div className="font-serif italic text-navy font-bold text-lg leading-none -rotate-2 select-none mb-1 opacity-90 h-8 flex items-end break-all">
+                {getCert("branding", "chief_editor_signature")}
               </div>
               <div className="w-36 h-px bg-foreground/30 mb-2" />
-              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider">
-                Dr. Dileep Kumar
+              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
+                {getCert("branding", "chief_editor")}
               </div>
-              <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest">
-                Chief Editor, ICAR-CAZRI
+              <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest max-w-[220px] break-words leading-tight mt-0.5">
+                {getCert("branding", "chief_editor_title")}
               </div>
             </div>
 
@@ -258,7 +261,7 @@ function MembershipCertificate() {
                   <path id="seal-text-path" fill="none" d="M 50,50 m -36,0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0" />
                   <text className="fill-[#8C6D3E] font-sans font-bold text-[6.5px] uppercase tracking-wider">
                     <textPath href="#seal-text-path" startOffset="0%">
-                      • TAPAM ESTD 2026 • SCIENCE & AGRICULTURE RURAL ADVANCEMENT
+                      {getCert("branding", "seal_text_membership")}
                     </textPath>
                   </text>
                 </svg>
@@ -272,15 +275,15 @@ function MembershipCertificate() {
             {/* Managing Director Signature */}
             <div className="flex flex-col items-center">
               {/* Simulated Signature */}
-              <div className="font-serif italic text-navy font-bold text-lg leading-none rotate-2 select-none mb-1 opacity-90 h-8 flex items-end">
-                Ram Mangalam
+              <div className="font-serif italic text-navy font-bold text-lg leading-none rotate-2 select-none mb-1 opacity-90 h-8 flex items-end break-all">
+                {getCert("branding", "publisher_signature")}
               </div>
               <div className="w-36 h-px bg-foreground/30 mb-2" />
-              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider">
-                Managing Director
+              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
+                {getCert("branding", "publisher_title")}
               </div>
-              <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest">
-                RADF Jaipur
+              <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest max-w-[220px] break-words leading-tight mt-0.5">
+                {getCert("branding", "publisher_institution")}
               </div>
             </div>
 

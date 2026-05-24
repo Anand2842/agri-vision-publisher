@@ -34,6 +34,7 @@ import { Route as ArticleCertificateSubmissionIdRouteImport } from './routes/art
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_authenticated.admin.submissions'
 import { Route as AuthenticatedAdminQueueRouteImport } from './routes/_authenticated.admin.queue'
+import { Route as AuthenticatedAdminMessagesRouteImport } from './routes/_authenticated.admin.messages'
 import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated.admin.memberships'
 import { Route as AuthenticatedAdminIssuesRouteImport } from './routes/_authenticated.admin.issues'
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated.admin.content'
@@ -167,6 +168,12 @@ const AuthenticatedAdminQueueRoute = AuthenticatedAdminQueueRouteImport.update({
   path: '/queue',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminMessagesRoute =
+  AuthenticatedAdminMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminMembershipsRoute =
   AuthenticatedAdminMembershipsRouteImport.update({
     id: '/memberships',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/issues': typeof AuthenticatedAdminIssuesRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
+  '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/queue': typeof AuthenticatedAdminQueueRoute
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -252,6 +260,7 @@ export interface FileRoutesByTo {
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/issues': typeof AuthenticatedAdminIssuesRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
+  '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/queue': typeof AuthenticatedAdminQueueRoute
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -285,6 +294,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/issues': typeof AuthenticatedAdminIssuesRoute
   '/_authenticated/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
+  '/_authenticated/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/_authenticated/admin/queue': typeof AuthenticatedAdminQueueRoute
   '/_authenticated/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/issues'
     | '/admin/memberships'
+    | '/admin/messages'
     | '/admin/queue'
     | '/admin/submissions'
     | '/admin/users'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/issues'
     | '/admin/memberships'
+    | '/admin/messages'
     | '/admin/queue'
     | '/admin/submissions'
     | '/admin/users'
@@ -380,6 +392,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/issues'
     | '/_authenticated/admin/memberships'
+    | '/_authenticated/admin/messages'
     | '/_authenticated/admin/queue'
     | '/_authenticated/admin/submissions'
     | '/_authenticated/admin/users'
@@ -585,6 +598,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminQueueRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/messages': {
+      id: '/_authenticated/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AuthenticatedAdminMessagesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/memberships': {
       id: '/_authenticated/admin/memberships'
       path: '/memberships'
@@ -629,6 +649,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
   AuthenticatedAdminIssuesRoute: typeof AuthenticatedAdminIssuesRoute
   AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
+  AuthenticatedAdminMessagesRoute: typeof AuthenticatedAdminMessagesRoute
   AuthenticatedAdminQueueRoute: typeof AuthenticatedAdminQueueRoute
   AuthenticatedAdminSubmissionsRoute: typeof AuthenticatedAdminSubmissionsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -641,6 +662,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
   AuthenticatedAdminIssuesRoute: AuthenticatedAdminIssuesRoute,
   AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,
+  AuthenticatedAdminMessagesRoute: AuthenticatedAdminMessagesRoute,
   AuthenticatedAdminQueueRoute: AuthenticatedAdminQueueRoute,
   AuthenticatedAdminSubmissionsRoute: AuthenticatedAdminSubmissionsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,

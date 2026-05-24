@@ -160,19 +160,19 @@ function AdminMemberships() {
             }
             try {
               const { data, error } = await supabase.storage
-                .from("receipts")
+                .from("payment-receipts")
                 .createSignedUrl(c.receipt_path, 60);
               if (!error && data) {
                 urlsMap[c.id] = data.signedUrl;
               } else {
                 const { data: pubData } = supabase.storage
-                  .from("receipts")
+                  .from("payment-receipts")
                   .getPublicUrl(c.receipt_path);
                 urlsMap[c.id] = pubData.publicUrl;
               }
             } catch (err) {
               const { data: pubData } = supabase.storage
-                .from("receipts")
+                .from("payment-receipts")
                 .getPublicUrl(c.receipt_path);
               urlsMap[c.id] = pubData.publicUrl;
             }

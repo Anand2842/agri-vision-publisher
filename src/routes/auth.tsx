@@ -91,7 +91,7 @@ function Auth() {
           </p>
           <button
             onClick={() => setSignUpPending(false)}
-            className="mt-8 w-full bg-primary text-primary-foreground px-6 py-3 rounded-sm text-sm hover:bg-primary/90 transition-colors"
+            className="mt-8 w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 transition-colors"
           >
             Back to Sign In
           </button>
@@ -113,31 +113,34 @@ function Auth() {
         </h1>
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
           {mode === "signup" && (
-            <input
-              name="full_name"
-              required
-              placeholder="Full name *"
-              className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
-            />
+              <input
+                name="full_name"
+                required
+                autoComplete="name"
+                placeholder="Full name *"
+                className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+              />
           )}
           <input
             name="email"
             type="email"
             required
+            autoComplete="email"
             placeholder="Email"
-            className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
+            className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
           />
           <input
             name="password"
             type="password"
             required
+            autoComplete="current-password"
             minLength={8}
             placeholder="Password (min 8 characters)"
-            className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
+            className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
           />
           <button
             disabled={loading}
-            className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-sm text-sm hover:bg-primary/90 disabled:opacity-60"
+            className="w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
           >
             {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>

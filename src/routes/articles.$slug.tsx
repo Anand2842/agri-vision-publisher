@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -42,6 +44,30 @@ export const Route = createFileRoute("/articles/$slug")({
 function Article() {
   const { a, related } = Route.useLoaderData();
   const { get: getHeader } = useSiteContent("header");
+
+  useEffect(() => {
+    if (a?.id) {
+      try {
+        const sessionKey = "tapam_viewed_articles";
+        const raw = sessionStorage.getItem(sessionKey);
+        const viewedIds: string[] = raw ? JSON.parse(raw) : [];
+        
+        if (!viewedIds.includes(a.id)) {
+          viewedIds.push(a.id);
+          sessionStorage.setItem(sessionKey, JSON.stringify(viewedIds));
+          
+          (supabase as any).rpc("increment_article_views", { article_id: a.id }).then(({ error }: { error: any }) => {
+            if (error) console.error("Error incrementing views:", error);
+          });
+        }
+      } catch (err) {
+        (supabase as any).rpc("increment_article_views", { article_id: a.id }).then(({ error }: { error: any }) => {
+          if (error) console.error("Error incrementing views:", error);
+        });
+      }
+    }
+  }, [a?.id]);
+
   const siteTitle = (getHeader("branding", "title_line1") || "The Agriculture") + " " + (getHeader("branding", "title_line2") || "Popular Article Magazine");
   const pdfHref = articlePdf(a.pdfPath);
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
@@ -134,57 +160,16 @@ function Article() {
             </button>
           </aside>
           <article className="md:col-span-7 max-w-2xl mx-auto">
-            <div className="bg-paper border-l-4 border-primary p-6 mb-10">
-              <div className="eyebrow mb-3">Key Insights</div>
-              <ul className="space-y-2 text-sm text-foreground/85 list-disc pl-5">
-                <li>
-                  A multi-season trial across six agro-ecological zones reveals a 22% yield
-                  advantage.
-                </li>
-                <li>Resistance traits cluster around three known QTL loci on chromosome 2B.</li>
-                <li>Smallholder adoption depends critically on seed-system access, not biology.</li>
-              </ul>
-            </div>
-
-            <p className="drop-cap text-lg leading-[1.75] text-foreground/85">
-              {a.abstract} The findings reported here emerge from a four-year multi-institutional
-              collaboration spanning research stations in three countries. Across thirty-two field
-              plots, our team measured agronomic, physiological, and socio-economic indicators in
-              tandem — an integrated approach increasingly necessary as farming systems collide with
-              climate volatility.
-            </p>
-            <p className="mt-6 text-foreground/85 leading-[1.75]">
-              The opening section reviews methodology in detail. Readers familiar with classical
-              breeding trials may skim the first three pages; novel material begins with the
-              molecular-marker analysis on page seven, where we describe a previously unreported
-              allelic combination associated with durable resistance under elevated daytime
-              temperatures.
-            </p>
-            <h2 className="font-display text-2xl md:text-3xl mt-12 text-ink">Methodology</h2>
-            <p className="mt-4 text-foreground/85 leading-[1.75]">
-              Field trials followed an alpha-lattice design with four replications per location.
-              Phenotyping covered 18 traits at three growth stages. Genotyping used the 35K Axiom
-              Wheat Breeders' Array. Statistical models accounted for genotype × environment
-              interactions using mixed-effects regression.
-            </p>
-            <blockquote className="my-12 border-l-2 border-primary pl-6 font-display text-2xl md:text-3xl text-ink leading-snug">
-              "The biological gains are real — but the bottleneck remains seed access. Without a
-              working seed system, durable resistance is a paper victory."
-            </blockquote>
-            <h2 className="font-display text-2xl md:text-3xl mt-12 text-ink">
-              Results &amp; Discussion
-            </h2>
-            <p className="mt-4 text-foreground/85 leading-[1.75]">
-              Across all locations, the candidate lines outperformed local checks by a mean of 22%
-              under inoculated conditions and held a 9% advantage under non-inoculated controls.
-              Heritability estimates remained stable across years, suggesting reliable transmission
-              of resistance to subsequent generations.
-            </p>
-            <p className="mt-6 text-foreground/85 leading-[1.75]">
-              These outcomes echo earlier reports from East African trials, but extend the work by
-              integrating socio-economic survey data: farmer willingness-to-adopt was strongly
-              predicted by perceived seed quality, not yield differential alone.
-            </p>
+            {a.content ? (
+              <div 
+                className="article-content prose prose-stone max-w-none prose-p:text-foreground/85 prose-p:leading-[1.75] prose-headings:font-display prose-headings:text-ink prose-a:text-primary hover:prose-a:text-orange"
+                dangerouslySetInnerHTML={{ __html: a.content }} 
+              />
+            ) : (
+              <p className="drop-cap text-lg leading-[1.75] text-foreground/85">
+                {a.abstract}
+              </p>
+            )}
 
             <div className="rule-thin mt-16 pt-8">
               <div className="eyebrow">About the author</div>
@@ -200,8 +185,7 @@ function Article() {
                   <div className="font-display text-lg">{a.author}</div>
                   <div className="text-sm text-muted-foreground">{a.affiliation}</div>
                   <p className="text-sm mt-2 text-foreground/75 max-w-md">
-                    Senior researcher with two decades of experience in cereal genetics and breeding
-                    for stress-prone environments.
+                    {a.authorBio || "Contributor to The Agriculture Popular Article Magazine."}
                   </p>
                 </div>
               </div>

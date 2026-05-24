@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getLocalStorageClaims, MOCK_PROFILES } from "@/lib/paymentStorage";
 import { Printer, ArrowLeft, Loader2, Award, ShieldCheck } from "lucide-react";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 export const Route = createFileRoute("/article/certificate/$submissionId")({
   component: PublicationCertificate,
   head: () => ({
     title: "Publication Certificate — The Agriculture Popular Article Magazine",
+    meta: [],
   }),
 });
 
@@ -29,6 +31,7 @@ function PublicationCertificate() {
   const [data, setData] = useState<ArticleCertificateData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { get: getCert } = useSiteContent("certificate");
 
   useEffect(() => {
     const loadCertificateData = async () => {
@@ -183,10 +186,10 @@ function PublicationCertificate() {
           {/* Header */}
           <div className="space-y-1.5">
             <div className="text-[11px] font-sans font-semibold text-primary uppercase tracking-[0.3em] font-semibold">
-              The Agriculture Popular Article Magazine
+              {getCert("branding", "magazine_name")}
             </div>
             <div className="text-[9px] font-sans font-bold text-muted-foreground uppercase tracking-widest">
-              Published by: Ram Mangalam Agri–Rural Development Foundation (RADF)
+              Published by: {getCert("branding", "publisher")}
             </div>
             <div className="w-40 h-px bg-gradient-to-r from-transparent via-[#8C6D3E]/40 to-transparent mx-auto mt-2" />
           </div>
@@ -203,10 +206,10 @@ function PublicationCertificate() {
 
           {/* Author Name */}
           <div>
-            <div className="font-serif italic text-3xl md:text-4xl font-bold text-navy px-12 border-b border-[#8C6D3E]/30 pb-1.5 inline-block min-w-[340px] drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)]">
+            <div className="font-serif italic text-3xl md:text-4xl font-bold text-navy px-12 border-b border-[#8C6D3E]/30 pb-1.5 inline-block min-w-[340px] max-w-[650px] break-words leading-tight drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)]">
               {authorName}
             </div>
-            <div className="text-[10px] font-sans font-semibold text-foreground/60 uppercase tracking-widest mt-1.5">
+            <div className="text-[10px] font-sans font-semibold text-foreground/60 uppercase tracking-widest mt-1.5 max-w-[600px] break-words leading-normal mx-auto">
               {institution ? `${institution}, ${country}` : "Registered Agricultural Researcher"}
             </div>
           </div>
@@ -214,7 +217,7 @@ function PublicationCertificate() {
           {/* Article Info Statement */}
           <div className="max-w-3xl text-sm font-serif leading-relaxed text-foreground/80 mt-1">
             in appreciation for the successful publication of the popular-science article titled:
-            <div className="font-display font-bold text-base text-navy px-6 py-2 border border-[#8C6D3E]/20 bg-stone-50 rounded-sm my-2 text-center max-w-2xl mx-auto italic">
+            <div className="font-display font-bold text-base text-navy px-6 py-2 border border-[#8C6D3E]/20 bg-stone-50 rounded-sm my-2 text-center max-w-2xl mx-auto italic break-words">
               “{submission.title}”
             </div>
             which has been successfully accepted, peer-reviewed, and published in the upcoming monthly issue of
@@ -232,15 +235,15 @@ function PublicationCertificate() {
           <div className="w-full grid grid-cols-3 items-end px-12 text-center">
             
             <div className="flex flex-col items-center">
-              <div className="font-serif italic text-navy font-bold text-lg leading-none -rotate-2 select-none mb-1 opacity-90 h-8 flex items-end">
-                Dileep K. Dangi
+              <div className="font-serif italic text-navy font-bold text-lg leading-none -rotate-2 select-none mb-1 opacity-90 h-8 flex items-end break-all">
+                {getCert("branding", "chief_editor_signature")}
               </div>
               <div className="w-36 h-px bg-foreground/30 mb-2" />
-              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider">
-                Dr. Dileep Kumar
+              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
+                {getCert("branding", "chief_editor")}
               </div>
-              <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest">
-                Chief Editor, ICAR-CAZRI
+              <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest max-w-[220px] break-words leading-tight mt-0.5">
+                {getCert("branding", "chief_editor_title")}
               </div>
             </div>
 
@@ -250,7 +253,7 @@ function PublicationCertificate() {
                   <path id="seal-text-path" fill="none" d="M 50,50 m -36,0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0" />
                   <text className="fill-[#8C6D3E] font-sans font-bold text-[6.5px] uppercase tracking-wider">
                     <textPath href="#seal-text-path" startOffset="0%">
-                      • TAPAM • RADF JAIPUR • RESEARCH & POPULAR SCIENCE PUBLICATION
+                      {getCert("branding", "seal_text")}
                     </textPath>
                   </text>
                 </svg>
@@ -262,15 +265,15 @@ function PublicationCertificate() {
             </div>
 
             <div className="flex flex-col items-center">
-              <div className="font-serif italic text-navy font-bold text-lg leading-none rotate-2 select-none mb-1 opacity-90 h-8 flex items-end">
-                Ram Mangalam
+              <div className="font-serif italic text-navy font-bold text-lg leading-none rotate-2 select-none mb-1 opacity-90 h-8 flex items-end break-all">
+                {getCert("branding", "publisher_signature")}
               </div>
               <div className="w-36 h-px bg-foreground/30 mb-2" />
-              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider">
-                Managing Director
+              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
+                {getCert("branding", "publisher_title")}
               </div>
-              <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest">
-                RADF Jaipur
+              <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest max-w-[220px] break-words leading-tight mt-0.5">
+                {getCert("branding", "publisher_institution")}
               </div>
             </div>
 

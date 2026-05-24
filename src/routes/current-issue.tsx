@@ -80,7 +80,7 @@ function CurrentIssue() {
             <aside className="lg:col-span-5 lg:sticky lg:top-28">
               <div className="relative">
                 <img
-                  src={issue.cover}
+                  src={issue.cover || undefined}
                   alt={`Cover of Volume ${issue.volume}, Issue ${issue.number} — ${issue.title}`}
                   className="w-full max-w-md mx-auto shadow-2xl ring-1 ring-[oklch(var(--navy))]/10"
                 />
@@ -155,9 +155,7 @@ function CurrentIssue() {
                 {issue.desc}
               </p>
               <p className="mt-4 text-foreground/70 leading-relaxed">
-                A peer-reviewed selection of original research and field reports curated by the
-                editorial board — covering agronomy, plant protection, horticulture, soil science
-                and rural extension across the Indian sub-continent and beyond.
+                {get("editorial", "description") || "A peer-reviewed selection of original research and field reports curated by the editorial board — covering agronomy, plant protection, horticulture, soil science and rural extension across the Indian sub-continent and beyond."}
               </p>
 
               {/* Read articles */}

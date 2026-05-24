@@ -3,89 +3,63 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 import { Mail, Phone, Megaphone, CheckCircle, BarChart3, Users, Globe2, Award } from "lucide-react";
+import { z } from "zod";
+
+const BenefitsSchema = z.array(z.object({
+  title: z.string(),
+  description: z.string(),
+  icon: z.string()
+}));
+
+const StatsSchema = z.array(z.object({
+  value: z.string(),
+  label: z.string()
+}));
+
+const PackagesSchema = z.array(z.object({
+  name: z.string(),
+  price: z.string(),
+  description: z.string(),
+  features: z.array(z.string()),
+  cta: z.string(),
+  highlighted: z.boolean()
+}));
+
+const IconMap: Record<string, React.ElementType> = {
+  Users, BarChart3, Globe2, Award, CheckCircle, Megaphone, Mail, Phone
+};
 
 export const Route = createFileRoute("/advertise")({
   component: Advertise,
-  loader: () => fetchSeoMetadata("contact"), // Use contact SEO metadata as high-quality fallback
+  loader: () => fetchSeoMetadata("advertise"),
   head: ({ loaderData }) => ({
-    title: "Advertise — The Agriculture Popular Article Magazine",
+    title: loaderData?.title || "Advertise — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
-          { name: "description", content: "Reach a highly targeted audience of scientists, progressive farmers, researchers, and agri-startups by advertising with us." },
-          { property: "og:title", content: "Advertise — The Agriculture Popular Article Magazine" },
-          { property: "og:description", content: "Reach a highly targeted audience of scientists, progressive farmers, researchers, and agri-startups by advertising with us." },
+          { name: "description", content: loaderData.description },
+          { property: "og:title", content: loaderData.title },
+          { property: "og:description", content: loaderData.description },
         ]
       : [],
   }),
 });
 
 function Advertise() {
-  const { get } = useSiteContent("contact");
+  const { get: getContact } = useSiteContent("contact");
+  const { get: getAdvertise, getJson } = useSiteContent("advertise");
 
-  const benefits = [
-    {
-      title: "Targeted Audience",
-      description: "Direct connection with researchers, KVK scientists, faculty members, and progressive farmers.",
-      icon: Users,
-    },
-    {
-      title: "Extensive Reach",
-      description: "Over 50,000+ active monthly readers and growing agricultural community network.",
-      icon: BarChart3,
-    },
-    {
-      title: "International Visibility",
-      description: "Global readership across India, Nepal, Sri Lanka, and international agricultural research bodies.",
-      icon: Globe2,
-    },
-    {
-      title: "Credible Alignment",
-      description: "Associate your brand with an open-access, peer-reviewed scientific and rural advancement platform.",
-      icon: Award,
-    },
-  ];
+  // Provide empty arrays as fallbacks before validation
+  const rawBenefits = getJson("benefits", "items") || [];
+  const rawStats = getJson("audience", "stats") || [];
+  const rawPackages = getJson("sponsorship", "packages") || [];
 
-  const packages = [
-    {
-      name: "Issue Sponsor",
-      price: "Enquire for Price",
-      description: "Premium placement on the cover and table of contents pages of our monthly issue.",
-      features: [
-        "Full-page back cover advertisement",
-        "Editorial board acknowledgement",
-        "Logo in Monthly Newsletter",
-        "Hyperlink to company website",
-      ],
-      cta: "Contact Editor",
-      highlighted: true,
-    },
-    {
-      name: "Startup Spotlight Sponsor",
-      price: "Special Startup Rate",
-      description: "Specifically designed for young agri-tech startups looking to showcase innovations.",
-      features: [
-        "Feature story in Startup Spotlight section",
-        "Half-page display advertisement",
-        "Social media announcement",
-        "Direct inquiry lead forwarding",
-      ],
-      cta: "Enquire Now",
-      highlighted: false,
-    },
-    {
-      name: "Standard Banner Placement",
-      price: "Flexible Monthly Rates",
-      description: "Standard slots across our dynamic online article pages and categories.",
-      features: [
-        "Sidebar banner on article view pages",
-        "Bottom banner on home page",
-        "Rotational priority slots",
-        "Basic CTR performance analytics",
-      ],
-      cta: "Request Rate Card",
-      highlighted: false,
-    },
-  ];
+  const benefitsResult = BenefitsSchema.safeParse(rawBenefits);
+  const statsResult = StatsSchema.safeParse(rawStats);
+  const packagesResult = PackagesSchema.safeParse(rawPackages);
+
+  const benefits = benefitsResult.success ? benefitsResult.data : [];
+  const stats = statsResult.success ? statsResult.data : [];
+  const packages = packagesResult.success ? packagesResult.data : [];
 
   return (
     <>
@@ -98,10 +72,10 @@ function Advertise() {
           <div className="max-w-3xl">
             <div className="eyebrow text-orange mb-3">Partner With Us</div>
             <h1 className="font-display text-5xl md:text-7xl leading-[1.05] text-white">
-              {get("advertise", "heading") || "Reach the agriculture community"}
+              {getAdvertise("hero", "heading") || "Reach the agriculture community"}
             </h1>
             <p className="mt-6 text-white/80 text-lg leading-relaxed font-sans">
-              {get("advertise", "body") || "Agro-based industrial and other allied sectors can advertise in The Agriculture Popular Article Magazine. Write to us for placements, rate cards and partnership enquiries."}
+              {getAdvertise("hero", "body") || "Agro-based industrial and other allied sectors can advertise in The Agriculture Popular Article Magazine. Write to us for placements, rate cards and partnership enquiries."}
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <a href="#packages" className="btn-orange">
@@ -126,15 +100,18 @@ function Advertise() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {benefits.map((b, i) => (
-            <div key={i} className="bg-paper border border-rule p-8 hover-lift">
-              <div className="bg-orange/10 p-3 rounded-sm w-fit mb-6">
-                <b.icon className="h-6 w-6 text-primary" />
+          {benefits.map((b, i) => {
+            const Icon = IconMap[b.icon] || CheckCircle;
+            return (
+              <div key={i} className="bg-paper border border-rule p-8 hover-lift">
+                <div className="bg-orange/10 p-3 rounded-sm w-fit mb-6">
+                  <Icon className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-display text-xl text-ink mb-3">{b.title}</h3>
+                <p className="text-sm text-foreground/75 leading-relaxed">{b.description}</p>
               </div>
-              <h3 className="font-display text-xl text-ink mb-3">{b.title}</h3>
-              <p className="text-sm text-foreground/75 leading-relaxed">{b.description}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -144,22 +121,12 @@ function Advertise() {
           <div className="eyebrow">Audience Breakdown</div>
           <h2 className="font-display text-3xl mt-2 mb-10 text-ink">Our Growing Agricultural Reader Network</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            <div className="p-4 border-r border-rule last:border-0">
-              <div className="font-display text-4xl font-bold text-primary">50,000+</div>
-              <div className="text-xs uppercase tracking-wider text-foreground/60 mt-1 font-semibold">Monthly Readers</div>
-            </div>
-            <div className="p-4 border-r border-rule last:border-0">
-              <div className="font-display text-4xl font-bold text-primary">30,000+</div>
-              <div className="text-xs uppercase tracking-wider text-foreground/60 mt-1 font-semibold">Active Farmers</div>
-            </div>
-            <div className="p-4 border-r border-rule last:border-0">
-              <div className="font-display text-4xl font-bold text-primary">55,000+</div>
-              <div className="text-xs uppercase tracking-wider text-foreground/60 mt-1 font-semibold">Academicians</div>
-            </div>
-            <div className="p-4">
-              <div className="font-display text-4xl font-bold text-primary">2,500+</div>
-              <div className="text-xs uppercase tracking-wider text-foreground/60 mt-1 font-semibold">International Visitors</div>
-            </div>
+            {stats.map((s, i) => (
+              <div key={i} className="p-4 border-r border-rule last:border-0 max-lg:[&:nth-child(2n)]:border-r-0">
+                <div className="font-display text-4xl font-bold text-primary">{s.value}</div>
+                <div className="text-xs uppercase tracking-wider text-foreground/60 mt-1 font-semibold">{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -228,11 +195,11 @@ function Advertise() {
             Ready to advertise? Request a comprehensive media kit and discussion regarding custom marketing schedules.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm font-sans">
-            <a href={`mailto:${get("office", "email") || "dkdkdangi@gmail.com"}`} className="flex items-center gap-2.5 underline hover:text-orange transition-colors">
-              <Mail className="h-4 w-4" /> {get("office", "email") || "dkdkdangi@gmail.com"}
+            <a href={`mailto:${getContact("office", "email") || "dkdkdangi@gmail.com"}`} className="flex items-center gap-2.5 underline hover:text-orange transition-colors">
+              <Mail className="h-4 w-4" /> {getContact("office", "email") || "dkdkdangi@gmail.com"}
             </a>
-            <a href={`tel:${get("office", "phone") || "+91 9509164410"}`} className="flex items-center gap-2.5 hover:text-orange transition-colors">
-              <Phone className="h-4 w-4" /> {get("office", "phone") || "+91 9509164410"}
+            <a href={`tel:${getContact("office", "phone") || "+91 9509164410"}`} className="flex items-center gap-2.5 hover:text-orange transition-colors">
+              <Phone className="h-4 w-4" /> {getContact("office", "phone") || "+91 9509164410"}
             </a>
           </div>
         </div>

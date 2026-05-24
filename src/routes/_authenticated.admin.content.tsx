@@ -35,6 +35,9 @@ function AdminContentPage() {
           <TabsTrigger value="archives">Archives</TabsTrigger>
           <TabsTrigger value="search_page">Search Page</TabsTrigger>
           <TabsTrigger value="current_issue">Current Issue</TabsTrigger>
+          <TabsTrigger value="advertise">Advertise</TabsTrigger>
+          <TabsTrigger value="publication_ethics">Publication Ethics</TabsTrigger>
+          <TabsTrigger value="certificate">Certificates</TabsTrigger>
           <TabsTrigger value="seo">SEO Meta</TabsTrigger>
         </TabsList>
 
@@ -73,6 +76,15 @@ function AdminContentPage() {
         </TabsContent>
         <TabsContent value="current_issue">
           <CurrentIssueCms />
+        </TabsContent>
+        <TabsContent value="advertise">
+          <AdvertiseCms />
+        </TabsContent>
+        <TabsContent value="publication_ethics">
+          <PublicationEthicsCms />
+        </TabsContent>
+        <TabsContent value="certificate">
+          <CertificateCms />
         </TabsContent>
         <TabsContent value="seo">
           <SeoCms />
@@ -333,6 +345,7 @@ function MembershipCms() {
             { key: "id", label: "ID (internal)", type: "text" },
             { key: "name", label: "Name", type: "text" },
             { key: "price", label: "Price", type: "text" },
+            { key: "amount", label: "Amount (numeric for pricing logic)", type: "number" },
             { key: "period", label: "Period", type: "text" },
             { key: "validity", label: "Validity", type: "text" },
             { key: "features", label: "Features (Comma separated)", type: "array" },
@@ -491,6 +504,8 @@ function SeoCms() {
     { key: "archives", name: "Archives Page" },
     { key: "current_issue", name: "Current Issue Page" },
     { key: "startup_spotlight", name: "Startup Spotlight Page" },
+    { key: "publication_ethics", name: "Publication Ethics Page" },
+    { key: "advertise", name: "Advertise Page" },
   ];
 
   return (
@@ -504,4 +519,130 @@ function SeoCms() {
     </div>
   );
 }
+
+function PublicationEthicsCms() {
+  const { get, loading } = useSiteContent("publication_ethics");
+  if (loading) return <Loader2 className="animate-spin" />;
+  return (
+    <div className="space-y-6">
+      <CmsSection title="Hero">
+        <TextFieldEditor page="publication_ethics" section="hero" contentKey="eyebrow" label="Eyebrow Text" initialValue={get("hero", "eyebrow")} />
+        <TextFieldEditor page="publication_ethics" section="hero" contentKey="title" label="Title" initialValue={get("hero", "title")} />
+        <TextareaEditor page="publication_ethics" section="hero" contentKey="body" label="Body" initialValue={get("hero", "body")} />
+      </CmsSection>
+      <CmsSection title="1. Originality & Plagiarism">
+        <TextFieldEditor page="publication_ethics" section="originality" contentKey="title" label="Section Title" initialValue={get("originality", "title")} />
+        <TextareaEditor page="publication_ethics" section="originality" contentKey="body" label="Section Body" initialValue={get("originality", "body")} />
+        <JsonArrayEditor page="publication_ethics" section="originality" contentKey="points" label="Bullet Points" initialValue={get("originality", "points")} />
+      </CmsSection>
+      <CmsSection title="2. Authorship">
+        <TextFieldEditor page="publication_ethics" section="authorship" contentKey="title" label="Section Title" initialValue={get("authorship", "title")} />
+        <TextareaEditor page="publication_ethics" section="authorship" contentKey="body" label="Section Body" initialValue={get("authorship", "body")} />
+      </CmsSection>
+      <CmsSection title="3. Peer Review">
+        <TextFieldEditor page="publication_ethics" section="peer_review" contentKey="title" label="Section Title" initialValue={get("peer_review", "title")} />
+        <TextareaEditor page="publication_ethics" section="peer_review" contentKey="body" label="Section Body" initialValue={get("peer_review", "body")} />
+      </CmsSection>
+      <CmsSection title="4. Conflicts of Interest">
+        <TextFieldEditor page="publication_ethics" section="conflicts" contentKey="title" label="Section Title" initialValue={get("conflicts", "title")} />
+        <TextareaEditor page="publication_ethics" section="conflicts" contentKey="body" label="Section Body" initialValue={get("conflicts", "body")} />
+      </CmsSection>
+      <CmsSection title="5. Corrections, Retractions & Misconduct">
+        <TextFieldEditor page="publication_ethics" section="corrections" contentKey="title" label="Section Title" initialValue={get("corrections", "title")} />
+        <TextareaEditor page="publication_ethics" section="corrections" contentKey="body" label="Section Body" initialValue={get("corrections", "body")} />
+      </CmsSection>
+      <CmsSection title="6. Open Access & Copyright">
+        <TextFieldEditor page="publication_ethics" section="open_access" contentKey="title" label="Section Title" initialValue={get("open_access", "title")} />
+        <TextareaEditor page="publication_ethics" section="open_access" contentKey="body" label="Section Body" initialValue={get("open_access", "body")} />
+      </CmsSection>
+      <CmsSection title="7. Reporting Concerns">
+        <TextFieldEditor page="publication_ethics" section="reporting" contentKey="title" label="Section Title" initialValue={get("reporting", "title")} />
+        <TextareaEditor page="publication_ethics" section="reporting" contentKey="body" label="Section Body (HTML allowed for links)" initialValue={get("reporting", "body")} />
+      </CmsSection>
+    </div>
+  );
+}
+
+function CertificateCms() {
+  const { get, loading } = useSiteContent("certificate");
+  if (loading) return <Loader2 className="animate-spin" />;
+  return (
+    <div className="space-y-6">
+      <CmsSection title="Branding">
+        <TextFieldEditor page="certificate" section="branding" contentKey="magazine_name" label="Magazine Title" initialValue={get("branding", "magazine_name")} />
+        <TextFieldEditor page="certificate" section="branding" contentKey="publisher" label="Publisher Name" initialValue={get("branding", "publisher")} />
+      </CmsSection>
+      <CmsSection title="Editor-in-Chief Seal & Details">
+        <TextFieldEditor page="certificate" section="branding" contentKey="chief_editor" label="Chief Editor Name" initialValue={get("branding", "chief_editor")} />
+        <TextFieldEditor page="certificate" section="branding" contentKey="chief_editor_title" label="Chief Editor Title" initialValue={get("branding", "chief_editor_title")} />
+        <TextFieldEditor page="certificate" section="branding" contentKey="chief_editor_signature" label="Chief Editor Signature Text (Simulated Handwriting)" initialValue={get("branding", "chief_editor_signature")} />
+        <TextFieldEditor page="certificate" section="branding" contentKey="seal_text" label="Seal Text Circular (Publication Certificate)" initialValue={get("branding", "seal_text")} />
+      </CmsSection>
+      <CmsSection title="Publisher Signatures & Details">
+        <TextFieldEditor page="certificate" section="branding" contentKey="publisher_signature" label="Publisher Signature Text (Simulated Handwriting)" initialValue={get("branding", "publisher_signature")} />
+        <TextFieldEditor page="certificate" section="branding" contentKey="publisher_title" label="Publisher Title" initialValue={get("branding", "publisher_title")} />
+        <TextFieldEditor page="certificate" section="branding" contentKey="publisher_institution" label="Publisher Institution" initialValue={get("branding", "publisher_institution")} />
+        <TextFieldEditor page="certificate" section="branding" contentKey="seal_text_membership" label="Seal Text Circular (Membership Certificate)" initialValue={get("branding", "seal_text_membership")} />
+      </CmsSection>
+    </div>
+  );
+}
+
+function AdvertiseCms() {
+  const { get, loading } = useSiteContent("advertise");
+  if (loading) return <Loader2 className="animate-spin" />;
+  return (
+    <div className="space-y-6">
+      <CmsSection title="Hero">
+        <TextFieldEditor page="advertise" section="hero" contentKey="heading" label="Heading" initialValue={get("hero", "heading")} />
+        <TextareaEditor page="advertise" section="hero" contentKey="body" label="Body" initialValue={get("hero", "body")} />
+      </CmsSection>
+      <CmsSection title="Benefits">
+        <JsonObjectArrayEditor
+          page="advertise"
+          section="benefits"
+          contentKey="items"
+          label="Benefits List"
+          initialValue={get("benefits", "items")}
+          fields={[
+            { key: "title", label: "Title", type: "text" },
+            { key: "description", label: "Description", type: "textarea" },
+            { key: "icon", label: "Icon Name (e.g. Users, BarChart3, Globe2, Award)", type: "text" }
+          ]}
+        />
+      </CmsSection>
+      <CmsSection title="Audience Statistics">
+        <JsonObjectArrayEditor
+          page="advertise"
+          section="audience"
+          contentKey="stats"
+          label="Stats List"
+          initialValue={get("audience", "stats")}
+          fields={[
+            { key: "value", label: "Value (e.g. 50,000+)", type: "text" },
+            { key: "label", label: "Label (e.g. Monthly Readers)", type: "text" }
+          ]}
+        />
+      </CmsSection>
+      <CmsSection title="Sponsorship Packages">
+        <JsonObjectArrayEditor
+          page="advertise"
+          section="sponsorship"
+          contentKey="packages"
+          label="Packages"
+          initialValue={get("sponsorship", "packages")}
+          fields={[
+            { key: "name", label: "Package Name", type: "text" },
+            { key: "price", label: "Price Text", type: "text" },
+            { key: "description", label: "Description", type: "textarea" },
+            { key: "features", label: "Features (Comma separated)", type: "array" },
+            { key: "cta", label: "CTA Button Text", type: "text" },
+            { key: "highlighted", label: "Highlighted / Featured (Boolean)", type: "boolean" }
+          ]}
+        />
+      </CmsSection>
+    </div>
+  );
+}
+
 

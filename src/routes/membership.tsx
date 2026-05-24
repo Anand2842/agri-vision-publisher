@@ -85,21 +85,11 @@ function Membership() {
 
   // Update amount automatically when plan changes
   useEffect(() => {
-    switch (selectedPlan) {
-      case "single":
-        setAmountPaid("200");
-        break;
-      case "annual":
-        setAmountPaid("500");
-        break;
-      case "lifetime":
-        setAmountPaid("2000");
-        break;
-      case "institute":
-        setAmountPaid("5000");
-        break;
+    const plan = plans.find((p) => p.id === selectedPlan);
+    if (plan && plan.amount) {
+      setAmountPaid(String(plan.amount));
     }
-  }, [selectedPlan]);
+  }, [selectedPlan, plans]);
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -132,8 +122,13 @@ function Membership() {
       toast.error("Please sign in to submit a payment claim.");
       return;
     }
-    if (!transactionRef.trim()) {
-      toast.error("Please enter a valid Transaction Reference ID (UTR).");
+    const cleanRef = transactionRef.trim();
+    if (!cleanRef || cleanRef.length < 4 || cleanRef.length > 50) {
+      toast.error("Invalid Transaction Reference ID (UTR). It must be between 4 and 50 alphanumeric characters.");
+      return;
+    }
+    if (cleanRef.includes("\n") || cleanRef.includes("[DEBUG]") || cleanRef.includes("[ERROR]")) {
+      toast.error("Invalid Transaction Reference ID (UTR) format. Please enter a valid transaction reference.");
       return;
     }
     if (!receiptFile) {
@@ -154,19 +149,18 @@ function Membership() {
     setSubmitting(true);
 
     try {
-      // 1. Upload receipt to Storage bucket 'receipts'
+      // 1. Upload receipt to Storage bucket 'payment-receipts'
       const fileExt = receiptFile.name.slice(receiptFile.name.lastIndexOf(".")).toLowerCase();
-      const uniqueId = Math.random().toString(36).substring(2, 15) + "_" + Date.now();
-      const storagePath = `${session.user.id}/${uniqueId}${fileExt}`;
-
-      // We wrap the bucket upload in an extra try-catch to let storage upload failures fallback too
+      const storagePath = `${session.user.id}/${Date.now()}_receipt${fileExt}`;
+      
       let uploadSuccessful = false;
       try {
         const { error: uploadErr } = await supabase.storage
-          .from("receipts")
+          .from("payment-receipts")
           .upload(storagePath, receiptFile, {
             contentType: receiptFile.type || "application/octet-stream",
-            upsert: false,
+            cacheControl: "3600",
+            upsert: false
           });
         if (!uploadErr) {
           uploadSuccessful = true;
@@ -578,14 +572,14 @@ function Membership() {
                     <div className="mt-5 space-y-4 text-xs text-background/90">
                       {/* Plan Selection Dropdown */}
                       <div>
-                        <label className="block text-[10px] uppercase tracking-wider text-background/50 font-bold mb-1.5">
+                        <label className="text-sm font-sans font-medium block mb-2 text-background/80">
                           Selected Membership Plan
                         </label>
                         <select
                           disabled={!session}
                           value={selectedPlan}
                           onChange={(e) => setSelectedPlan(e.target.value as PlanId)}
-                          className="w-full bg-background/10 border border-background/20 p-2.5 text-background rounded-sm focus:outline-none focus:border-ochre focus:bg-ink font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full h-12 bg-background/10 border border-background/20 px-4 text-background rounded-sm focus:outline-none focus:border-ochre focus:bg-ink font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <option className="bg-ink text-background" value="single">Single Article (₹200)</option>
                           <option className="bg-ink text-background" value="annual">Annual Membership (₹500)</option>
@@ -596,11 +590,11 @@ function Membership() {
 
                       {/* Amount Paid Field */}
                       <div>
-                        <label className="block text-[10px] uppercase tracking-wider text-background/50 font-bold mb-1.5">
+                        <label className="text-sm font-sans font-medium block mb-2 text-background/80">
                           Amount Settled (INR)
                         </label>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-background/50 font-bold">₹</span>
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-background/50 font-bold">₹</span>
                           <input
                             type="text"
                             required
@@ -608,14 +602,14 @@ function Membership() {
                             value={amountPaid}
                             onChange={(e) => setAmountPaid(e.target.value)}
                             placeholder="Amount settled"
-                            className="w-full bg-background/10 border border-background/20 pl-7 pr-3 py-2 text-background rounded-sm focus:outline-none focus:border-ochre font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full h-12 bg-background/10 border border-background/20 pl-8 pr-4 text-background rounded-sm focus:outline-none focus:border-ochre font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                           />
                         </div>
                       </div>
 
                       {/* Transaction Reference Number (UTR) */}
                       <div>
-                        <label className="block text-[10px] uppercase tracking-wider text-background/50 font-bold mb-1.5">
+                        <label className="text-sm font-sans font-medium block mb-2 text-background/80">
                           Transaction Ref ID / UTR
                         </label>
                         <input
@@ -625,7 +619,7 @@ function Membership() {
                           value={transactionRef}
                           onChange={(e) => setTransactionRef(e.target.value)}
                           placeholder={!session ? "Log in to fill details..." : "e.g. 12-digit UTR or Txn ID"}
-                          className="w-full bg-background/10 border border-background/20 px-3 py-2 text-background rounded-sm focus:outline-none focus:border-ochre font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full h-12 bg-background/10 border border-background/20 px-4 text-background rounded-sm focus:outline-none focus:border-ochre font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                       </div>
 
@@ -670,7 +664,7 @@ function Membership() {
                       <Link
                         to="/auth"
                         search={{ redirect: "/membership" }}
-                        className="w-full py-3 bg-ochre hover:bg-ochre/90 text-ink text-xs text-center font-bold rounded-sm uppercase tracking-wider transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                        className="w-full h-12 bg-ochre hover:bg-ochre/90 text-ink text-sm text-center font-semibold rounded-sm tracking-wide transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
                       >
                         Sign In & Submit Claim
                       </Link>
@@ -678,7 +672,7 @@ function Membership() {
                       <button
                         type="submit"
                         disabled={submitting}
-                        className="w-full py-3 bg-ochre hover:bg-ochre/90 disabled:opacity-60 text-ink text-xs text-center font-bold rounded-sm uppercase tracking-wider transition cursor-pointer flex items-center justify-center gap-2"
+                        className="w-full h-12 bg-ochre hover:bg-ochre/90 disabled:opacity-60 text-ink text-sm text-center font-semibold rounded-sm tracking-wide transition cursor-pointer flex items-center justify-center gap-2"
                       >
                         {submitting ? (
                           <>

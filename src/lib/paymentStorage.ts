@@ -1,3 +1,6 @@
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
 export interface PaymentClaim {
   id: string;
   user_id: string;
@@ -92,6 +95,7 @@ export function saveLocalStorageClaim(claim: Omit<PaymentClaim, "id" | "created_
   
   const newClaim: PaymentClaim = {
     ...claim,
+    transaction_ref: (claim.transaction_ref || "").trim().slice(0, 50),
     id,
     created_at: now,
     updated_at: now
@@ -147,4 +151,102 @@ export function getProfileFallback(userId: string) {
     institution: "Agricultural Research Center",
     country: "India"
   };
+}
+
+const syncInProgress = new Set<string>();
+
+export async function syncOfflineClaims(userId: string) {
+  if (typeof window === "undefined" || !userId) return;
+  
+  const claims = getLocalStorageClaims();
+  // Filter claims that belong to this user, are local offline claims, and aren't already syncing
+  const pendingSync = claims.filter(
+    (c) =>
+      c.user_id === userId &&
+      c.id.startsWith("mock-claim-") &&
+      c.id !== "mock-claim-1" &&
+      c.id !== "mock-claim-2" &&
+      !syncInProgress.has(c.id)
+  );
+  
+  if (pendingSync.length === 0) return;
+  
+  // Lock all pending items
+  pendingSync.forEach((c) => syncInProgress.add(c.id));
+  
+  console.log(`[Offline Sync] Found ${pendingSync.length} claims pending synchronization...`);
+  
+  let syncedCount = 0;
+  const updatedClaims = getLocalStorageClaims(); // Fetch fresh to avoid mutation races
+  
+  for (const localClaim of pendingSync) {
+    try {
+      // Skip remote sync for local mock user accounts to prevent database foreign key violation (HTTP 422)
+      if (MOCK_PROFILES[localClaim.user_id] || localClaim.user_id.startsWith("mock-user-") || localClaim.user_id.startsWith("mock-")) {
+        console.info(`[Offline Sync] Skipping remote database insertion for mock sandbox user: ${localClaim.user_id}`);
+        continue;
+      }
+
+      // Check if this transaction_ref already exists on Supabase to prevent duplicate inserts
+      const { data: existing } = await supabase
+        .from("membership_payments")
+        .select("id")
+        .eq("transaction_ref", localClaim.transaction_ref)
+        .maybeSingle();
+        
+      if (existing) {
+        // If it already exists in the database, we can simply remove the local mock claim
+        const idx = updatedClaims.findIndex((x) => x.id === localClaim.id);
+        if (idx !== -1) updatedClaims.splice(idx, 1);
+        continue;
+      }
+      
+      // Sanitize payload before insert to prevent garbage/pasted logs pollution
+      const sanitizedTxRef = (localClaim.transaction_ref || "").trim().slice(0, 50);
+
+      // Attempt remote insertion
+      const { data, error } = await supabase
+        .from("membership_payments")
+        .insert({
+          user_id: localClaim.user_id,
+          plan: localClaim.plan,
+          amount: localClaim.amount,
+          transaction_ref: sanitizedTxRef,
+          payment_method: localClaim.payment_method as "upi" | "bank",
+          receipt_path: localClaim.receipt_path,
+          status: localClaim.status,
+          notes: localClaim.notes
+        })
+        .select()
+        .single();
+        
+      if (error) {
+        console.warn(
+          `[Offline Sync] Remote DB insert failed for claim ${localClaim.id}:`,
+          error.message,
+          error.code
+        );
+        continue;
+      }
+      
+      if (data) {
+        // Successfully synced! Remove the mock local claim
+        const idx = updatedClaims.findIndex((x) => x.id === localClaim.id);
+        if (idx !== -1) {
+          updatedClaims.splice(idx, 1);
+        }
+        syncedCount++;
+      }
+    } catch (err) {
+      console.warn("[Offline Sync] Exception syncing claim:", localClaim.id, err);
+    } finally {
+      // Release lock for this item
+      syncInProgress.delete(localClaim.id);
+    }
+  }
+  
+  if (syncedCount > 0) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedClaims));
+    toast.success(`Synchronized ${syncedCount} offline payment claim(s) with the database!`);
+  }
 }

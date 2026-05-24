@@ -112,17 +112,17 @@ function Contact() {
               <Field name="subject" label="Subject" />
             </div>
             <div>
-              <label className="eyebrow block mb-2">Message</label>
+              <label className="text-sm font-sans font-medium block mb-2">Message</label>
               <textarea
                 name="message"
                 rows={8}
                 required
-                className="w-full bg-background border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
+                className="w-full bg-background border border-rule px-4 py-3 min-h-[140px] rounded-sm text-sm focus:outline-none focus:border-primary"
               />
             </div>
             <button
               disabled={sending}
-              className="bg-primary text-primary-foreground px-6 py-3 rounded-sm text-sm hover:bg-primary/90 disabled:opacity-60"
+              className="bg-primary text-primary-foreground h-12 px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60 flex items-center justify-center w-max"
             >
               {sending ? "Sending…" : "Send message"}
             </button>
@@ -182,12 +182,12 @@ function Contact() {
 function Field({ name, label, type = "text" }: { name: string; label: string; type?: string }) {
   return (
     <div>
-      <label className="eyebrow block mb-2">{label}</label>
+      <label className="text-sm font-sans font-medium block mb-2">{label}</label>
       <input
         name={name}
         type={type}
         required
-        className="w-full bg-background border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
+        className="w-full h-12 bg-background border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
       />
     </div>
   );

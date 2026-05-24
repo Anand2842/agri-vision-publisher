@@ -2,9 +2,50 @@ import { Link } from "@tanstack/react-router";
 import React from "react";
 import logo from "@/assets/logo.png";
 import { useGlobalSiteContent } from "@/hooks/useSiteContent";
+import { z } from "zod";
+
+const FooterNavColumnSchema = z.object({
+  title: z.string(),
+  links: z.array(z.object({
+    label: z.string(),
+    href: z.string()
+  }))
+});
+
+const FooterNavSchema = z.array(FooterNavColumnSchema);
 
 export function SiteFooter() {
   const { getHeader, getFooter, getFooterJson } = useGlobalSiteContent();
+
+  const rawColumns = getFooterJson("navigation", "columns");
+  const parsedColumns = rawColumns ? FooterNavSchema.safeParse(rawColumns) : null;
+  const cmsColumns = parsedColumns?.success ? parsedColumns.data : null;
+
+  const defaultColumns = [
+    {
+      title: "Magazine",
+      links: [
+        { label: "Current Issue", href: "/current-issue" },
+        { label: "Archives", href: "/archives" },
+        { label: "Editorial Board", href: "/editorial-board" },
+        { label: "Advertise", href: "/advertise" },
+        { label: "About", href: "/about" },
+      ]
+    },
+    {
+      title: "Authors",
+      links: [
+        { label: "Submit Article", href: "/submit" },
+        { label: "Submission Guidelines", href: "/submission-guidelines" },
+        { label: "Publication Ethics", href: "/publication-ethics" },
+        { label: "Membership", href: "/membership" },
+        { label: "Advertise", href: "/advertise" },
+        { label: "Author Dashboard", href: "/dashboard" },
+      ]
+    }
+  ];
+
+  const columns = cmsColumns ?? defaultColumns;
   return (
     <footer className="mt-0 bg-navy text-white">
       <div className="container-editorial py-16 grid grid-cols-2 md:grid-cols-5 gap-10">
@@ -36,27 +77,13 @@ export function SiteFooter() {
             ))}
           </div>
         </div>
-        <FooterCol
-          title="Magazine"
-          links={[
-            ["Current Issue", "/current-issue"],
-            ["Archives", "/archives"],
-            ["Editorial Board", "/editorial-board"],
-            ["Advertise", "/advertise"],
-            ["About", "/about"],
-          ]}
-        />
-        <FooterCol
-          title="Authors"
-          links={[
-            ["Submit Article", "/submit"],
-            ["Submission Guidelines", "/submission-guidelines"],
-            ["Publication Ethics", "/publication-ethics"],
-            ["Membership", "/membership"],
-            ["Advertise", "/advertise"],
-            ["Author Dashboard", "/dashboard"],
-          ]}
-        />
+        {(columns as any[]).map((col: any, idx: number) => (
+          <FooterCol
+            key={idx}
+            title={col.title}
+            links={(col.links as any[]).map((l: any) => [l.label, l.href]) as [string, string][]}
+          />
+        ))}
         <div>
           <div className="eyebrow mb-4 text-white/50">Editorial Office</div>
           <ul className="space-y-2 text-sm text-white/80">

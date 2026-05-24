@@ -4,8 +4,22 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useGlobalSiteContent } from "@/hooks/useSiteContent";
 import logo from "@/assets/logo.png";
+import { z } from "zod";
 
-const nav: { to: string; label: string; children?: { to: string; label: string }[] }[] = [
+const NavItemSchema = z.object({
+  to: z.string().optional(),
+  href: z.string().optional(),
+  label: z.string(),
+  children: z.array(z.object({
+    to: z.string().optional(),
+    href: z.string().optional(),
+    label: z.string(),
+  })).optional()
+});
+
+const NavSchema = z.array(NavItemSchema);
+
+const defaultNav: { to: string; label: string; children?: { to: string; label: string }[] }[] = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/editorial-board", label: "Editorial" },
@@ -37,7 +51,21 @@ export function SiteHeader() {
   const [editorRole, setEditorRole] = useState<"admin" | "moderator" | null>(null);
   const [q, setQ] = useState("");
   const navigate = useNavigate();
-  const { getHeader } = useGlobalSiteContent();
+  const { getHeader, getHeaderJson } = useGlobalSiteContent();
+  
+  const rawNav = getHeaderJson("navigation", "items");
+  const navResult = rawNav ? NavSchema.safeParse(rawNav) : null;
+  const cmsNav = navResult?.success ? navResult.data.map((item: any) => ({
+    to: item.href || item.to || "/",
+    label: item.label,
+    children: (item.children as any[])?.map((child: any) => ({
+      to: child.href || child.to || "/",
+      label: child.label
+    }))
+  })) : null;
+
+  const currentNav = cmsNav ?? defaultNav;
+
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const term = q.trim();
@@ -129,21 +157,21 @@ export function SiteHeader() {
 
         <form
           onSubmit={submitSearch}
-          className="hidden md:flex flex-1 max-w-md items-center border border-rule overflow-hidden"
+          className="hidden md:flex flex-1 max-w-[420px] h-12 items-center border border-rule overflow-hidden"
         >
           <input
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search articles, authors…"
-            className="flex-1 px-4 py-2.5 text-sm bg-transparent focus:outline-none"
+            className="flex-1 px-4 h-full text-[15px] bg-transparent focus:outline-none"
           />
           <button
             type="submit"
             aria-label="Search"
-            className="bg-orange text-white px-4 py-2.5 hover:brightness-105"
+            className="bg-orange text-white px-4 h-full flex items-center justify-center hover:brightness-105"
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-[18px] w-[18px]" />
           </button>
         </form>
 
@@ -189,7 +217,7 @@ export function SiteHeader() {
       {/* Dark navigation bar */}
       <nav className="bg-navy hidden lg:block">
         <div className="container-editorial flex flex-wrap items-stretch">
-          {nav.map((n) => (
+          {(currentNav as any[]).map((n: any) => (
             <div key={n.label} className="relative group">
               <Link to={n.to} className="nav-link flex items-center gap-1">
                 {n.label}
@@ -197,7 +225,7 @@ export function SiteHeader() {
               </Link>
               {n.children && (
                 <div className="absolute left-0 top-full hidden group-hover:block bg-navy border-t border-white/10 min-w-[180px] z-50 shadow-xl">
-                  {n.children.map((c) => (
+                  {(n.children as any[]).map((c: any) => (
                     <Link
                       key={c.label}
                       to={c.to}
@@ -225,18 +253,18 @@ export function SiteHeader() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search…"
-              className="flex-1 px-3 py-2 text-sm bg-muted"
+              className="flex-1 px-4 h-12 text-[15px] bg-muted focus:outline-none"
             />
             <button
               type="submit"
               aria-label="Search"
-              className="bg-orange text-white px-4 py-2 ml-2"
+              className="bg-orange text-white px-4 h-12 ml-2 flex items-center justify-center hover:brightness-105"
             >
-              <Search className="h-4 w-4" />
+              <Search className="h-[18px] w-[18px]" />
             </button>
           </form>
           <div className="container-editorial py-3 flex flex-col space-y-1">
-            {nav.map((n) => (
+            {(currentNav as any[]).map((n: any) => (
               <div key={n.label} className="flex flex-col">
                 <Link
                   to={n.to}
@@ -248,7 +276,7 @@ export function SiteHeader() {
                 </Link>
                 {n.children && (
                   <div className="pl-4 bg-muted/40 border-l border-primary/20 flex flex-col py-1.5 space-y-2">
-                    {n.children.map((c) => (
+                    {(n.children as any[]).map((c: any) => (
                       <Link
                         key={c.label}
                         to={c.to}

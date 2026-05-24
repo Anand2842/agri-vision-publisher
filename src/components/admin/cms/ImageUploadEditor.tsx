@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Upload, Trash2, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { updateSiteContentCache } from "@/hooks/useSiteContent";
 
 
 interface ImageUploadEditorProps {
@@ -71,6 +72,7 @@ export function ImageUploadEditor({
         throw dbError;
       }
 
+      updateSiteContentCache(page, section, contentKey, publicUrl);
       setImageUrl(publicUrl);
       toast.success("Image uploaded and saved successfully!");
       if (onUploadSuccess) {
@@ -111,6 +113,7 @@ export function ImageUploadEditor({
         throw dbError;
       }
 
+      updateSiteContentCache(page, section, contentKey, "");
       setImageUrl("");
       toast.success("Image removed successfully!");
       if (onUploadSuccess) {

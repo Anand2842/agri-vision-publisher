@@ -223,10 +223,10 @@ function Submit() {
           <Field label="Abstract (50–3000 chars)" name="abstract" textarea rows={5} required />
           <Field label="Keywords (comma separated)" name="keywords" />
           <div>
-            <label className="eyebrow block mb-2">Category</label>
+            <label className="text-sm font-sans font-medium block mb-2">Category</label>
             <select
               name="category_id"
-              className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm"
+              className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm"
             >
               <option value="">— Select —</option>
               {cats.map((c) => (
@@ -238,7 +238,7 @@ function Submit() {
           </div>
 
           <div>
-            <label className="eyebrow block mb-2">
+            <label className="text-sm font-sans font-medium block mb-2">
               Manuscript file (.doc / .docx, up to 10 MB)
             </label>
             <input
@@ -276,12 +276,12 @@ function Submit() {
           />
 
           <div>
-            <label className="eyebrow block mb-2">Membership plan</label>
+            <label className="text-sm font-sans font-medium block mb-2">Membership plan</label>
             <select
               name="plan"
               required
               defaultValue="single"
-              className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm"
+              className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm"
             >
               <option value="single">Single Article (₹200)</option>
               <option value="annual">Annual (₹500 · 8 articles / 12 months)</option>
@@ -305,7 +305,7 @@ function Submit() {
 
           <button
             disabled={loading}
-            className="w-full bg-primary text-primary-foreground px-6 py-4 rounded-sm hover:bg-primary/90 disabled:opacity-60 font-sans font-semibold uppercase tracking-wider text-xs"
+            className="w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm hover:bg-primary/90 disabled:opacity-60 font-sans font-semibold text-sm"
           >
             {loading ? "Submitting…" : "Submit for review"}
           </button>
@@ -331,19 +331,19 @@ function Field({
 }) {
   return (
     <div>
-      <label className="eyebrow block mb-2">{label}</label>
+      <label className="text-sm font-sans font-medium block mb-2">{label}</label>
       {textarea ? (
         <textarea
           name={name}
           rows={rows}
           required={required}
-          className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
+          className="w-full bg-paper border border-rule px-4 py-3 min-h-[140px] rounded-sm text-sm focus:outline-none focus:border-primary"
         />
       ) : (
         <input
           name={name}
           required={required}
-          className="w-full bg-paper border border-rule px-4 py-3 rounded-sm text-sm focus:outline-none focus:border-primary"
+          className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
         />
       )}
     </div>

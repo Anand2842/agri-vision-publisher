@@ -45,6 +45,10 @@ function getDeadlineText() {
 }
 
 function Home() {
+  const { get } = useSiteContent("home");
+  const cmsDeadline = get("banner", "deadline_date");
+  const deadlineText = cmsDeadline || getDeadlineText();
+
   return (
     <>
       <SiteHeader />
@@ -60,7 +64,7 @@ function Home() {
               </span>
               <p className="text-sm font-sans text-foreground/80 leading-normal">
                 Submissions for the upcoming monthly issue close on{" "}
-                <span className="text-primary font-bold font-display">{getDeadlineText()}</span>.
+                <span className="text-primary font-bold font-display">{deadlineText}</span>.
               </p>
             </div>
             <div className="flex gap-4 items-center shrink-0">
@@ -209,18 +213,18 @@ function RecentBlogs() {
                 <Link
                   to="/articles/$slug"
                   params={{ slug: a.slug }}
-                  className="block aspect-[4/3] overflow-hidden"
+                  className="block aspect-video overflow-hidden"
                 >
                   <img
-                    src={a.cover}
+                    src={a.cover || undefined}
                     alt={a.title}
                     className="w-full h-full object-contain bg-stone-50/50 p-1 border-b border-rule hover:scale-105 transition-transform duration-700"
                     loading="lazy"
                   />
                 </Link>
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="eyebrow text-orange">{a.category}</div>
-                  <h3 className="font-display text-lg md:text-xl mt-2 leading-snug text-navy">
+                <div className="p-6 flex flex-col flex-1">
+                  <div className="text-xs text-orange font-semibold uppercase tracking-wider">{a.category}</div>
+                  <h3 className="font-display text-2xl md:text-[28px] mt-2 leading-tight text-navy">
                     <Link
                       to="/articles/$slug"
                       params={{ slug: a.slug }}
@@ -229,7 +233,7 @@ function RecentBlogs() {
                       {a.title}
                     </Link>
                   </h3>
-                  <p className="mt-3 text-sm text-foreground/70 leading-relaxed line-clamp-3 flex-1">
+                  <p className="mt-3 text-[15px] text-foreground/70 leading-relaxed line-clamp-3 flex-1">
                     {a.abstract}
                   </p>
                   <Link
@@ -354,9 +358,9 @@ function Partners() {
           <h2 className="section-title text-xl md:text-3xl text-center">{get("partners", "heading")}</h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-6 items-center">
-          {partners.map((p) => (
+          {partners.map((p, idx) => (
             <div
-              key={p.name}
+              key={p.name + "-" + idx}
               className="aspect-square bg-white border border-rule grid place-items-center text-center p-2 hover-lift overflow-hidden"
             >
               {p.logo_url ? (

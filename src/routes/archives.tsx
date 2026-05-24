@@ -119,17 +119,17 @@ function Archives() {
             <div key={i.id} className="hover-lift">
               <div className="bg-paper border border-rule aspect-[3/4] overflow-hidden flex items-center justify-center">
                 <img
-                  src={i.cover}
+                  src={i.cover || undefined}
                   alt={i.title}
                   className="w-full h-full object-contain bg-stone-50/50 p-2"
                   loading="lazy"
                 />
               </div>
-              <div className="eyebrow mt-5">
+              <div className="text-xs text-foreground/60 uppercase font-semibold tracking-wider mt-5">
                 Vol {i.volume} · Issue {i.number} · {i.date}
               </div>
-              <h3 className="font-display text-2xl mt-2">{i.title}</h3>
-              <p className="text-sm text-foreground/70 mt-3 leading-relaxed">{i.desc}</p>
+              <h3 className="font-display text-2xl md:text-[28px] leading-tight mt-2">{i.title}</h3>
+              <p className="text-[15px] text-foreground/70 mt-3 leading-relaxed">{i.desc}</p>
               <Link
                 to="/current-issue"
                 className="text-xs text-primary mt-4 inline-block hover:underline"

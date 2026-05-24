@@ -21,11 +21,13 @@ export type SiteContentKeys = {
     topbar: "phone" | "email";
     branding: "tagline" | "logo_url" | "title_line1" | "title_line2";
     cta: "special_issue_label";
+    navigation: "items";
   };
   footer: {
     branding: "description" | "tagwords";
     contact: "name" | "address" | "phone" | "email";
     legal: "publisher_name";
+    navigation: "columns";
   };
   home: {
     hero: "headline" | "slide_images";
@@ -34,6 +36,7 @@ export type SiteContentKeys = {
     testimonials: "heading" | "items";
     readership: "heading" | "items";
     partners: "heading" | "items";
+    banner: "deadline_date";
   };
   about: {
     hero: "tagline" | "para1" | "para2" | "para3" | "para4";
@@ -45,6 +48,12 @@ export type SiteContentKeys = {
     office: "chief_editor" | "chief_editor_title" | "email" | "phone" | "address" | "hours" | "turnaround";
     publisher: "name" | "address";
     advertise: "heading" | "body";
+  };
+  advertise: {
+    hero: "heading" | "body";
+    benefits: "items";
+    audience: "stats";
+    sponsorship: "packages";
   };
   editorial_board: {
     hero: "tagline" | "subtitle" | "eyebrow";
@@ -82,6 +91,8 @@ export type SiteContentKeys = {
     archives: "title" | "description";
     current_issue: "title" | "description";
     startup_spotlight: "title" | "description";
+    publication_ethics: "title" | "description";
+    advertise: "title" | "description";
   };
   archives: {
     hero: "headline" | "subtitle";
@@ -91,6 +102,20 @@ export type SiteContentKeys = {
   };
   current_issue: {
     call_for_papers: "heading" | "subheading" | "body";
+    editorial: "description";
+  };
+  publication_ethics: {
+    hero: "eyebrow" | "title" | "body";
+    originality: "title" | "body" | "points";
+    authorship: "title" | "body";
+    peer_review: "title" | "body";
+    conflicts: "title" | "body";
+    corrections: "title" | "body";
+    open_access: "title" | "body";
+    reporting: "title" | "body";
+  };
+  certificate: {
+    branding: "magazine_name" | "publisher" | "chief_editor" | "chief_editor_title" | "chief_editor_signature" | "publisher_title" | "publisher_institution" | "publisher_signature" | "seal_text" | "seal_text_membership";
   };
 };
 
@@ -99,6 +124,21 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
     topbar: { phone: "+91 9509164410", email: "dkdkdangi@gmail.com" },
     branding: { tagline: "Knowledge · Innovation · Sustainability", logo_url: logo, title_line1: "The Agriculture", title_line2: "Popular Article Magazine" },
     cta: { special_issue_label: "Special Issue" },
+    navigation: {
+      items: JSON.stringify([
+        { label: "Current Issue", href: "/current-issue" },
+        { label: "Archives", href: "/archives" },
+        { label: "Submission Guidelines", href: "/submission-guidelines" },
+        { label: "Membership", href: "/membership" },
+        { label: "About", href: "/about", children: [
+            { label: "About the Magazine", href: "/about" },
+            { label: "Editorial Board", href: "/editorial-board" },
+            { label: "Startup Spotlight", href: "/startup-spotlight" },
+            { label: "Contact Office", href: "/contact" }
+          ]
+        }
+      ]),
+    },
   },
   footer: {
     branding: {
@@ -112,6 +152,27 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       email: "dkdkdangi@gmail.com",
     },
     legal: { publisher_name: "Ram Mangalam Agri – Rural Development Foundation" },
+    navigation: {
+      columns: JSON.stringify([
+        {
+          title: "Magazine",
+          links: [
+            { label: "Current Issue", href: "/current-issue" },
+            { label: "Archives", href: "/archives" },
+            { label: "About Us", href: "/about" },
+            { label: "Editorial Board", href: "/editorial-board" },
+          ],
+        },
+        {
+          title: "Authors",
+          links: [
+            { label: "Submit Article", href: "/auth" },
+            { label: "Author Guidelines", href: "/submission-guidelines" },
+            { label: "Membership & Fees", href: "/membership" },
+          ],
+        },
+      ]),
+    },
   },
   home: {
     hero: {
@@ -151,6 +212,9 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
         { name: "TNAU", logo_url: "" },
       ]),
     },
+    banner: {
+      deadline_date: "25th of every month",
+    },
   },
   about: {
     hero: {
@@ -189,6 +253,35 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
     advertise: {
       heading: "Reach the agriculture community",
       body: "Agro-based industrial and other allied sectors can advertise in The Agriculture Popular Article Magazine. Write to us for placements, rate cards and partnership enquiries.",
+    },
+  },
+  advertise: {
+    hero: {
+      heading: "Reach the agriculture community",
+      body: "Agro-based industrial and other allied sectors can advertise in The Agriculture Popular Article Magazine. Write to us for placements, rate cards and partnership enquiries.",
+    },
+    benefits: {
+      items: JSON.stringify([
+        { title: "Targeted Audience", description: "Direct connection with researchers, KVK scientists, faculty members, and progressive farmers.", icon: "Users" },
+        { title: "Extensive Reach", description: "Over 50,000+ active monthly readers and growing agricultural community network.", icon: "BarChart3" },
+        { title: "International Visibility", description: "Global readership across India, Nepal, Sri Lanka, and international agricultural research bodies.", icon: "Globe2" },
+        { title: "Credible Alignment", description: "Associate your brand with an open-access, peer-reviewed scientific and rural advancement platform.", icon: "Award" }
+      ]),
+    },
+    audience: {
+      stats: JSON.stringify([
+        { value: "50,000+", label: "Monthly Readers" },
+        { value: "30,000+", label: "Active Farmers" },
+        { value: "55,000+", label: "Academicians" },
+        { value: "2,500+", label: "International Visitors" }
+      ]),
+    },
+    sponsorship: {
+      packages: JSON.stringify([
+        { name: "Issue Sponsor", price: "Enquire for Price", description: "Premium placement on the cover and table of contents pages of our monthly issue.", features: ["Full-page back cover advertisement", "Editorial board acknowledgement", "Logo in Monthly Newsletter", "Hyperlink to company website"], cta: "Contact Editor", highlighted: true },
+        { name: "Startup Spotlight Sponsor", price: "Special Startup Rate", description: "Specifically designed for young agri-tech startups looking to showcase innovations.", features: ["Feature story in Startup Spotlight section", "Half-page display advertisement", "Social media announcement", "Direct inquiry lead forwarding"], cta: "Enquire Now", highlighted: false },
+        { name: "Standard Banner Placement", price: "Flexible Monthly Rates", description: "Standard slots across our dynamic online article pages and categories.", features: ["Sidebar banner on article view pages", "Bottom banner on home page", "Rotational priority slots", "Basic CTR performance analytics"], cta: "Request Rate Card", highlighted: false }
+      ]),
     },
   },
   editorial_board: {
@@ -337,7 +430,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       subtext: "Annual members publish for free. Non-member authors and non-member co-authors pay a small per-article publication fee. Membership directly supports independent agricultural publishing in India.",
     },
     plans: {
-      items: '[{"id":"single","name":"Single Article","price":"₹200","period":"per article","validity":"1 article","features":["Peer review","Online publication","Author certificate","Indexed listing"],"featured":false},{"id":"annual","name":"Annual Membership","price":"₹500","period":"per year","validity":"Up to 8 articles · 12 months","features":["Publish up to 8 articles free","Priority review queue","Member ID & certificate","Listed on author directory"],"featured":true},{"id":"lifetime","name":"Lifetime Membership","price":"₹2,000","period":"one-time","validity":"5 years","features":["Unlimited submissions for 5 years","Editorial consultations","Member ID & certificate","Lifetime member directory"],"featured":false},{"id":"institute","name":"Institute / Library","price":"₹5,000","period":"one-time","validity":"5 years","features":["Institutional authorship support","Branded archive page","Discounted author fees for faculty","Quarterly impact reports"],"featured":false}]',
+      items: '[{"id":"single","name":"Single Article","price":"₹200","amount":200,"period":"per article","validity":"1 article","features":["Peer review","Online publication","Author certificate","Indexed listing"],"featured":false},{"id":"annual","name":"Annual Membership","price":"₹500","amount":500,"period":"per year","validity":"Up to 8 articles · 12 months","features":["Publish up to 8 articles free","Priority review queue","Member ID & certificate","Listed on author directory"],"featured":true},{"id":"lifetime","name":"Lifetime Membership","price":"₹2,000","amount":2000,"period":"one-time","validity":"5 years","features":["Unlimited submissions for 5 years","Editorial consultations","Member ID & certificate","Lifetime member directory"],"featured":false},{"id":"institute","name":"Institute / Library","price":"₹5,000","amount":5000,"period":"one-time","validity":"5 years","features":["Institutional authorship support","Branded archive page","Discounted author fees for faculty","Quarterly impact reports"],"featured":false}]',
     },
     payment: {
       bank_holder: "Dileep Kumar",
@@ -429,6 +522,14 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       title: "Startup Spotlight — The Agriculture Popular Article Magazine",
       description: "The companies rebuilding agriculture from the ground up showcased in the magazine.",
     },
+    publication_ethics: {
+      title: "Publication Ethics & Plagiarism Policy — The Agriculture Popular Article Magazine",
+      description: "Publication ethics, plagiarism policy, authorship, peer review and editorial standards followed by The Agriculture Popular Article Magazine.",
+    },
+    advertise: {
+      title: "Advertise — The Agriculture Popular Article Magazine",
+      description: "Reach a highly targeted audience of scientists, progressive farmers, researchers, and agri-startups by advertising with us.",
+    },
   },
   archives: {
     hero: {
@@ -447,5 +548,58 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       subheading: "Submit to the next issue",
       body: "We invite popular science articles, field case studies, and startup stories for our upcoming monthly issue. Submissions are reviewed continuously.",
     },
+    editorial: {
+      description: "A peer-reviewed selection of original research and field reports advancing agricultural science and practice.",
+    },
   },
+  publication_ethics: {
+    hero: {
+      eyebrow: "Editorial Policy",
+      title: "Publication Ethics & Plagiarism Policy",
+      body: "The Agriculture Popular Article Magazine is committed to maintaining the highest standards of publication ethics. All authors, reviewers and editors are expected to follow the principles set out below."
+    },
+    originality: {
+      title: "1. Originality & Plagiarism",
+      body: "Manuscripts submitted to the magazine must be the original work of the authors and must not have been published or be under consideration elsewhere. All submissions are screened for plagiarism. Any manuscript with a similarity index above 15% (excluding references and standard terminology) will be returned to the author for revision or rejected outright.",
+      points: '["Verbatim copying without quotation and citation is considered plagiarism.","Paraphrasing another author\'s work without attribution is plagiarism.","Self-plagiarism (republishing one\'s own work without disclosure) is not permitted.","All sources, data and figures must be properly cited."]'
+    },
+    authorship: {
+      title: "2. Authorship",
+      body: "Authorship should be limited to those who have made a significant contribution to the conception, design, execution or interpretation of the reported study. All persons who have made substantial contributions must be listed as co-authors. The corresponding author is responsible for ensuring that all co-authors have seen and approved the final version of the manuscript."
+    },
+    peer_review: {
+      title: "3. Peer Review",
+      body: "Every research article is subject to a double-blind peer review process. The identity of authors and reviewers is kept confidential. Reviewers are expected to evaluate manuscripts objectively, declare any conflicts of interest, and return their assessment within the agreed timeline."
+    },
+    conflicts: {
+      title: "4. Conflicts of Interest",
+      body: "Authors must disclose any financial, personal or professional relationships that could be perceived as influencing the content of their manuscript. Reviewers and editors must recuse themselves from manuscripts where a conflict of interest exists."
+    },
+    corrections: {
+      title: "5. Corrections, Retractions & Misconduct",
+      body: "If errors are discovered in a published article, the magazine will publish a correction or, in serious cases, retract the article. Allegations of misconduct including fabrication of data, image manipulation, duplicate submission or plagiarism will be investigated in line with COPE (Committee on Publication Ethics) guidelines."
+    },
+    open_access: {
+      title: "6. Open Access & Copyright",
+      body: "All articles are published under an open-access license. Authors retain copyright of their work and grant the magazine a non-exclusive license to publish and distribute the article. Readers may share and adapt the work for non-commercial purposes with proper attribution."
+    },
+    reporting: {
+      title: "7. Reporting Concerns",
+      body: "Concerns about publication ethics, plagiarism or research misconduct should be reported in writing to the Chief Editor through the <a href=\"/contact\" class=\"text-primary underline underline-offset-2\">contact page</a>. All reports will be reviewed confidentially."
+    }
+  },
+  certificate: {
+    branding: {
+      magazine_name: "The Agriculture Popular Article Magazine",
+      publisher: "Ram Mangalam Agri–Rural Development Foundation (RADF)",
+      chief_editor: "Dr. Dileep Kumar",
+      chief_editor_title: "Chief Editor, ICAR-CAZRI",
+      chief_editor_signature: "Dileep K. Dangi",
+      publisher_title: "Managing Director",
+      publisher_institution: "RADF Jaipur",
+      publisher_signature: "Ram Mangalam",
+      seal_text: "• TAPAM • RADF JAIPUR • RESEARCH & POPULAR SCIENCE PUBLICATION",
+      seal_text_membership: "• TAPAM ESTD 2026 • SCIENCE & AGRICULTURE RURAL ADVANCEMENT"
+    }
+  }
 };

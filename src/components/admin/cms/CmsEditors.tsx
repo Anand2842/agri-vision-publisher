@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Save, Loader2, Upload, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { updateSiteContentCache } from "@/hooks/useSiteContent";
 
 export function CmsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -52,6 +53,7 @@ export function CmsSaveButton({
     if (error) {
       toast.error(`Failed to save ${contentKey}: ${error.message}`);
     } else {
+      updateSiteContentCache(page, section, contentKey, value);
       toast.success(`Saved ${contentKey}`);
     }
   };

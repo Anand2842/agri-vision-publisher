@@ -12,10 +12,10 @@
  */
 
 @theme inline {
-  --font-display: "Merriweather", "Source Serif Pro", Georgia, serif;
-  --font-sans: "Poppins", "Helvetica Neue", system-ui, sans-serif;
-  --font-script: "Merriweather", Georgia, serif;
-  --font-condensed: "Poppins", "Inter", sans-serif;
+  --font-display: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", "Source Sans Pro", "Helvetica Neue", system-ui, sans-serif;
+  --font-script: "Playfair Display", Georgia, serif;
+  --font-condensed: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -150,15 +150,23 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
   }
   h1,
   h2,
   h3,
   h4,
+  h5,
+  h6,
   .font-display {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
   }
+  h1 { font-size: 48px; font-weight: 700; line-height: 1.15; }
+  h2 { font-size: 36px; font-weight: 600; line-height: 1.2; }
+  h3 { font-size: 28px; font-weight: 600; line-height: 1.25; }
+  h4 { font-size: 24px; font-weight: 600; line-height: 1.3; }
   ::selection {
     background: var(--color-orange);
     color: var(--color-accent-foreground);
@@ -167,7 +175,13 @@
 
 @layer components {
   .container-editorial {
-    @apply mx-auto max-w-[1240px] px-4 md:px-8;
+    @apply mx-auto max-w-[1280px] px-4 md:px-8;
+  }
+  .container-reading {
+    @apply mx-auto max-w-[760px] px-4 md:px-8;
+  }
+  .container-dashboard {
+    @apply mx-auto max-w-[1200px] px-4 md:px-8;
   }
   .eyebrow {
     font-family: var(--font-condensed);
@@ -179,12 +193,12 @@
   }
   .nav-link {
     font-family: var(--font-condensed);
-    font-size: 0.84rem;
+    font-size: 14px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.03em;
     font-weight: 500;
     color: oklch(1 0 0 / 0.92);
-    padding: 1.1rem 0.9rem;
+    padding: 1.1rem 14px; /* Creates ~28px gap between text */
     transition:
       color 0.2s ease,
       background-color 0.2s ease;
@@ -214,18 +228,20 @@
   .btn-orange {
     background: var(--color-orange);
     color: var(--color-accent-foreground);
-    padding: 0.7rem 1.6rem;
+    height: 48px;
+    padding: 0 20px;
     font-family: var(--font-condensed);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-weight: 600;
-    font-size: 0.78rem;
+    font-size: 14px;
     border-radius: 999px;
     transition:
       filter 0.2s ease,
       transform 0.2s ease;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
   }
   .btn-orange:hover {
@@ -235,12 +251,16 @@
     border: 2px solid white;
     color: white;
     background: transparent;
-    padding: 0.85rem 2.4rem;
+    height: 48px;
+    padding: 0 24px;
     font-family: var(--font-condensed);
     text-transform: uppercase;
     letter-spacing: 0.14em;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition:
       background-color 0.25s ease,
       color 0.25s ease;
