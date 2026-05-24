@@ -59,6 +59,13 @@ function Auth() {
         });
         if (error) throw error;
         
+        // Detect if the email is already taken under Supabase Email Enumeration Prevention
+        if (signUpData.user && signUpData.user.identities && signUpData.user.identities.length === 0) {
+          toast.error("An account with this email already exists. Please sign in instead.");
+          setLoading(false);
+          return;
+        }
+        
         if (!signUpData.session) {
           toast.success("Signup successful! Please check your email.");
           setSignUpPending(true);
