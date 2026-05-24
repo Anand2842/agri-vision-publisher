@@ -281,19 +281,37 @@ function Dashboard() {
             </div>
           ) : pendingMembership ? (
             // Membership claim is pending review
-            <div className="bg-ochre/5 border border-ochre/30 p-6 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="bg-ochre/15 p-3 rounded-full text-ink shrink-0">
+            <div className="bg-ochre/5 border border-ochre/30 p-6 rounded flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-sm">
+              <div className="flex items-start gap-4 min-w-0">
+                <div className="bg-ochre/15 p-3 rounded-full text-ochre shrink-0">
                   <Clock className="h-6 w-6 animate-spin" />
                 </div>
-                <div>
-                  <h3 className="font-display text-lg text-ink font-bold">Payment Claim Pending Verification</h3>
-                  <p className="text-xs text-foreground/80 mt-1 leading-relaxed">
-                    Proof for <strong>{getPlanName(pendingMembership.plan)}</strong> (UTR: {pendingMembership.transaction_ref}) is being cross-examined by our editors. Settle active immediately once verified (within 2 days).
+                <div className="min-w-0">
+                  <h3 className="font-display text-lg text-ink font-bold">Payment Verification In Progress</h3>
+                  <p className="text-xs text-foreground/80 mt-1.5 leading-relaxed max-w-xl">
+                    Your membership payment claim has been submitted successfully and is currently under review by our editorial team. Verification is typically completed within 1–2 business days. Your membership benefits will activate immediately upon approval.
                   </p>
+                  
+                  {/* Styled Payment Reference Details */}
+                  <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs border-t border-ochre/20 pt-3">
+                    <div>
+                      <span className="text-muted-foreground uppercase font-sans font-semibold tracking-wider text-[10px] block">Selected Plan</span>
+                      <span className="font-display text-ink font-semibold mt-0.5 block">{getPlanName(pendingMembership.plan)}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground uppercase font-sans font-semibold tracking-wider text-[10px] block">Amount Paid</span>
+                      <span className="font-display text-ink font-semibold mt-0.5 block">₹{pendingMembership.amount}</span>
+                    </div>
+                    <div className="min-w-0 max-w-xs sm:max-w-md">
+                      <span className="text-muted-foreground uppercase font-sans font-semibold tracking-wider text-[10px] block">Transaction Ref (UTR)</span>
+                      <code className="font-mono bg-ochre/10 text-ink text-[11px] px-1.5 py-0.5 rounded border border-ochre/10 break-all select-all mt-0.5 block whitespace-pre-wrap max-h-24 overflow-y-auto">
+                        {pendingMembership.transaction_ref}
+                      </code>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <span className="bg-ochre/10 border border-ochre/25 text-ink text-[10px] px-3.5 py-2 rounded-sm font-mono uppercase tracking-wider font-bold shrink-0">
+              <span className="bg-ochre/10 border border-ochre/25 text-ink text-[10px] px-3.5 py-2 rounded-sm font-mono uppercase tracking-wider font-bold shrink-0 self-start lg:self-center">
                 In Review Queue
               </span>
             </div>
