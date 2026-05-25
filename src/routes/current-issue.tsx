@@ -1,48 +1,88 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, ErrorComponent, useRouter } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import {
   fetchIssues,
   fetchPublishedArticles,
   articlePdf,
-  type IssueRow,
-  type DBArticle,
 } from "@/lib/data";
-import { useEffect, useState } from "react";
 import { Download, FileText, BookOpen, ArrowRight } from "lucide-react";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 
 export const Route = createFileRoute("/current-issue")({
   component: CurrentIssue,
-  loader: () => fetchSeoMetadata("current_issue"),
+  loader: async () => {
+    const [seo, issues, articles] = await Promise.all([
+      fetchSeoMetadata("current_issue"),
+      fetchIssues(),
+      fetchPublishedArticles(),
+    ]);
+    return { seo, issue: issues[0] ?? null, articles };
+  },
   head: ({ loaderData }) => ({
-    title: loaderData?.title || "Current Issue — The Agriculture Popular Article Magazine",
-    meta: loaderData
+    title: loaderData?.seo?.title || "Current Issue — The Agriculture Popular Article Magazine",
+    meta: loaderData?.seo
       ? [
-          { name: "description", content: loaderData.description },
-          { property: "og:title", content: loaderData.title },
-          { property: "og:description", content: loaderData.description },
+          { name: "description", content: loaderData.seo.description },
+          { property: "og:title", content: loaderData.seo.title },
+          { property: "og:description", content: loaderData.seo.description },
         ]
       : [],
   }),
+  errorComponent: ({ error }) => {
+    const router = useRouter();
+    return (
+      <>
+        <SiteHeader />
+        <main className="container-editorial py-24">
+          <ErrorComponent error={error} />
+          <button
+            onClick={() => router.invalidate()}
+            className="mt-6 px-4 py-2 bg-[oklch(var(--orange))] text-white text-sm font-semibold uppercase tracking-wider"
+          >
+            Retry
+          </button>
+        </main>
+        <SiteFooter />
+      </>
+    );
+  },
+  notFoundComponent: () => (
+    <>
+      <SiteHeader />
+      <main className="container-editorial py-24 text-center">
+        <h1 className="font-display text-3xl text-[oklch(var(--navy))]">No issue published yet</h1>
+        <p className="mt-3 text-foreground/70">Please check back soon.</p>
+      </main>
+      <SiteFooter />
+    </>
+  ),
 });
 
 function CurrentIssue() {
-  const [issue, setIssue] = useState<IssueRow | null>(null);
-  const [articles, setArticles] = useState<DBArticle[]>([]);
+  const { issue, articles } = Route.useLoaderData();
   const { get } = useSiteContent("current_issue");
-
-  useEffect(() => {
-    fetchIssues().then((rows) => setIssue(rows[0] ?? null));
-    fetchPublishedArticles().then(setArticles);
-  }, []);
 
   if (!issue) {
     return (
       <>
         <SiteHeader />
-        <main className="container-editorial py-32 text-center text-muted-foreground">
-          Loading…
+        <main className="container-editorial py-24 text-center">
+          <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+            Current Issue
+          </div>
+          <h1 className="font-display text-3xl mt-3 text-[oklch(var(--navy))]">
+            No issue published yet
+          </h1>
+          <p className="mt-3 text-foreground/70">
+            The first issue is being prepared. Please check back soon.
+          </p>
+          <Link
+            to="/archives"
+            className="inline-flex items-center gap-2 mt-6 text-sm font-semibold uppercase tracking-wider text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))]"
+          >
+            Browse Archives <ArrowRight className="h-4 w-4" />
+          </Link>
         </main>
         <SiteFooter />
       </>
