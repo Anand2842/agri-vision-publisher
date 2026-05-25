@@ -210,7 +210,7 @@ function CurrentIssue() {
                   </span>
                 </div>
                 <ol className="divide-y divide-[oklch(var(--navy))]/10">
-                  {articles.map((a, i) => (
+                  {articles.map((a: DBArticle, i: number) => (
                     <li key={a.slug}>
                       <div className="group grid grid-cols-12 gap-4 py-6 items-start">
                         <div className="col-span-2 sm:col-span-1 font-display text-2xl text-[oklch(var(--orange))] tabular-nums">
