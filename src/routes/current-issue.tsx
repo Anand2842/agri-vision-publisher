@@ -5,6 +5,7 @@ import {
   fetchIssues,
   fetchPublishedArticles,
   articlePdf,
+  type DBArticle,
 } from "@/lib/data";
 import { Download, FileText, BookOpen, ArrowRight } from "lucide-react";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
