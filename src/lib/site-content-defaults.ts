@@ -151,7 +151,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       phone: "+91 9509164410",
       email: "dkdkdangi@gmail.com",
     },
-    legal: { publisher_name: "Ram Mangalam Agri – Rural Development Foundation" },
+    legal: { publisher_name: "Ram Mangalam Agri – Rural Development Foundation", eissn: "3107-4521", pissn: "3107-4513" },
     navigation: {
       columns: JSON.stringify([
         {
