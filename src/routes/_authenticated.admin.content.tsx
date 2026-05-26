@@ -131,8 +131,10 @@ function FooterCms() {
         <TextFieldEditor page="footer" section="contact" contentKey="phone" label="Phone" initialValue={get("contact", "phone")} />
         <TextFieldEditor page="footer" section="contact" contentKey="email" label="Email" initialValue={get("contact", "email")} />
       </CmsSection>
-      <CmsSection title="Legal">
+      <CmsSection title="Legal / ISSN">
         <TextFieldEditor page="footer" section="legal" contentKey="publisher_name" label="Publisher Name" initialValue={get("legal", "publisher_name")} />
+        <TextFieldEditor page="footer" section="legal" contentKey="eissn" label="E-ISSN (Online)" initialValue={get("legal", "eissn")} />
+        <TextFieldEditor page="footer" section="legal" contentKey="pissn" label="P-ISSN (Print)" initialValue={get("legal", "pissn")} />
       </CmsSection>
     </div>
   );
