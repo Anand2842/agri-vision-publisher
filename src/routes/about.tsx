@@ -69,14 +69,6 @@ function About() {
                     <dd className="text-sm text-ink leading-relaxed">{v}</dd>
                   </div>
                 ))}
-                <div className="grid grid-cols-[110px_1fr] gap-4 py-3">
-                  <dt className="text-xs uppercase tracking-wider text-foreground/60 font-semibold pt-0.5">
-                    E-ISSN
-                  </dt>
-                  <dd className="text-sm text-ink leading-relaxed italic text-foreground/60">
-                    To be assigned
-                  </dd>
-                </div>
               </dl>
             </div>
           </aside>
