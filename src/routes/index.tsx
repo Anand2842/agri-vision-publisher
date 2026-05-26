@@ -105,7 +105,7 @@ function HeroSlider() {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full overflow-hidden bg-navy aspect-[16/10] sm:aspect-[16/9] md:h-[65vh] md:min-h-[460px] md:max-h-[700px]">
+    <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
       {slides.map((s, idx) => (
         <img
           key={idx}
