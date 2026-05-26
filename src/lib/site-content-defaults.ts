@@ -26,7 +26,7 @@ export type SiteContentKeys = {
   footer: {
     branding: "description" | "tagwords";
     contact: "name" | "address" | "phone" | "email";
-    legal: "publisher_name";
+    legal: "publisher_name" | "eissn" | "pissn";
     navigation: "columns";
   };
   home: {
@@ -151,7 +151,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       phone: "+91 9509164410",
       email: "dkdkdangi@gmail.com",
     },
-    legal: { publisher_name: "Ram Mangalam Agri – Rural Development Foundation" },
+    legal: { publisher_name: "Ram Mangalam Agri – Rural Development Foundation", eissn: "3107-4521", pissn: "3107-4513" },
     navigation: {
       columns: JSON.stringify([
         {
@@ -233,7 +233,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       items: '["Disseminate practical, science-based agricultural knowledge to farmers, extension workers, students and policy-makers.","Highlight indigenous innovations, traditional wisdom and locally adapted practices alongside contemporary research.","Bridge the gap between scientific research and on-farm application through accessible popular articles.","Support young scientists, research scholars and field practitioners with a credible publishing platform.","Encourage interdisciplinary work across agronomy, horticulture, animal sciences, extension and allied fields.","Strengthen India\'s rural development ecosystem by amplifying voices from KVKs, ICAR institutes and state universities."]',
     },
     particulars: {
-      items: '[["Title","The Agriculture Popular Article Magazine"],["Frequency","Monthly"],["Subject","Agriculture"],["Language","English / Hindi"],["Format","Online"],["Starting Year","2026"],["Publisher","Ram Mangalam Agri – Rural Development Foundation (RADF)"],["Chief Editor","Dr. Dileep Kumar"],["Address","ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India"],["Mobile","+91 95091 64410"],["Email","dkdkdangi@gmail.com"]]',
+      items: '[["Title","The Agriculture Popular Article Magazine"],["E-ISSN","3107-4521"],["P-ISSN","3107-4513"],["Frequency","Monthly"],["Subject","Agriculture"],["Language","English / Hindi"],["Format","Online"],["Starting Year","2026"],["Publisher","Ram Mangalam Agri – Rural Development Foundation (RADF)"],["Chief Editor","Dr. Dileep Kumar"],["Address","ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India"],["Mobile","+91 95091 64410"],["Email","dkdkdangi@gmail.com"]]',
     },
   },
   contact: {
