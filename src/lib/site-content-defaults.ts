@@ -26,7 +26,7 @@ export type SiteContentKeys = {
   footer: {
     branding: "description" | "tagwords";
     contact: "name" | "address" | "phone" | "email";
-    legal: "publisher_name";
+    legal: "publisher_name" | "eissn" | "pissn";
     navigation: "columns";
   };
   home: {
