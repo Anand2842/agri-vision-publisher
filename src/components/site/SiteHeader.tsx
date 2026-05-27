@@ -158,19 +158,20 @@ export function SiteHeader() {
 
         <form
           onSubmit={submitSearch}
-          className="hidden md:flex flex-1 max-w-[420px] h-12 items-center border border-rule overflow-hidden"
+          className="hidden md:flex flex-1 min-w-[260px] max-w-[560px] h-12 items-center border-2 border-rule focus-within:border-orange overflow-hidden bg-paper rounded-sm"
         >
           <input
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search articles, authors…"
-            className="flex-1 px-4 h-full text-[15px] bg-transparent focus:outline-none"
+            placeholder="Search articles, authors, topics…"
+            aria-label="Search the magazine"
+            className="flex-1 px-4 h-full text-[15px] bg-transparent focus:outline-none placeholder:text-foreground/50"
           />
           <button
             type="submit"
             aria-label="Search"
-            className="bg-orange text-white px-4 h-full flex items-center justify-center hover:brightness-105"
+            className="bg-orange text-white px-5 h-full flex items-center justify-center hover:brightness-105 shrink-0"
           >
             <Search className="h-[18px] w-[18px]" />
           </button>
