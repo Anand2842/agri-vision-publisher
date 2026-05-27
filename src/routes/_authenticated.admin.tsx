@@ -6,6 +6,12 @@ import { LayoutGrid, BookOpen, FileText, FolderTree, Inbox, ListChecks, Users, L
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ location }) => {
+    // Skip on SSR — auth session lives in localStorage and isn't available
+    // during prerender. The client re-runs beforeLoad after hydration.
+    if (typeof window === "undefined") {
+      return { role: undefined };
+    }
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
