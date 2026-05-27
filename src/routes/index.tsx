@@ -102,7 +102,16 @@ function HeroSlider() {
     return () => clearInterval(t);
   }, [slides.length]);
 
-  if (slides.length === 0) return null;
+  if (slides.length === 0) {
+    return (
+      <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
+        <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-primary/30 animate-pulse" />
+        <div className="absolute inset-0 grid place-items-center">
+          <div className="text-white/60 font-display text-sm uppercase tracking-widest">Loading featured stories…</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
@@ -115,6 +124,7 @@ function HeroSlider() {
           height={1080}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1400ms] ${idx === i ? "opacity-100" : "opacity-0"}`}
           loading={idx === 0 ? "eager" : "lazy"}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
         />
       ))}
       <div className="absolute inset-0 bg-black/10" />
