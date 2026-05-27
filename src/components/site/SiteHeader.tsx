@@ -208,8 +208,9 @@ export function SiteHeader() {
           </Link>
           <button
             onClick={() => setOpen(!open)}
-            className="lg:hidden p-2 text-navy"
-            aria-label="Menu"
+            className="lg:hidden p-2 text-navy transition-transform duration-200 active:scale-90"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
