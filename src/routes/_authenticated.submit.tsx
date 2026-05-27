@@ -39,6 +39,17 @@ function Submit() {
       if (!user) { setMembershipStatus("none"); return; }
 
       try {
+        // Staff (admin/moderator) bypass the membership gate.
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id);
+        const roleList = (roles || []).map((r) => r.role);
+        if (roleList.includes("admin") || roleList.includes("moderator")) {
+          setMembershipStatus("approved");
+          return;
+        }
+
         const { data, error } = await supabase
           .from("membership_payments")
           .select("status")
