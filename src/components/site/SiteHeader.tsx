@@ -83,6 +83,7 @@ export function SiteHeader() {
       const list = (data || []).map((r) => r.role);
       if (list.includes("admin")) setEditorRole("admin");
       else if (list.includes("moderator")) setEditorRole("moderator");
+      else if (list.includes("author")) setEditorRole("author");
       else setEditorRole(null);
     };
     supabase.auth.getSession().then(({ data }) => {
