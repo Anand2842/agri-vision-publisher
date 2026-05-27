@@ -226,11 +226,16 @@ function RecentBlogs() {
                   className="block aspect-video overflow-hidden"
                 >
                   <img
-                    src={a.cover || undefined}
+                    src={a.cover || "/placeholder.svg"}
                     alt={a.title}
                     className="w-full h-full object-contain bg-stone-50/50 p-1 border-b border-rule hover:scale-105 transition-transform duration-700"
                     loading="lazy"
+                    onError={(e) => {
+                      const t = e.currentTarget as HTMLImageElement;
+                      if (!t.src.endsWith("/placeholder.svg")) t.src = "/placeholder.svg";
+                    }}
                   />
+
                 </Link>
                 <div className="p-6 flex flex-col flex-1">
                   <div className="text-xs text-orange font-semibold uppercase tracking-wider">{a.category}</div>
