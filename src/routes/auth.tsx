@@ -30,6 +30,31 @@ function Auth() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
   const [signUpPending, setSignUpPending] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSent, setResetSent] = useState(false);
+
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = z.string().email().max(255).safeParse(resetEmail.trim());
+    if (!parsed.success) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
+        redirectTo: window.location.origin + "/auth",
+      });
+      if (error) throw error;
+      setResetSent(true);
+      toast.success("Password reset link sent. Please check your email.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send reset email");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -108,6 +133,53 @@ function Auth() {
     );
   }
 
+  if (resetMode) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="container-editorial py-20 max-w-md">
+          <div className="eyebrow">Account recovery</div>
+          <h1 className="font-display text-4xl mt-3 text-ink">Reset your password</h1>
+          {resetSent ? (
+            <p className="mt-6 text-sm text-muted-foreground leading-relaxed">
+              If an account exists for <strong>{resetEmail}</strong>, we've sent a password reset link. Please check your inbox (and spam folder).
+            </p>
+          ) : (
+            <>
+              <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+                Enter the email associated with your account and we'll send you a secure link to set a new password.
+              </p>
+              <form onSubmit={handleReset} className="mt-8 space-y-4">
+                <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder="Email"
+                  className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+                />
+                <button
+                  disabled={loading}
+                  className="w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
+                >
+                  {loading ? "Sending…" : "Send reset link"}
+                </button>
+              </form>
+            </>
+          )}
+          <button
+            onClick={() => { setResetMode(false); setResetSent(false); }}
+            className="mt-6 text-sm text-primary hover:underline"
+          >
+            ← Back to sign in
+          </button>
+        </main>
+        <SiteFooter />
+      </>
+    );
+  }
+
   return (
     <>
       <SiteHeader />
@@ -152,12 +224,22 @@ function Auth() {
             {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>
         </form>
-        <button
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-6 text-sm text-primary hover:underline"
-        >
-          {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
-        </button>
+        <div className="mt-6 flex items-center justify-between text-sm">
+          <button
+            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            className="text-primary hover:underline"
+          >
+            {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
+          </button>
+          {mode === "signin" && (
+            <button
+              onClick={() => setResetMode(true)}
+              className="text-foreground/60 hover:text-orange hover:underline"
+            >
+              Forgot password?
+            </button>
+          )}
+        </div>
         <div className="mt-10 text-xs text-muted-foreground">
           By continuing you agree to our{" "}
           <Link to="/submission-guidelines" className="underline">
