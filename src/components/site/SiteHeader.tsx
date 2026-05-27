@@ -48,7 +48,7 @@ const defaultNav: { to: string; label: string; children?: { to: string; label: s
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
-  const [editorRole, setEditorRole] = useState<"admin" | "moderator" | null>(null);
+  const [editorRole, setEditorRole] = useState<"admin" | "moderator" | "author" | null>(null);
   const [q, setQ] = useState("");
   const navigate = useNavigate();
   const { getHeader, getHeaderJson } = useGlobalSiteContent();
