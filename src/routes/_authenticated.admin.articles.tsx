@@ -125,6 +125,24 @@ function AdminArticles() {
     }
   };
 
+  const uploadCover = async (file: File, setVal: (v: string) => void) => {
+    setUploading(true);
+    try {
+      const path = `article-covers/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      const { error } = await supabase.storage
+        .from("site-assets")
+        .upload(path, file, { upsert: false, contentType: file.type || "image/jpeg" });
+      if (error) throw error;
+      const { data } = supabase.storage.from("site-assets").getPublicUrl(path);
+      setVal(data.publicUrl);
+      toast.success("Cover uploaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between">
