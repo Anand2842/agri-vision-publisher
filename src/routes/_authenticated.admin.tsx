@@ -92,7 +92,7 @@ const items: {
   { to: "/admin/submissions", label: "Submissions", icon: Inbox, roles: ["admin"] },
   { to: "/admin/users", label: "Users & Roles", icon: Users, roles: ["admin"] },
   { to: "/admin/issues", label: "Issues", icon: BookOpen, roles: ["admin"] },
-  { to: "/admin/articles", label: "Articles", icon: FileText, roles: ["admin"] },
+  { to: "/admin/articles", label: "Articles / Blogs", icon: FileText, roles: ["admin"] },
   { to: "/admin/categories", label: "Categories", icon: FolderTree, roles: ["admin"] },
   { to: "/admin/content", label: "Site Content", icon: LayoutTemplate, roles: ["admin"] },
   { to: "/admin/messages", label: "Messages", icon: Mail, roles: ["admin"] },
