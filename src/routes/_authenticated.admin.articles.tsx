@@ -205,7 +205,14 @@ function AdminArticles() {
             type="number"
             defaultValue={editing.read_time ?? 8}
           />
-          <Field name="cover_url" label="Cover URL" defaultValue={editing.cover_url ?? ""} />
+          <div className="sm:col-span-2">
+            <label className="eyebrow block mb-2">Cover image</label>
+            <CoverPicker
+              initial={editing.cover_url ?? ""}
+              uploading={uploading}
+              onUpload={uploadCover}
+            />
+          </div>
 
           <div className="sm:col-span-2">
             <label className="eyebrow block mb-2">PDF</label>
