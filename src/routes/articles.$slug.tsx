@@ -110,8 +110,11 @@ function Article() {
 
         <div className="container-editorial">
           <img
-            src={a.cover}
+            src={a.cover || "/placeholder.svg"}
             alt={a.title}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = "/placeholder.svg";
+            }}
             className="w-full aspect-[16/9] object-contain bg-stone-50/50 p-2 border border-rule rounded-sm"
           />
         </div>

@@ -125,6 +125,24 @@ function AdminArticles() {
     }
   };
 
+  const uploadCover = async (file: File, setVal: (v: string) => void) => {
+    setUploading(true);
+    try {
+      const path = `article-covers/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      const { error } = await supabase.storage
+        .from("site-assets")
+        .upload(path, file, { upsert: false, contentType: file.type || "image/jpeg" });
+      if (error) throw error;
+      const { data } = supabase.storage.from("site-assets").getPublicUrl(path);
+      setVal(data.publicUrl);
+      toast.success("Cover uploaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -187,7 +205,14 @@ function AdminArticles() {
             type="number"
             defaultValue={editing.read_time ?? 8}
           />
-          <Field name="cover_url" label="Cover URL" defaultValue={editing.cover_url ?? ""} />
+          <div className="sm:col-span-2">
+            <label className="eyebrow block mb-2">Cover image</label>
+            <CoverPicker
+              initial={editing.cover_url ?? ""}
+              uploading={uploading}
+              onUpload={uploadCover}
+            />
+          </div>
 
           <div className="sm:col-span-2">
             <label className="eyebrow block mb-2">PDF</label>
@@ -310,6 +335,59 @@ function PdfPicker({
           }}
         />
       </label>
+    </div>
+  );
+}
+
+function CoverPicker({
+  initial,
+  uploading,
+  onUpload,
+}: {
+  initial: string;
+  uploading: boolean;
+  onUpload: (f: File, set: (v: string) => void) => void;
+}) {
+  const [val, setVal] = useState(initial);
+  return (
+    <div className="space-y-2">
+      <div className="flex items-start gap-3">
+        {val ? (
+          <img
+            src={val}
+            alt="cover preview"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = "/placeholder.svg";
+            }}
+            className="h-20 w-32 object-cover border border-rule rounded-sm bg-stone-50"
+          />
+        ) : (
+          <div className="h-20 w-32 border border-dashed border-rule rounded-sm flex items-center justify-center text-[0.6rem] uppercase tracking-wider text-muted-foreground">
+            No cover
+          </div>
+        )}
+        <div className="flex-1 space-y-2">
+          <input
+            name="cover_url"
+            value={val}
+            onChange={(e) => setVal(e.target.value)}
+            placeholder="Paste image URL or upload from device"
+            className="w-full bg-background border border-rule px-3 py-2 text-sm focus:outline-none focus:border-primary"
+          />
+          <label className="inline-flex items-center gap-2 text-xs uppercase tracking-wider cursor-pointer text-navy hover:text-orange">
+            <Upload className="h-4 w-4" /> {uploading ? "Uploading…" : "Upload from device"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) onUpload(f, setVal);
+              }}
+            />
+          </label>
+        </div>
+      </div>
     </div>
   );
 }
