@@ -28,14 +28,10 @@ export const Route = createFileRoute("/archives")({
 });
 
 function Archives() {
-  const [issues, setIssues] = useState<IssueRow[]>([]);
+  const { issues } = Route.useLoaderData();
   const [year, setYear] = useState<string>("all");
   const [month, setMonth] = useState<string>("all");
   const { get } = useSiteContent("archives");
-
-  useEffect(() => {
-    fetchIssues().then(setIssues);
-  }, []);
 
   const years = useMemo(() => {
     const set = new Set<string>();
