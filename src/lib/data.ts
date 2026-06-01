@@ -12,6 +12,7 @@ export type Article = {
   cover: string;
   abstract: string;
   date: string;
+  publishedAt?: string;
   /** Path of the article PDF inside the `article-pdfs` Supabase Storage bucket. */
   pdfPath?: string;
   content?: string;
@@ -27,6 +28,7 @@ export type IssueRow = {
   title: string;
   desc: string;
   date: string;
+  publishedAt?: string;
   cover: string;
   pdfUrl: string | null;
 };
