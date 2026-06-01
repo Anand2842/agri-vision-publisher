@@ -106,6 +106,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap",
       },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "The Agriculture Popular Article Magazine",
+              url: "https://theagriculturepopulararticlemagazine.lovable.app",
+              logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp",
+            },
+            {
+              "@type": "WebSite",
+              name: "The Agriculture Popular Article Magazine",
+              url: "https://theagriculturepopulararticlemagazine.lovable.app",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://theagriculturepopulararticlemagazine.lovable.app/search?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            },
+          ],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,

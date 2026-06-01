@@ -12,6 +12,7 @@ export type Article = {
   cover: string;
   abstract: string;
   date: string;
+  publishedAt?: string;
   /** Path of the article PDF inside the `article-pdfs` Supabase Storage bucket. */
   pdfPath?: string;
   content?: string;
@@ -27,6 +28,7 @@ export type IssueRow = {
   title: string;
   desc: string;
   date: string;
+  publishedAt?: string;
   cover: string;
   pdfUrl: string | null;
 };
@@ -61,6 +63,7 @@ export async function fetchIssues(): Promise<IssueRow[]> {
     title: r.title,
     desc: r.description ?? "",
     date: fmtDate(r.published_at),
+    publishedAt: r.published_at ?? undefined,
     cover: r.cover_url || defaultCover,
     pdfUrl: r.pdf_url ?? null,
   }));
@@ -95,6 +98,7 @@ function mapArticle(r: ArticleJoin): DBArticle {
     readTime: r.read_time ?? 5,
     views: String(r.views ?? 0),
     date: fmtDate(r.published_at),
+    publishedAt: r.published_at ?? undefined,
     pdfPath: r.pdf_url ?? undefined,
     content: r.content ?? undefined,
     authorBio: r.author_bio ?? undefined,

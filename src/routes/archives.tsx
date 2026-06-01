@@ -2,19 +2,25 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchIssues, type IssueRow } from "@/lib/data";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 
 export const Route = createFileRoute("/archives")({
   component: Archives,
-  loader: () => fetchSeoMetadata("archives"),
+  loader: async () => {
+    const [seo, issues] = await Promise.all([
+      fetchSeoMetadata("archives"),
+      fetchIssues(),
+    ]);
+    return { seo, issues };
+  },
   head: ({ loaderData }) => ({
-    meta: loaderData
+    meta: loaderData?.seo
       ? [
-          { title: loaderData.title },
-          { name: "description", content: loaderData.description },
-          { property: "og:title", content: loaderData.title },
-          { property: "og:description", content: loaderData.description },
+          { title: loaderData.seo.title },
+          { name: "description", content: loaderData.seo.description },
+          { property: "og:title", content: loaderData.seo.title },
+          { property: "og:description", content: loaderData.seo.description },
         ]
       : [{ title: "Archives — The Agriculture Popular Article Magazine" }],
     links: [{ rel: "canonical", href: "/archives" }],
@@ -22,14 +28,10 @@ export const Route = createFileRoute("/archives")({
 });
 
 function Archives() {
-  const [issues, setIssues] = useState<IssueRow[]>([]);
+  const { issues } = Route.useLoaderData() as { seo: { title: string; description: string }; issues: IssueRow[] };
   const [year, setYear] = useState<string>("all");
   const [month, setMonth] = useState<string>("all");
   const { get } = useSiteContent("archives");
-
-  useEffect(() => {
-    fetchIssues().then(setIssues);
-  }, []);
 
   const years = useMemo(() => {
     const set = new Set<string>();
@@ -64,8 +66,25 @@ function Archives() {
     return yearMatch && monthMatch;
   });
 
+  const collectionSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Archives",
+    description: "Browse all issues of The Agriculture Popular Article Magazine.",
+    url: "https://theagriculturepopulararticlemagazine.lovable.app/archives",
+    hasPart: issues.map((i: IssueRow) => ({
+      "@type": "CreativeWork",
+      name: i.title,
+      description: i.desc,
+      url: "https://theagriculturepopulararticlemagazine.lovable.app/current-issue",
+      datePublished: i.publishedAt,
+      image: i.cover,
+    })),
+  });
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: collectionSchema }} />
       <SiteHeader />
       <main className="container-editorial py-16">
         <div className="eyebrow">Archives</div>
