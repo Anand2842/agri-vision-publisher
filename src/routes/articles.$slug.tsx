@@ -28,8 +28,8 @@ export const Route = createFileRoute("/articles/$slug")({
     const related = pool.filter((x) => x.slug !== a.slug).slice(0, 3);
     return { a, related };
   },
-  head: ({ params, loaderData }) => {
-    const baseMeta = loaderData
+  head: ({ params, loaderData }) => ({
+    meta: loaderData
       ? [
           { title: `${loaderData.a.title} — The Agriculture Popular Article Magazine` },
           { name: "description", content: loaderData.a.abstract },
@@ -38,44 +38,8 @@ export const Route = createFileRoute("/articles/$slug")({
           { property: "og:image", content: loaderData.a.cover },
           { property: "og:type", content: "article" },
         ]
-      : [{ title: "Article — The Agriculture Popular Article Magazine" }];
-    const scripts = loaderData
-      ? [
-          {
-            type: "application/ld+json",
-            children: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Article",
-              headline: loaderData.a.title,
-              description: loaderData.a.abstract,
-              image: loaderData.a.cover,
-              author: {
-                "@type": "Person",
-                name: loaderData.a.author,
-                ...(loaderData.a.affiliation
-                  ? { affiliation: { "@type": "Organization", name: loaderData.a.affiliation } }
-                  : {}),
-              },
-              datePublished: loaderData.a.publishedAt,
-              publisher: {
-                "@type": "Organization",
-                name: "The Agriculture Popular Article Magazine",
-                url: "https://theagriculturepopulararticlemagazine.lovable.app",
-                logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp",
-              },
-              mainEntityOfPage: {
-                "@type": "WebPage",
-                "@id": `https://theagriculturepopulararticlemagazine.lovable.app/articles/${params.slug}`,
-              },
-            }),
-          },
-        ]
-      : [];
-    return {
-      meta: baseMeta,
-      links: [{ rel: "canonical", href: `/articles/${params.slug}` }],
-      scripts,
-    };
+      : [{ title: "Article — The Agriculture Popular Article Magazine" }],
+    links: [{ rel: "canonical", href: `/articles/${params.slug}` }],
   }),
 });
 
