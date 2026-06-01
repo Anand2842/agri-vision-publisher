@@ -7,14 +7,15 @@ export const Route = createFileRoute("/submission-guidelines")({
   component: Guidelines,
   loader: () => fetchSeoMetadata("guidelines"),
   head: ({ loaderData }) => ({
-    title: loaderData?.title || "Submission Guidelines — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
+          { title: loaderData.title },
           { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },
         ]
-      : [],
+      : [{ title: "Submission Guidelines — The Agriculture Popular Article Magazine" }],
+    links: [{ rel: "canonical", href: "/submission-guidelines" }],
   }),
 });
 

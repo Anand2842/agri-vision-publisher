@@ -10,17 +10,15 @@ export const Route = createFileRoute("/")({
   component: Home,
   loader: () => fetchSeoMetadata("home"),
   head: ({ loaderData }) => ({
-    title: loaderData?.title || "The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
-          {
-            name: "description",
-            content: loaderData.description,
-          },
+          { title: loaderData.title },
+          { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },
         ]
-      : [],
+      : [{ title: "The Agriculture Popular Article Magazine" }],
+    links: [{ rel: "canonical", href: "/" }],
   }),
 });
 

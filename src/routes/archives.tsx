@@ -9,14 +9,15 @@ export const Route = createFileRoute("/archives")({
   component: Archives,
   loader: () => fetchSeoMetadata("archives"),
   head: ({ loaderData }) => ({
-    title: loaderData?.title || "Archives — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
+          { title: loaderData.title },
           { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },
         ]
-      : [],
+      : [{ title: "Archives — The Agriculture Popular Article Magazine" }],
+    links: [{ rel: "canonical", href: "/archives" }],
   }),
 });
 

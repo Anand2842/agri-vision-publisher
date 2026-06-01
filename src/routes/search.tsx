@@ -15,14 +15,15 @@ export const Route = createFileRoute("/search")({
   validateSearch: searchSchema,
   loader: () => fetchSeoMetadata("search"),
   head: ({ loaderData }) => ({
-    title: loaderData?.title || "Search Articles — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
+          { title: loaderData.title },
           { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },
         ]
-      : [],
+      : [{ title: "Search Articles — The Agriculture Popular Article Magazine" }],
+    links: [{ rel: "canonical", href: "/search" }],
   }),
 });
 

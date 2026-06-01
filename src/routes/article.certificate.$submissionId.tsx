@@ -7,9 +7,12 @@ import { useSiteContent } from "@/hooks/useSiteContent";
 
 export const Route = createFileRoute("/article/certificate/$submissionId")({
   component: PublicationCertificate,
-  head: () => ({
-    title: "Publication Certificate — The Agriculture Popular Article Magazine",
-    meta: [],
+  head: ({ params }) => ({
+    meta: [
+      { title: "Publication Certificate — The Agriculture Popular Article Magazine" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: `/article/certificate/${params.submissionId}` }],
   }),
 });
 

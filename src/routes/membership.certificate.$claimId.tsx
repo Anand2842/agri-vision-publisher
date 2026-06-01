@@ -8,9 +8,12 @@ import { useSiteContent } from "@/hooks/useSiteContent";
 
 export const Route = createFileRoute("/membership/certificate/$claimId")({
   component: MembershipCertificate,
-  head: () => ({
-    title: "Membership Certificate — The Agriculture Popular Article Magazine",
-    meta: [],
+  head: ({ params }) => ({
+    meta: [
+      { title: "Membership Certificate — The Agriculture Popular Article Magazine" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: `/membership/certificate/${params.claimId}` }],
   }),
 });
 

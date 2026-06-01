@@ -21,14 +21,15 @@ export const Route = createFileRoute("/current-issue")({
     return { seo, issue: issues[0] ?? null, articles };
   },
   head: ({ loaderData }) => ({
-    title: loaderData?.seo?.title || "Current Issue — The Agriculture Popular Article Magazine",
     meta: loaderData?.seo
       ? [
+          { title: loaderData.seo.title },
           { name: "description", content: loaderData.seo.description },
           { property: "og:title", content: loaderData.seo.title },
           { property: "og:description", content: loaderData.seo.description },
         ]
-      : [],
+      : [{ title: "Current Issue — The Agriculture Popular Article Magazine" }],
+    links: [{ rel: "canonical", href: "/current-issue" }],
   }),
   errorComponent: ({ error }) => {
     const router = useRouter();
