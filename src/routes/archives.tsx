@@ -66,8 +66,25 @@ function Archives() {
     return yearMatch && monthMatch;
   });
 
+  const collectionSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Archives",
+    description: "Browse all issues of The Agriculture Popular Article Magazine.",
+    url: "https://theagriculturepopulararticlemagazine.lovable.app/archives",
+    hasPart: issues.map((i: IssueRow) => ({
+      "@type": "CreativeWork",
+      name: i.title,
+      description: i.desc,
+      url: "https://theagriculturepopulararticlemagazine.lovable.app/current-issue",
+      datePublished: i.publishedAt,
+      image: i.cover,
+    })),
+  });
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: collectionSchema }} />
       <SiteHeader />
       <main className="container-editorial py-16">
         <div className="eyebrow">Archives</div>
