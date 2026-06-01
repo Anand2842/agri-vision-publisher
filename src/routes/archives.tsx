@@ -28,7 +28,7 @@ export const Route = createFileRoute("/archives")({
 });
 
 function Archives() {
-  const { issues } = Route.useLoaderData();
+  const { issues } = Route.useLoaderData() as { seo: { title: string; description: string }; issues: IssueRow[] };
   const [year, setYear] = useState<string>("all");
   const [month, setMonth] = useState<string>("all");
   const { get } = useSiteContent("archives");
