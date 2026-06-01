@@ -24,6 +24,7 @@ import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 import { Route as AuthenticatedSubmitRouteImport } from './routes/_authenticated.submit'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
@@ -113,6 +114,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapXmlRoute = SitemapXmlRouteImport.update({
+  id: '/sitemap/xml',
+  path: '/sitemap/xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
@@ -255,6 +262,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
@@ -289,6 +297,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/_authenticated/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
@@ -323,6 +332,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/submit'
     | '/articles/$slug'
+    | '/sitemap/xml'
     | '/admin/articles'
     | '/admin/categories'
     | '/admin/content'
@@ -354,6 +364,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/submit'
     | '/articles/$slug'
+    | '/sitemap/xml'
     | '/admin/articles'
     | '/admin/categories'
     | '/admin/content'
@@ -387,6 +398,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/submit'
     | '/articles/$slug'
+    | '/sitemap/xml'
     | '/_authenticated/admin/articles'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/content'
@@ -418,6 +430,7 @@ export interface RootRouteChildren {
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
+  SitemapXmlRoute: typeof SitemapXmlRoute
   ArticleCertificateSubmissionIdRoute: typeof ArticleCertificateSubmissionIdRoute
 }
 
@@ -526,6 +539,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap/xml': {
+      id: '/sitemap/xml'
+      path: '/sitemap/xml'
+      fullPath: '/sitemap/xml'
+      preLoaderRoute: typeof SitemapXmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/articles/$slug': {
@@ -717,8 +737,19 @@ const rootRouteChildren: RootRouteChildren = {
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
+  SitemapXmlRoute: SitemapXmlRoute,
   ArticleCertificateSubmissionIdRoute: ArticleCertificateSubmissionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
