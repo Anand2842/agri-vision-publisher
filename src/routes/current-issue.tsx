@@ -111,7 +111,7 @@ function CurrentIssue() {
       name: "The Agriculture Popular Article Magazine",
       url: "https://theagriculturepopulararticlemagazine.lovable.app",
     },
-    hasPart: articles.map((a) => ({
+    hasPart: articles.map((a: DBArticle) => ({
       "@type": "Article",
       headline: a.title,
       url: `https://theagriculturepopulararticlemagazine.lovable.app/articles/${a.slug}`,
