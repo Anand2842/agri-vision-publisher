@@ -69,29 +69,31 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
-    title: "The Agriculture Popular Article Magazine",
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "The Agriculture Popular Article Magazine" },
       {
         name: "description",
         content:
-          "A monthly peer-reviewed, open-access magazine for agriculture and allied sciences.",
+          "A peer-reviewed, open-access monthly magazine for agriculture and allied sciences — original research, popular articles, and editorial commentary.",
       },
       { name: "author", content: "The Agriculture Popular Article Magazine — Editorial Office" },
       { property: "og:title", content: "The Agriculture Popular Article Magazine" },
       {
         property: "og:description",
         content:
-          "A monthly peer-reviewed, open-access magazine for agriculture and allied sciences.",
+          "A peer-reviewed, open-access monthly magazine for agriculture and allied sciences — original research, popular articles, and editorial commentary.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "The Agriculture Popular Article Magazine" },
-      { name: "description", content: "The Agriculture Popular Article Magazine is a peer-reviewed, open access monthly magazine, initiated for the purpose of providing information about novel innova" },
-      { property: "og:description", content: "The Agriculture Popular Article Magazine is a peer-reviewed, open access monthly magazine, initiated for the purpose of providing information about novel innova" },
-      { name: "twitter:description", content: "The Agriculture Popular Article Magazine is a peer-reviewed, open access monthly magazine, initiated for the purpose of providing information about novel innova" },
+      {
+        name: "twitter:description",
+        content:
+          "A peer-reviewed, open-access monthly magazine for agriculture and allied sciences.",
+      },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp" },
     ],

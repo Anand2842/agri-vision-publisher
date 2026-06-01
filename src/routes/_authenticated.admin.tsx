@@ -70,10 +70,11 @@ export const Route = createFileRoute("/_authenticated/admin")({
   },
   component: AdminLayout,
   head: () => ({
-    title: "Admin — The Agriculture Popular Article Magazine",
     meta: [
+      { title: "Admin — The Agriculture Popular Article Magazine" },
       { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "/admin" }],
   }),
 });
 

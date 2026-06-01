@@ -7,14 +7,15 @@ export const Route = createFileRoute("/publication-ethics")({
   component: PublicationEthics,
   loader: () => fetchSeoMetadata("publication_ethics"),
   head: ({ loaderData }) => ({
-    title: loaderData?.title || "Publication Ethics & Plagiarism Policy — The Agriculture Popular Article Magazine",
     meta: loaderData
       ? [
+          { title: loaderData.title },
           { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },
         ]
-      : [],
+      : [{ title: "Publication Ethics & Plagiarism Policy — The Agriculture Popular Article Magazine" }],
+    links: [{ rel: "canonical", href: "/publication-ethics" }],
   }),
 });
 
