@@ -227,16 +227,16 @@ function Article() {
           </article>
           <aside className="md:col-span-4">
             <div className="md:sticky md:top-28">
-              <div className="eyebrow">Related</div>
+              <h2 className="eyebrow">Related</h2>
               <div className="rule-thick mt-3" />
               <ul className="mt-5 space-y-7">
                 {related.map((r: typeof a) => (
                   <li key={r.slug}>
                     <Link to="/articles/$slug" params={{ slug: r.slug }} className="group block">
                       <div className="eyebrow text-[0.6rem]">{r.category}</div>
-                      <div className="font-display text-lg mt-1 group-hover:text-primary leading-snug">
+                      <h3 className="font-display text-lg mt-1 group-hover:text-primary leading-snug">
                         {r.title}
-                      </div>
+                      </h3>
                       <div className="text-xs text-muted-foreground mt-1">{r.author}</div>
                     </Link>
                   </li>
