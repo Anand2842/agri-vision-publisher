@@ -295,7 +295,7 @@ function Membership() {
               className={`border p-7 flex flex-col ${p.featured ? "bg-ink text-background border-ink" : "bg-paper border-rule"}`}
             >
               {p.featured && <div className="eyebrow text-background/70 mb-3">Most popular</div>}
-              <h3 className="font-display text-2xl">{p.name}</h3>
+              <h2 className="font-display text-2xl">{p.name}</h2>
               <div className="mt-4 flex items-baseline gap-2">
                 <div className="font-display text-4xl">{p.price}</div>
                 <div

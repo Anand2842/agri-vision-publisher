@@ -36,7 +36,7 @@ const defaultNav: { to: string; label: string; children?: { to: string; label: s
   { to: "/membership", label: "Membership" },
   {
     to: "/startup-spotlight",
-    label: "More",
+    label: "Additional Resources",
     children: [
       { to: "/startup-spotlight", label: "Startup Spotlight" },
       { to: "/advertise", label: "Advertise" },

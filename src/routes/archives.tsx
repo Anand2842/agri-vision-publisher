@@ -148,7 +148,7 @@ function Archives() {
               <div className="text-xs text-foreground/60 uppercase font-semibold tracking-wider mt-5">
                 Vol {i.volume} · Issue {i.number} · {i.date}
               </div>
-              <h3 className="font-display text-2xl md:text-[28px] leading-tight mt-2">{i.title}</h3>
+              <h2 className="font-display text-2xl md:text-[28px] leading-tight mt-2">{i.title}</h2>
               <p className="text-[15px] text-foreground/70 mt-3 leading-relaxed">{i.desc}</p>
               <Link
                 to="/current-issue"
