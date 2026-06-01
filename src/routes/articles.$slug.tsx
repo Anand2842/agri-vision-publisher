@@ -84,8 +84,37 @@ function Article() {
       await navigator.clipboard.writeText(shareUrl);
     }
   };
+  const articleSchema = a
+    ? JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: a.title,
+        description: a.abstract,
+        image: a.cover,
+        author: {
+          "@type": "Person",
+          name: a.author,
+          ...(a.affiliation ? { affiliation: { "@type": "Organization", name: a.affiliation } } : {}),
+        },
+        datePublished: a.publishedAt,
+        publisher: {
+          "@type": "Organization",
+          name: "The Agriculture Popular Article Magazine",
+          url: "https://theagriculturepopulararticlemagazine.lovable.app",
+          logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp",
+        },
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `https://theagriculturepopulararticlemagazine.lovable.app/articles/${a.slug}`,
+        },
+      })
+    : "";
+
   return (
     <>
+      {articleSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleSchema }} />
+      )}
       <SiteHeader />
       <main>
         <header className="container-editorial pt-16 pb-12">
