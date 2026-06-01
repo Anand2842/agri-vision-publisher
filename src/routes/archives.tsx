@@ -2,19 +2,25 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchIssues, type IssueRow } from "@/lib/data";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 
 export const Route = createFileRoute("/archives")({
   component: Archives,
-  loader: () => fetchSeoMetadata("archives"),
+  loader: async () => {
+    const [seo, issues] = await Promise.all([
+      fetchSeoMetadata("archives"),
+      fetchIssues(),
+    ]);
+    return { seo, issues };
+  },
   head: ({ loaderData }) => ({
-    meta: loaderData
+    meta: loaderData?.seo
       ? [
-          { title: loaderData.title },
-          { name: "description", content: loaderData.description },
-          { property: "og:title", content: loaderData.title },
-          { property: "og:description", content: loaderData.description },
+          { title: loaderData.seo.title },
+          { name: "description", content: loaderData.seo.description },
+          { property: "og:title", content: loaderData.seo.title },
+          { property: "og:description", content: loaderData.seo.description },
         ]
       : [{ title: "Archives — The Agriculture Popular Article Magazine" }],
     links: [{ rel: "canonical", href: "/archives" }],
