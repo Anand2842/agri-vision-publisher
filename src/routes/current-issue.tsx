@@ -92,9 +92,36 @@ function CurrentIssue() {
   }
 
   const pdfHref = issue.pdfUrl;
+  const issueSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "PublicationIssue",
+    name: issue.title,
+    description: issue.desc,
+    volumeNumber: issue.volume,
+    issueNumber: issue.number,
+    datePublished: issue.publishedAt,
+    image: issue.cover,
+    isPartOf: {
+      "@type": "Periodical",
+      name: "The Agriculture Popular Article Magazine",
+      url: "https://theagriculturepopulararticlemagazine.lovable.app",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "The Agriculture Popular Article Magazine",
+      url: "https://theagriculturepopulararticlemagazine.lovable.app",
+    },
+    hasPart: articles.map((a) => ({
+      "@type": "Article",
+      headline: a.title,
+      url: `https://theagriculturepopulararticlemagazine.lovable.app/articles/${a.slug}`,
+      author: { "@type": "Person", name: a.author },
+    })),
+  });
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: issueSchema }} />
       <SiteHeader />
       <main>
         {/* Masthead band */}
