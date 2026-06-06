@@ -15,7 +15,7 @@ export const Route = createFileRoute("/startup-spotlight")({
           { property: "og:description", content: loaderData.description },
         ]
       : [{ title: "Startup Spotlight — The Agriculture Popular Article Magazine" }],
-    links: [{ rel: "canonical", href: "/startup-spotlight" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/startup-spotlight" }],
   }),
 });
 

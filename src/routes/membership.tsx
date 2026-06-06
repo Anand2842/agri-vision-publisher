@@ -35,7 +35,7 @@ export const Route = createFileRoute("/membership")({
           { property: "og:description", content: loaderData.description },
         ]
       : [{ title: "Membership — The Agriculture Popular Article Magazine" }],
-    links: [{ rel: "canonical", href: "/membership" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/membership" }],
   }),
 });
 

@@ -115,16 +115,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             {
               "@type": "Organization",
               name: "The Agriculture Popular Article Magazine",
-              url: "https://theagriculturepopulararticlemagazine.lovable.app",
+              url: "https://agriculturemagazine.in",
               logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp",
             },
             {
               "@type": "WebSite",
               name: "The Agriculture Popular Article Magazine",
-              url: "https://theagriculturepopulararticlemagazine.lovable.app",
+              url: "https://agriculturemagazine.in",
               potentialAction: {
                 "@type": "SearchAction",
-                target: "https://theagriculturepopulararticlemagazine.lovable.app/search?q={search_term_string}",
+                target: "https://agriculturemagazine.in/search?q={search_term_string}",
                 "query-input": "required name=search_term_string",
               },
             },

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/search")({
           { property: "og:description", content: loaderData.description },
         ]
       : [{ title: "Search Articles — The Agriculture Popular Article Magazine" }],
-    links: [{ rel: "canonical", href: "/search" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/search" }],
   }),
 });
 

@@ -74,7 +74,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { title: "Admin — The Agriculture Popular Article Magazine" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: "/admin" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/admin" }],
   }),
 });
 

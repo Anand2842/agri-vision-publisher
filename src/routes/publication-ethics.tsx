@@ -15,7 +15,7 @@ export const Route = createFileRoute("/publication-ethics")({
           { property: "og:description", content: loaderData.description },
         ]
       : [{ title: "Publication Ethics & Plagiarism Policy — The Agriculture Popular Article Magazine" }],
-    links: [{ rel: "canonical", href: "/publication-ethics" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/publication-ethics" }],
   }),
 });
 

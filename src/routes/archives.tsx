@@ -23,7 +23,7 @@ export const Route = createFileRoute("/archives")({
           { property: "og:description", content: loaderData.seo.description },
         ]
       : [{ title: "Archives — The Agriculture Popular Article Magazine" }],
-    links: [{ rel: "canonical", href: "/archives" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/archives" }],
   }),
 });
 
@@ -71,12 +71,12 @@ function Archives() {
     "@type": "CollectionPage",
     name: "Archives",
     description: "Browse all issues of The Agriculture Popular Article Magazine.",
-    url: "https://theagriculturepopulararticlemagazine.lovable.app/archives",
+    url: "https://agriculturemagazine.in/archives",
     hasPart: issues.map((i: IssueRow) => ({
       "@type": "CreativeWork",
       name: i.title,
       description: i.desc,
-      url: "https://theagriculturepopulararticlemagazine.lovable.app/current-issue",
+      url: "https://agriculturemagazine.in/current-issue",
       datePublished: i.publishedAt,
       image: i.cover,
     })),

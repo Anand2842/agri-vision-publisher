@@ -39,7 +39,7 @@ export const Route = createFileRoute("/articles/$slug")({
           { property: "og:type", content: "article" },
         ]
       : [{ title: "Article — The Agriculture Popular Article Magazine" }],
-    links: [{ rel: "canonical", href: `/articles/${params.slug}` }],
+    links: [{ rel: "canonical", href: `https://agriculturemagazine.in/articles/${params.slug}` }],
   }),
 });
 
@@ -100,12 +100,12 @@ function Article() {
         publisher: {
           "@type": "Organization",
           name: "The Agriculture Popular Article Magazine",
-          url: "https://theagriculturepopulararticlemagazine.lovable.app",
+          url: "https://agriculturemagazine.in",
           logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp",
         },
         mainEntityOfPage: {
           "@type": "WebPage",
-          "@id": `https://theagriculturepopulararticlemagazine.lovable.app/articles/${a.slug}`,
+          "@id": `https://agriculturemagazine.in/articles/${a.slug}`,
         },
       })
     : "";

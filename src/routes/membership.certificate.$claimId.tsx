@@ -13,7 +13,7 @@ export const Route = createFileRoute("/membership/certificate/$claimId")({
       { title: "Membership Certificate — The Agriculture Popular Article Magazine" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: `/membership/certificate/${params.claimId}` }],
+    links: [{ rel: "canonical", href: `https://agriculturemagazine.in/membership/certificate/${params.claimId}` }],
   }),
 });
 

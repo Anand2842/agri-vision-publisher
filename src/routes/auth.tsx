@@ -14,7 +14,7 @@ const authSearchSchema = z.object({
 export const Route = createFileRoute("/auth")({
   validateSearch: (search) => authSearchSchema.parse(search),
   component: Auth,
-  head: () => ({ meta: [{ title: "Sign in — The Agriculture Popular Article Magazine" }], links: [{ rel: "canonical", href: "/auth" }] }),
+  head: () => ({ meta: [{ title: "Sign in — The Agriculture Popular Article Magazine" }], links: [{ rel: "canonical", href: "https://agriculturemagazine.in/auth" }] }),
 });
 
 const schema = z.object({
