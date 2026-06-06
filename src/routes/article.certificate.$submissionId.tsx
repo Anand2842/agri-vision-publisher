@@ -1,7 +1,6 @@
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getLocalStorageClaims, MOCK_PROFILES } from "@/lib/paymentStorage";
 import { Printer, ArrowLeft, Loader2, Award, ShieldCheck } from "lucide-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
 
@@ -42,32 +41,25 @@ function PublicationCertificate() {
       setError(null);
 
       try {
-        // 1. Fetch submission details
+        // Require authentication
+        const { data: userData } = await supabase.auth.getUser();
+        if (!userData?.user) {
+          throw new Error("You must be signed in to view a publication certificate.");
+        }
+
+        // 1. Fetch submission details (RLS restricts to owner/admin/moderator)
         const { data: dbSub, error: subErr } = await supabase
           .from("submissions")
           .select("id,title,status,user_id,created_at,updated_at")
           .eq("id", submissionId)
-          .single();
+          .maybeSingle();
 
         if (subErr || !dbSub) {
-          // Attempt offline fallback search for mock submissions if in local testing
-          if (submissionId.startsWith("mock-") || submissionId.length < 15) {
-            setData({
-              submission: {
-                id: submissionId,
-                title: "Precision Farming & Drip Irrigation Adaptation in Arid Regions",
-                status: "published",
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              },
-              authorName: "Dr. Anand Kumar",
-              institution: "Indian Agricultural Research Institute (IARI)",
-              country: "India",
-            });
-            setLoading(false);
-            return;
-          }
-          throw new Error("Submission record not found.");
+          throw new Error("Submission record not found or you do not have access.");
+        }
+
+        if (dbSub.status !== "published") {
+          throw new Error("This submission has not been published yet.");
         }
 
         // Fetch author profile
