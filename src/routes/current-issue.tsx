@@ -10,6 +10,8 @@ import {
 import { Download, FileText, BookOpen, ArrowRight } from "lucide-react";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 
+const escapeJsonLd = (json: string) => json.replace(/<\/script/gi, "<\\/script");
+
 export const Route = createFileRoute("/current-issue")({
   component: CurrentIssue,
   loader: async () => {
@@ -121,7 +123,7 @@ function CurrentIssue() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: issueSchema }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(issueSchema) }} />
       <SiteHeader />
       <main>
         {/* Masthead band */}

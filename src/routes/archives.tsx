@@ -5,6 +5,8 @@ import { fetchIssues, type IssueRow } from "@/lib/data";
 import { useMemo, useState } from "react";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 
+const escapeJsonLd = (json: string) => json.replace(/<\/script/gi, "<\\/script");
+
 export const Route = createFileRoute("/archives")({
   component: Archives,
   loader: async () => {
@@ -84,7 +86,7 @@ function Archives() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: collectionSchema }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(collectionSchema) }} />
       <SiteHeader />
       <main className="container-editorial py-16">
         <div className="eyebrow">Archives</div>
