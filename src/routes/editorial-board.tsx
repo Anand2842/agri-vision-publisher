@@ -24,7 +24,7 @@ export const Route = createFileRoute("/editorial-board")({
           { property: "og:description", content: loaderData.description },
         ]
       : [{ title: "Editorial Board — The Agriculture Popular Article Magazine" }],
-    links: [{ rel: "canonical", href: "/editorial-board" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/editorial-board" }],
   }),
 });
 

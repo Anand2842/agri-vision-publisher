@@ -2,5 +2,5 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/moderate")({
   component: () => <Navigate to="/admin/queue" replace />,
-  head: () => ({ meta: [{ title: "Editorial Queue" }, { name: "robots", content: "noindex" }], links: [{ rel: "canonical", href: "/moderate" }] }),
+  head: () => ({ meta: [{ title: "Editorial Queue" }, { name: "robots", content: "noindex" }], links: [{ rel: "canonical", href: "https://agriculturemagazine.in/moderate" }] }),
 });

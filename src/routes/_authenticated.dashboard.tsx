@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
   head: () => ({
     meta: [{ title: "Author Dashboard — The Agriculture Popular Article Magazine" }, { name: "robots", content: "noindex" }],
-    links: [{ rel: "canonical", href: "/dashboard" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/dashboard" }],
   }),
 });
 

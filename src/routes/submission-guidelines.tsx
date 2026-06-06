@@ -15,7 +15,7 @@ export const Route = createFileRoute("/submission-guidelines")({
           { property: "og:description", content: loaderData.description },
         ]
       : [{ title: "Submission Guidelines — The Agriculture Popular Article Magazine" }],
-    links: [{ rel: "canonical", href: "/submission-guidelines" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/submission-guidelines" }],
   }),
 });
 

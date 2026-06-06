@@ -29,7 +29,7 @@ export const Route = createFileRoute("/current-issue")({
           { property: "og:description", content: loaderData.seo.description },
         ]
       : [{ title: "Current Issue — The Agriculture Popular Article Magazine" }],
-    links: [{ rel: "canonical", href: "/current-issue" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/current-issue" }],
   }),
   errorComponent: ({ error }) => {
     const router = useRouter();
@@ -104,17 +104,17 @@ function CurrentIssue() {
     isPartOf: {
       "@type": "Periodical",
       name: "The Agriculture Popular Article Magazine",
-      url: "https://theagriculturepopulararticlemagazine.lovable.app",
+      url: "https://agriculturemagazine.in",
     },
     publisher: {
       "@type": "Organization",
       name: "The Agriculture Popular Article Magazine",
-      url: "https://theagriculturepopulararticlemagazine.lovable.app",
+      url: "https://agriculturemagazine.in",
     },
     hasPart: articles.map((a: DBArticle) => ({
       "@type": "Article",
       headline: a.title,
-      url: `https://theagriculturepopulararticlemagazine.lovable.app/articles/${a.slug}`,
+      url: `https://agriculturemagazine.in/articles/${a.slug}`,
       author: { "@type": "Person", name: a.author },
     })),
   });
