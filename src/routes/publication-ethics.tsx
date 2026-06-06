@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
+import DOMPurify from "isomorphic-dompurify";
 
 export const Route = createFileRoute("/publication-ethics")({
   component: PublicationEthics,
@@ -67,7 +68,7 @@ function PublicationEthics() {
         </Section>
 
         <Section title={get("reporting", "title")}>
-          <p dangerouslySetInnerHTML={{ __html: get("reporting", "body") }} />
+          <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(get("reporting", "body")) }} />
         </Section>
       </main>
       <SiteFooter />
@@ -80,7 +81,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <section className="mt-12">
       <h2
         className="font-display text-2xl md:text-3xl text-ink"
-        dangerouslySetInnerHTML={{ __html: title }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(title) }}
       />
       <div className="rule-thick mt-3 mb-5 max-w-[60px]" />
       <div className="prose-editorial text-foreground/80 leading-relaxed max-w-3xl space-y-3">

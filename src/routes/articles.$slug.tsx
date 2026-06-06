@@ -6,6 +6,9 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchArticleBySlug, fetchPublishedArticles, articlePdf } from "@/lib/data";
 import { Bookmark, Share2, Download, Quote, Clock, Eye } from "lucide-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import DOMPurify from "isomorphic-dompurify";
+
+const escapeJsonLd = (json: string) => json.replace(/<\/script/gi, "<\\/script");
 
 export const Route = createFileRoute("/articles/$slug")({
   component: Article,
@@ -113,7 +116,7 @@ function Article() {
   return (
     <>
       {articleSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleSchema }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(articleSchema) }} />
       )}
       <SiteHeader />
       <main>
