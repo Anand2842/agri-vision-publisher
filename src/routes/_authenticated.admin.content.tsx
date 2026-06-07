@@ -87,6 +87,9 @@ function AdminContentPage() {
         <TabsContent value="certificate">
           <CertificateCms />
         </TabsContent>
+        <TabsContent value="faq">
+          <FaqCms />
+        </TabsContent>
         <TabsContent value="seo">
           <SeoCms />
         </TabsContent>
