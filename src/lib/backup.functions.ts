@@ -120,15 +120,19 @@ export async function performBackupMirror(
       let tableRows = 0;
       // eslint-disable-next-line no-constant-condition
       while (true) {
-        const { data, error } = await supabaseAdmin
-          .from(name)
+        // Dynamic table name: bypass generated Database literal-union typing.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const primaryFrom = (supabaseAdmin as any).from(name);
+        const { data, error } = await primaryFrom
           .select("*")
           .range(from, from + PAGE_SIZE - 1);
         if (error) throw error;
         if (!data || data.length === 0) break;
-        const { error: upErr } = await backupAdmin
-          .from(name)
-          .upsert(data, { onConflict: conflict });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const backupFrom = (backupAdmin as any).from(name);
+        const { error: upErr } = await backupFrom.upsert(data, {
+          onConflict: conflict,
+        });
         if (upErr) throw upErr;
         tableRows += data.length;
         if (data.length < PAGE_SIZE) break;
