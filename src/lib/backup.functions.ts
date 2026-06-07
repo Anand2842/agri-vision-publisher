@@ -1,16 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+type RowData = Record<string, unknown>;
+type MirrorTable = {
+  name: string;
+  conflict: string;
+  naturalKeys?: string[][];
+};
+
 // Tables to mirror, in dependency-safe order (parents before children).
-// Conflict keys for upsert are the primary keys of each table.
-const TABLES: Array<{ name: string; conflict: string }> = [
-  { name: "categories", conflict: "id" },
-  { name: "issues", conflict: "id" },
+// Upserts use the primary key, but several tables also have natural unique
+// keys seeded by the bootstrap SQL. If a backup project already has seeded rows
+// with generated IDs, remove those conflicting rows first so the primary IDs
+// from production can be mirrored and foreign keys continue to line up.
+const TABLES: MirrorTable[] = [
+  { name: "categories", conflict: "id", naturalKeys: [["slug"]] },
+  { name: "issues", conflict: "id", naturalKeys: [["volume", "issue_number"]] },
   { name: "profiles", conflict: "id" },
-  { name: "user_roles", conflict: "id" },
-  { name: "site_content", conflict: "id" },
-  { name: "membership_payments", conflict: "id" },
-  { name: "articles", conflict: "id" },
+  { name: "user_roles", conflict: "id", naturalKeys: [["user_id", "role"]] },
+  { name: "site_content", conflict: "id", naturalKeys: [["page", "section", "key"]] },
+  { name: "membership_payments", conflict: "id", naturalKeys: [["member_id"]] },
+  { name: "articles", conflict: "id", naturalKeys: [["slug"]] },
   { name: "submissions", conflict: "id" },
   { name: "submission_events", conflict: "id" },
   { name: "contact_messages", conflict: "id" },
