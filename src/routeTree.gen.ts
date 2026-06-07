@@ -40,6 +40,7 @@ import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminIssuesRouteImport } from './routes/_authenticated.admin.issues'
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated.admin.content'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated.admin.categories'
+import { Route as AuthenticatedAdminBackupsRouteImport } from './routes/_authenticated.admin.backups'
 import { Route as AuthenticatedAdminArticlesRouteImport } from './routes/_authenticated.admin.articles'
 import { Route as ApiPublicHooksBackupMirrorRouteImport } from './routes/api/public/hooks/backup-mirror'
 
@@ -205,6 +206,12 @@ const AuthenticatedAdminCategoriesRoute =
     path: '/categories',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminBackupsRoute =
+  AuthenticatedAdminBackupsRouteImport.update({
+    id: '/backups',
+    path: '/backups',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminArticlesRoute =
   AuthenticatedAdminArticlesRouteImport.update({
     id: '/articles',
@@ -239,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
+  '/admin/backups': typeof AuthenticatedAdminBackupsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/issues': typeof AuthenticatedAdminIssuesRoute
@@ -272,6 +280,7 @@ export interface FileRoutesByTo {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
+  '/admin/backups': typeof AuthenticatedAdminBackupsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
   '/admin/issues': typeof AuthenticatedAdminIssuesRoute
@@ -308,6 +317,7 @@ export interface FileRoutesById {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/_authenticated/admin/articles': typeof AuthenticatedAdminArticlesRoute
+  '/_authenticated/admin/backups': typeof AuthenticatedAdminBackupsRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
   '/_authenticated/admin/issues': typeof AuthenticatedAdminIssuesRoute
@@ -344,6 +354,7 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/sitemap/xml'
     | '/admin/articles'
+    | '/admin/backups'
     | '/admin/categories'
     | '/admin/content'
     | '/admin/issues'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/sitemap/xml'
     | '/admin/articles'
+    | '/admin/backups'
     | '/admin/categories'
     | '/admin/content'
     | '/admin/issues'
@@ -412,6 +424,7 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/sitemap/xml'
     | '/_authenticated/admin/articles'
+    | '/_authenticated/admin/backups'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/content'
     | '/_authenticated/admin/issues'
@@ -667,6 +680,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/backups': {
+      id: '/_authenticated/admin/backups'
+      path: '/backups'
+      fullPath: '/admin/backups'
+      preLoaderRoute: typeof AuthenticatedAdminBackupsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/articles': {
       id: '/_authenticated/admin/articles'
       path: '/articles'
@@ -686,6 +706,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminArticlesRoute: typeof AuthenticatedAdminArticlesRoute
+  AuthenticatedAdminBackupsRoute: typeof AuthenticatedAdminBackupsRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
   AuthenticatedAdminIssuesRoute: typeof AuthenticatedAdminIssuesRoute
@@ -699,6 +720,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminArticlesRoute: AuthenticatedAdminArticlesRoute,
+  AuthenticatedAdminBackupsRoute: AuthenticatedAdminBackupsRoute,
   AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
   AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
   AuthenticatedAdminIssuesRoute: AuthenticatedAdminIssuesRoute,
@@ -765,3 +787,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
