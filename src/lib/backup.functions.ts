@@ -186,12 +186,7 @@ export async function performBackupMirror(trigger: "manual" | "cron"): Promise<{
         if (!data || data.length === 0) break;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const backupFrom = (backupAdmin as any).from(name);
-        await clearNaturalKeyConflicts(
-          backupFrom,
-          data as RowData[],
-          conflict,
-          table.naturalKeys,
-        );
+        await clearNaturalKeyConflicts(backupFrom, data as RowData[], conflict, table.naturalKeys);
         const { error: upErr } = await backupFrom.upsert(data, {
           onConflict: conflict,
         });
@@ -342,10 +337,12 @@ async function walkAndCopy(
       const contentType =
         (item.metadata as { mimetype?: string } | null)?.mimetype ??
         "application/octet-stream";
-      const { error: upErr } = await backup.storage.from(bucket).upload(itemPath, new Uint8Array(arrBuf), {
-        upsert: true,
-        contentType,
-      });
+      const { error: upErr } = await backup.storage
+        .from(bucket)
+        .upload(itemPath, new Uint8Array(arrBuf), {
+          upsert: true,
+          contentType,
+        });
       if (upErr) throw upErr;
       onFiles(1);
     }
