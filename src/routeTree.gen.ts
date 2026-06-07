@@ -41,6 +41,7 @@ import { Route as AuthenticatedAdminIssuesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated.admin.content'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated.admin.categories'
 import { Route as AuthenticatedAdminArticlesRouteImport } from './routes/_authenticated.admin.articles'
+import { Route as ApiPublicHooksBackupMirrorRouteImport } from './routes/api/public/hooks/backup-mirror'
 
 const SubmissionGuidelinesRoute = SubmissionGuidelinesRouteImport.update({
   id: '/submission-guidelines',
@@ -210,6 +211,12 @@ const AuthenticatedAdminArticlesRoute =
     path: '/articles',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const ApiPublicHooksBackupMirrorRoute =
+  ApiPublicHooksBackupMirrorRouteImport.update({
+    id: '/api/public/hooks/backup-mirror',
+    path: '/api/public/hooks/backup-mirror',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -243,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
   '/membership/certificate/$claimId': typeof MembershipCertificateClaimIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/hooks/backup-mirror': typeof ApiPublicHooksBackupMirrorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -275,6 +283,7 @@ export interface FileRoutesByTo {
   '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
   '/membership/certificate/$claimId': typeof MembershipCertificateClaimIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/hooks/backup-mirror': typeof ApiPublicHooksBackupMirrorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -310,6 +319,7 @@ export interface FileRoutesById {
   '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
   '/membership/certificate/$claimId': typeof MembershipCertificateClaimIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/hooks/backup-mirror': typeof ApiPublicHooksBackupMirrorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -345,6 +355,7 @@ export interface FileRouteTypes {
     | '/article/certificate/$submissionId'
     | '/membership/certificate/$claimId'
     | '/admin/'
+    | '/api/public/hooks/backup-mirror'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/article/certificate/$submissionId'
     | '/membership/certificate/$claimId'
     | '/admin'
+    | '/api/public/hooks/backup-mirror'
   id:
     | '__root__'
     | '/'
@@ -411,6 +423,7 @@ export interface FileRouteTypes {
     | '/article/certificate/$submissionId'
     | '/membership/certificate/$claimId'
     | '/_authenticated/admin/'
+    | '/api/public/hooks/backup-mirror'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -432,6 +445,7 @@ export interface RootRouteChildren {
   ArticlesSlugRoute: typeof ArticlesSlugRoute
   SitemapXmlRoute: typeof SitemapXmlRoute
   ArticleCertificateSubmissionIdRoute: typeof ArticleCertificateSubmissionIdRoute
+  ApiPublicHooksBackupMirrorRoute: typeof ApiPublicHooksBackupMirrorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -660,6 +674,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminArticlesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/api/public/hooks/backup-mirror': {
+      id: '/api/public/hooks/backup-mirror'
+      path: '/api/public/hooks/backup-mirror'
+      fullPath: '/api/public/hooks/backup-mirror'
+      preLoaderRoute: typeof ApiPublicHooksBackupMirrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -739,6 +760,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArticlesSlugRoute: ArticlesSlugRoute,
   SitemapXmlRoute: SitemapXmlRoute,
   ArticleCertificateSubmissionIdRoute: ArticleCertificateSubmissionIdRoute,
+  ApiPublicHooksBackupMirrorRoute: ApiPublicHooksBackupMirrorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
