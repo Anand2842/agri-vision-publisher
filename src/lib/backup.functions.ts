@@ -57,27 +57,36 @@ function fmtErr(e: unknown): string {
 }
 
 async function clearNaturalKeyConflicts(
-  // Dynamic Supabase table builder; generated types cannot model runtime table names.
+  // Dynamic Supabase table builder factory; generated types cannot model runtime table names.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  backupFrom: any,
+  backupTable: () => any,
   rows: RowData[],
-  primaryKey: string,
   naturalKeys: string[][] | undefined,
 ) {
   if (!naturalKeys?.length) return;
 
-  for (const row of rows) {
-    const primaryValue = row[primaryKey];
-    if (primaryValue === null || primaryValue === undefined) continue;
-
-    for (const keys of naturalKeys) {
-      const match = Object.fromEntries(keys.map((key) => [key, row[key]]));
-      if (Object.values(match).some((value) => value === null || value === undefined)) {
-        continue;
-      }
-
-      const { error } = await backupFrom.delete().match(match).neq(primaryKey, primaryValue);
+  for (const keys of naturalKeys) {
+    if (keys.length === 1) {
+      // Single-column natural key: batch delete with .in()
+      const col = keys[0];
+      const values = Array.from(
+        new Set(
+          rows
+            .map((r) => r[col])
+            .filter((v) => v !== null && v !== undefined),
+        ),
+      );
+      if (values.length === 0) continue;
+      const { error } = await backupTable().delete().in(col, values);
       if (error) throw error;
+    } else {
+      // Composite natural key: delete each match individually (small N expected)
+      for (const row of rows) {
+        const match = Object.fromEntries(keys.map((k) => [k, row[k]]));
+        if (Object.values(match).some((v) => v === null || v === undefined)) continue;
+        const { error } = await backupTable().delete().match(match);
+        if (error) throw error;
+      }
     }
   }
 }
@@ -185,9 +194,9 @@ export async function performBackupMirror(trigger: "manual" | "cron"): Promise<{
         if (error) throw error;
         if (!data || data.length === 0) break;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const backupFrom = (backupAdmin as any).from(name);
-        await clearNaturalKeyConflicts(backupFrom, data as RowData[], conflict, table.naturalKeys);
-        const { error: upErr } = await backupFrom.upsert(data, {
+        const backupTable = () => (backupAdmin as any).from(name);
+        await clearNaturalKeyConflicts(backupTable, data as RowData[], table.naturalKeys);
+        const { error: upErr } = await backupTable().upsert(data, {
           onConflict: conflict,
         });
         if (upErr) throw upErr;
