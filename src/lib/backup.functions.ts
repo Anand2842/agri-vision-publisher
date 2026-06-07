@@ -20,6 +20,32 @@ const STORAGE_BUCKETS = ["article-pdfs", "manuscripts", "site-assets", "payment-
 
 const PAGE_SIZE = 500;
 
+// Supabase errors (PostgrestError, StorageError, AuthError) are plain objects,
+// not Error instances — so `e.message` works but `e instanceof Error` is false
+// and `String(e)` yields "[object Object]". Extract a readable string.
+function fmtErr(e: unknown): string {
+  if (!e) return "unknown error";
+  if (typeof e === "string") return e;
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object") {
+    const o = e as Record<string, unknown>;
+    const parts = [
+      o.message,
+      o.details ? `details: ${o.details}` : null,
+      o.hint ? `hint: ${o.hint}` : null,
+      o.code ? `code: ${o.code}` : null,
+      o.statusCode ? `status: ${o.statusCode}` : null,
+    ].filter(Boolean);
+    if (parts.length) return parts.join(" — ");
+    try {
+      return JSON.stringify(e);
+    } catch {
+      return "unserializable error";
+    }
+  }
+  return String(e);
+}
+
 async function ensureAdmin(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
@@ -53,7 +79,7 @@ export const testBackupConnection = createServerFn({ method: "POST" })
       return {
         ok: false,
         buckets: [],
-        message: e instanceof Error ? e.message : "Unknown error",
+        message: fmtErr(e),
       };
     }
   });
@@ -142,7 +168,7 @@ export async function performBackupMirror(
       rowsSynced += tableRows;
       tablesSynced += 1;
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
+      const msg = fmtErr(e);
       tableDetails[name] = `error: ${msg}`;
       errors.push(`table ${name}: ${msg}`);
     }
@@ -158,7 +184,7 @@ export async function performBackupMirror(
       tableDetails[`bucket:${bucket}`] = bucketFiles;
       filesSynced += bucketFiles;
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
+      const msg = fmtErr(e);
       tableDetails[`bucket:${bucket}`] = `error: ${msg}`;
       errors.push(`bucket ${bucket}: ${msg}`);
     }
@@ -198,7 +224,7 @@ export async function performBackupMirror(
           authUsersSynced += 1;
         } catch (e) {
           errors.push(
-            `auth user ${u.id}: ${e instanceof Error ? e.message : String(e)}`,
+            `auth user ${u.id}: ${fmtErr(e)}`,
           );
         }
       }
@@ -206,7 +232,7 @@ export async function performBackupMirror(
       page += 1;
     }
   } catch (e) {
-    errors.push(`auth listUsers: ${e instanceof Error ? e.message : String(e)}`);
+    errors.push(`auth listUsers: ${fmtErr(e)}`);
   }
 
   const status: "success" | "partial" | "failed" =
