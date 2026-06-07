@@ -20,6 +20,32 @@ const STORAGE_BUCKETS = ["article-pdfs", "manuscripts", "site-assets", "payment-
 
 const PAGE_SIZE = 500;
 
+// Supabase errors (PostgrestError, StorageError, AuthError) are plain objects,
+// not Error instances — so `e.message` works but `e instanceof Error` is false
+// and `String(e)` yields "[object Object]". Extract a readable string.
+function fmtErr(e: unknown): string {
+  if (!e) return "unknown error";
+  if (typeof e === "string") return e;
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object") {
+    const o = e as Record<string, unknown>;
+    const parts = [
+      o.message,
+      o.details ? `details: ${o.details}` : null,
+      o.hint ? `hint: ${o.hint}` : null,
+      o.code ? `code: ${o.code}` : null,
+      o.statusCode ? `status: ${o.statusCode}` : null,
+    ].filter(Boolean);
+    if (parts.length) return parts.join(" — ");
+    try {
+      return JSON.stringify(e);
+    } catch {
+      return "unserializable error";
+    }
+  }
+  return String(e);
+}
+
 async function ensureAdmin(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
