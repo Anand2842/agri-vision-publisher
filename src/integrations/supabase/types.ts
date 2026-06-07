@@ -93,6 +93,51 @@ export type Database = {
           },
         ]
       }
+      backup_runs: {
+        Row: {
+          auth_users_synced: number
+          created_at: string
+          details: Json
+          error: string | null
+          files_synced: number
+          finished_at: string | null
+          id: string
+          rows_synced: number
+          started_at: string
+          status: string
+          tables_synced: number
+          trigger: string
+        }
+        Insert: {
+          auth_users_synced?: number
+          created_at?: string
+          details?: Json
+          error?: string | null
+          files_synced?: number
+          finished_at?: string | null
+          id?: string
+          rows_synced?: number
+          started_at?: string
+          status?: string
+          tables_synced?: number
+          trigger?: string
+        }
+        Update: {
+          auth_users_synced?: number
+          created_at?: string
+          details?: Json
+          error?: string | null
+          files_synced?: number
+          finished_at?: string | null
+          id?: string
+          rows_synced?: number
+          started_at?: string
+          status?: string
+          tables_synced?: number
+          trigger?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
