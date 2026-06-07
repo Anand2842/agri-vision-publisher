@@ -1,16 +1,26 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+type RowData = Record<string, unknown>;
+type MirrorTable = {
+  name: string;
+  conflict: string;
+  naturalKeys?: string[][];
+};
+
 // Tables to mirror, in dependency-safe order (parents before children).
-// Conflict keys for upsert are the primary keys of each table.
-const TABLES: Array<{ name: string; conflict: string }> = [
-  { name: "categories", conflict: "id" },
-  { name: "issues", conflict: "id" },
+// Upserts use the primary key, but several tables also have natural unique
+// keys seeded by the bootstrap SQL. If a backup project already has seeded rows
+// with generated IDs, remove those conflicting rows first so the primary IDs
+// from production can be mirrored and foreign keys continue to line up.
+const TABLES: MirrorTable[] = [
+  { name: "categories", conflict: "id", naturalKeys: [["slug"]] },
+  { name: "issues", conflict: "id", naturalKeys: [["volume", "issue_number"]] },
   { name: "profiles", conflict: "id" },
-  { name: "user_roles", conflict: "id" },
-  { name: "site_content", conflict: "id" },
-  { name: "membership_payments", conflict: "id" },
-  { name: "articles", conflict: "id" },
+  { name: "user_roles", conflict: "id", naturalKeys: [["user_id", "role"]] },
+  { name: "site_content", conflict: "id", naturalKeys: [["page", "section", "key"]] },
+  { name: "membership_payments", conflict: "id", naturalKeys: [["member_id"]] },
+  { name: "articles", conflict: "id", naturalKeys: [["slug"]] },
   { name: "submissions", conflict: "id" },
   { name: "submission_events", conflict: "id" },
   { name: "contact_messages", conflict: "id" },
@@ -46,6 +56,32 @@ function fmtErr(e: unknown): string {
   return String(e);
 }
 
+async function clearNaturalKeyConflicts(
+  // Dynamic Supabase table builder; generated types cannot model runtime table names.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  backupFrom: any,
+  rows: RowData[],
+  primaryKey: string,
+  naturalKeys: string[][] | undefined,
+) {
+  if (!naturalKeys?.length) return;
+
+  for (const row of rows) {
+    const primaryValue = row[primaryKey];
+    if (primaryValue === null || primaryValue === undefined) continue;
+
+    for (const keys of naturalKeys) {
+      const match = Object.fromEntries(keys.map((key) => [key, row[key]]));
+      if (Object.values(match).some((value) => value === null || value === undefined)) {
+        continue;
+      }
+
+      const { error } = await backupFrom.delete().match(match).neq(primaryKey, primaryValue);
+      if (error) throw error;
+    }
+  }
+}
+
 async function ensureAdmin(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
@@ -64,9 +100,7 @@ export const testBackupConnection = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     await ensureAdmin(context.userId);
     try {
-      const { backupAdmin } = await import(
-        "@/integrations/supabase/backup-client.server"
-      );
+      const { backupAdmin } = await import("@/integrations/supabase/backup-client.server");
       // Try a harmless metadata call - list storage buckets
       const { data, error } = await backupAdmin.storage.listBuckets();
       if (error) throw error;
@@ -107,9 +141,7 @@ export const runBackupMirror = createServerFn({ method: "POST" })
   });
 
 // Shared core called by both the manual server fn and the cron webhook.
-export async function performBackupMirror(
-  trigger: "manual" | "cron",
-): Promise<{
+export async function performBackupMirror(trigger: "manual" | "cron"): Promise<{
   runId: string;
   status: "success" | "partial" | "failed";
   tablesSynced: number;
@@ -140,22 +172,21 @@ export async function performBackupMirror(
   const tableDetails: Record<string, number | string> = {};
 
   // 1. Mirror tables
-  for (const { name, conflict } of TABLES) {
+  for (const table of TABLES) {
+    const { name, conflict } = table;
     try {
       let from = 0;
       let tableRows = 0;
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         // Dynamic table name: bypass generated Database literal-union typing.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const primaryFrom = (supabaseAdmin as any).from(name);
-        const { data, error } = await primaryFrom
-          .select("*")
-          .range(from, from + PAGE_SIZE - 1);
+        const { data, error } = await primaryFrom.select("*").range(from, from + PAGE_SIZE - 1);
         if (error) throw error;
         if (!data || data.length === 0) break;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const backupFrom = (backupAdmin as any).from(name);
+        await clearNaturalKeyConflicts(backupFrom, data as RowData[], conflict, table.naturalKeys);
         const { error: upErr } = await backupFrom.upsert(data, {
           onConflict: conflict,
         });
@@ -223,9 +254,7 @@ export async function performBackupMirror(
           }
           authUsersSynced += 1;
         } catch (e) {
-          errors.push(
-            `auth user ${u.id}: ${fmtErr(e)}`,
-          );
+          errors.push(`auth user ${u.id}: ${fmtErr(e)}`);
         }
       }
       if (users.length < 200) break;
@@ -236,11 +265,7 @@ export async function performBackupMirror(
   }
 
   const status: "success" | "partial" | "failed" =
-    errors.length === 0
-      ? "success"
-      : tablesSynced > 0 || filesSynced > 0
-        ? "partial"
-        : "failed";
+    errors.length === 0 ? "success" : tablesSynced > 0 || filesSynced > 0 ? "partial" : "failed";
 
   await supabaseAdmin
     .from("backup_runs")
@@ -292,11 +317,8 @@ async function walkAndCopy(
   onFiles: (n: number) => void,
 ) {
   let offset = 0;
-  // eslint-disable-next-line no-constant-condition
   while (true) {
-    const { data, error } = await primary.storage
-      .from(bucket)
-      .list(prefix, { limit: 100, offset });
+    const { data, error } = await primary.storage.from(bucket).list(prefix, { limit: 100, offset });
     if (error) throw error;
     if (!data || data.length === 0) break;
     for (const item of data) {
@@ -308,15 +330,12 @@ async function walkAndCopy(
         continue;
       }
       // Download from primary
-      const { data: blob, error: dlErr } = await primary.storage
-        .from(bucket)
-        .download(itemPath);
+      const { data: blob, error: dlErr } = await primary.storage.from(bucket).download(itemPath);
       if (dlErr) throw dlErr;
       // Upload to backup (upsert)
       const arrBuf = await blob.arrayBuffer();
       const contentType =
-        (item.metadata as { mimetype?: string } | null)?.mimetype ??
-        "application/octet-stream";
+        (item.metadata as { mimetype?: string } | null)?.mimetype ?? "application/octet-stream";
       const { error: upErr } = await backup.storage
         .from(bucket)
         .upload(itemPath, new Uint8Array(arrBuf), {
@@ -337,8 +356,6 @@ async function loadPrimary() {
   return supabaseAdmin;
 }
 async function loadBackup() {
-  const { backupAdmin } = await import(
-    "@/integrations/supabase/backup-client.server"
-  );
+  const { backupAdmin } = await import("@/integrations/supabase/backup-client.server");
   return backupAdmin;
 }
