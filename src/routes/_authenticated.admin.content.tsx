@@ -38,6 +38,7 @@ function AdminContentPage() {
           <TabsTrigger value="advertise">Advertise</TabsTrigger>
           <TabsTrigger value="publication_ethics">Publication Ethics</TabsTrigger>
           <TabsTrigger value="certificate">Certificates</TabsTrigger>
+          <TabsTrigger value="faq">FAQ</TabsTrigger>
           <TabsTrigger value="seo">SEO Meta</TabsTrigger>
         </TabsList>
 
