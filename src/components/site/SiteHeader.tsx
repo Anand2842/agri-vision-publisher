@@ -1,5 +1,24 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, Menu, X, Phone, Mail, ChevronDown } from "lucide-react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  Search,
+  Menu,
+  X,
+  Phone,
+  Mail,
+  ChevronDown,
+  Home,
+  Info,
+  Users,
+  BookOpen,
+  Archive,
+  FileText,
+  Send,
+  Award,
+  Rocket,
+  Megaphone,
+  MessageCircle,
+  Sparkles,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useGlobalSiteContent } from "@/hooks/useSiteContent";
@@ -19,52 +38,84 @@ const NavItemSchema = z.object({
 
 const NavSchema = z.array(NavItemSchema);
 
-const defaultNav: { to: string; label: string; children?: { to: string; label: string }[] }[] = [
-  { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
-  { to: "/editorial-board", label: "Editorial" },
-  { to: "/current-issue", label: "Current Issue" },
-  { to: "/archives", label: "Archives" },
+type NavLeaf = { to: string; label: string; description?: string };
+type NavItem = { to: string; label: string; description?: string; children?: NavLeaf[] };
+
+const defaultNav: NavItem[] = [
+  { to: "/", label: "Home", description: "Latest from the magazine" },
+  { to: "/about", label: "About", description: "Our mission & story" },
+  { to: "/editorial-board", label: "Editorial", description: "Meet the board" },
+  { to: "/current-issue", label: "Current Issue", description: "This month's edition" },
+  { to: "/archives", label: "Archives", description: "Browse every back issue" },
   {
     to: "/submission-guidelines",
     label: "Submission",
     children: [
-      { to: "/submission-guidelines", label: "Author Guidelines" },
-      { to: "/submit", label: "Submit Article" },
+      { to: "/submission-guidelines", label: "Author Guidelines", description: "Format, scope & review process" },
+      { to: "/submit", label: "Submit Article", description: "Start a new manuscript" },
     ],
   },
-  { to: "/membership", label: "Membership" },
+  { to: "/membership", label: "Membership", description: "Join the community" },
   {
     to: "/startup-spotlight",
-    label: "Additional Resources",
+    label: "Resources",
     children: [
-      { to: "/startup-spotlight", label: "Startup Spotlight" },
-      { to: "/advertise", label: "Advertise" },
-      { to: "/contact", label: "Contact" },
+      { to: "/startup-spotlight", label: "Startup Spotlight", description: "Agri-ventures to watch" },
+      { to: "/advertise", label: "Advertise", description: "Reach our readership" },
+      { to: "/contact", label: "Contact", description: "Get in touch" },
     ],
   },
 ];
+
+const iconFor = (label: string) => {
+  const key = label.toLowerCase();
+  if (key.includes("home")) return Home;
+  if (key.includes("about")) return Info;
+  if (key.includes("editor")) return Users;
+  if (key.includes("current")) return BookOpen;
+  if (key.includes("archive")) return Archive;
+  if (key.includes("guideline")) return FileText;
+  if (key.includes("submit")) return Send;
+  if (key.includes("submission")) return FileText;
+  if (key.includes("member")) return Award;
+  if (key.includes("startup") || key.includes("spotlight")) return Rocket;
+  if (key.includes("advertise")) return Megaphone;
+  if (key.includes("contact")) return MessageCircle;
+  if (key.includes("resource")) return Sparkles;
+  return Sparkles;
+};
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [editorRole, setEditorRole] = useState<"admin" | "moderator" | "author" | null>(null);
   const [q, setQ] = useState("");
+  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const navigate = useNavigate();
   const { getHeader, getHeaderJson } = useGlobalSiteContent();
-  
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
   const rawNav = getHeaderJson("navigation", "items");
   const navResult = rawNav ? NavSchema.safeParse(rawNav) : null;
-  const cmsNav = navResult?.success ? navResult.data.map((item: any) => ({
-    to: item.href || item.to || "/",
-    label: item.label,
-    children: (item.children as any[])?.map((child: any) => ({
-      to: child.href || child.to || "/",
-      label: child.label
-    }))
-  })) : null;
+  const cmsNav: NavItem[] | null = navResult?.success
+    ? navResult.data.map((item) => ({
+        to: item.href || item.to || "/",
+        label: item.label,
+        children: item.children?.map((child) => ({
+          to: child.href || child.to || "/",
+          label: child.label,
+        })),
+      }))
+    : null;
 
-  const currentNav = cmsNav ?? defaultNav;
+  const currentNav: NavItem[] = cmsNav ?? defaultNav;
+
+  const isActive = (to: string) => {
+    if (to === "/") return pathname === "/";
+    return pathname === to || pathname.startsWith(to + "/");
+  };
+  const isGroupActive = (n: NavItem) =>
+    isActive(n.to) || (n.children?.some((c) => isActive(c.to)) ?? false);
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,30 +268,82 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* Dark navigation bar */}
-      <nav className="bg-navy hidden lg:block">
-        <div className="container-editorial flex flex-wrap items-stretch">
-          {(currentNav as any[]).map((n: any) => (
-            <div key={n.label} className="relative group">
-              <Link to={n.to} className="nav-link flex items-center gap-1">
-                {n.label}
-                {n.children && <ChevronDown className="h-3 w-3" />}
-              </Link>
-              {n.children && (
-                <div className="absolute left-0 top-full hidden group-hover:block bg-navy border-t border-white/10 min-w-[180px] z-50 shadow-xl">
-                  {(n.children as any[]).map((c: any) => (
-                    <Link
-                      key={c.label}
-                      to={c.to}
-                      className="block px-4.5 py-2.5 text-xs uppercase tracking-wider font-condensed text-white/85 hover:text-orange hover:bg-white/5"
-                    >
-                      {c.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+      {/* Desktop primary navigation */}
+      <nav className="bg-navy hidden lg:block border-t border-white/5 shadow-[inset_0_-1px_0_rgba(255,255,255,0.06)]">
+        <div className="container-editorial flex items-stretch justify-between gap-1">
+          <ul className="flex items-stretch flex-wrap">
+            {currentNav.map((n) => {
+              const Icon = iconFor(n.label);
+              const active = isGroupActive(n);
+              const hasChildren = !!n.children?.length;
+              return (
+                <li key={n.label} className="relative group">
+                  <Link
+                    to={n.to}
+                    className={`relative flex items-center gap-1.5 px-4 py-4 font-condensed uppercase tracking-[0.08em] text-[13px] font-medium transition-colors duration-200 ${
+                      active
+                        ? "text-orange"
+                        : "text-white/90 hover:text-orange"
+                    }`}
+                  >
+                    <Icon className="h-3.5 w-3.5 opacity-80 group-hover:opacity-100" />
+                    <span>{n.label}</span>
+                    {hasChildren && (
+                      <ChevronDown className="h-3 w-3 opacity-70 transition-transform duration-200 group-hover:rotate-180" />
+                    )}
+                    {/* Animated underline */}
+                    <span
+                      className={`pointer-events-none absolute left-3 right-3 bottom-0 h-[2px] bg-orange origin-left transition-transform duration-300 ${
+                        active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                      }`}
+                    />
+                  </Link>
+                  {hasChildren && (
+                    <div className="invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 absolute left-0 top-full z-50 min-w-[320px] bg-background text-foreground border border-rule shadow-2xl">
+                      <div className="h-1 bg-orange" />
+                      <ul className="py-2">
+                        {n.children!.map((c) => {
+                          const CIcon = iconFor(c.label);
+                          const cActive = isActive(c.to);
+                          return (
+                            <li key={c.label}>
+                              <Link
+                                to={c.to}
+                                className={`flex items-start gap-3 px-4 py-3 hover:bg-secondary/60 transition-colors ${
+                                  cActive ? "bg-secondary/50" : ""
+                                }`}
+                              >
+                                <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-orange/10 text-orange">
+                                  <CIcon className="h-4 w-4" />
+                                </span>
+                                <span className="flex flex-col">
+                                  <span className="font-condensed uppercase tracking-wider text-[12px] font-semibold text-navy">
+                                    {c.label}
+                                  </span>
+                                  {c.description && (
+                                    <span className="text-[12px] text-muted-foreground leading-snug mt-0.5">
+                                      {c.description}
+                                    </span>
+                                  )}
+                                </span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <Link
+            to="/submit"
+            className="hidden xl:inline-flex items-center gap-1.5 px-4 py-4 font-condensed uppercase tracking-[0.08em] text-[12px] font-semibold text-navy bg-orange hover:brightness-110 transition"
+          >
+            <Send className="h-3.5 w-3.5" />
+            Submit Article
+          </Link>
         </div>
       </nav>
 
@@ -266,33 +369,80 @@ export function SiteHeader() {
               <Search className="h-[18px] w-[18px]" />
             </button>
           </form>
-          <div className="container-editorial py-3 flex flex-col space-y-1">
-            {(currentNav as any[]).map((n: any) => (
-              <div key={n.label} className="flex flex-col">
-                <Link
-                  to={n.to}
-                  onClick={() => !n.children && setOpen(false)}
-                  className="text-sm font-condensed uppercase tracking-wider py-2.5 border-b border-rule/60 text-navy hover:text-orange flex items-center justify-between"
-                >
-                  <span>{n.label}</span>
-                  {n.children && <ChevronDown className="h-3 w-3 opacity-60" />}
-                </Link>
-                {n.children && (
-                  <div className="pl-4 bg-muted/40 border-l border-primary/20 flex flex-col py-1.5 space-y-2">
-                    {(n.children as any[]).map((c: any) => (
-                      <Link
-                        key={c.label}
-                        to={c.to}
-                        onClick={() => setOpen(false)}
-                        className="text-xs uppercase tracking-wider py-1.5 text-foreground/75 hover:text-orange"
-                      >
-                        {c.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className="container-editorial py-3 flex flex-col">
+            {currentNav.map((n) => {
+              const Icon = iconFor(n.label);
+              const hasChildren = !!n.children?.length;
+              const groupOpen = openMobileGroup === n.label;
+              const active = isGroupActive(n);
+              return (
+                <div key={n.label} className="flex flex-col border-b border-rule/60">
+                  {hasChildren ? (
+                    <button
+                      onClick={() => setOpenMobileGroup(groupOpen ? null : n.label)}
+                      className={`flex items-center justify-between gap-2 py-3 text-left font-condensed uppercase tracking-wider text-sm ${
+                        active ? "text-orange" : "text-navy"
+                      }`}
+                      aria-expanded={groupOpen}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Icon className="h-4 w-4 opacity-70" />
+                        {n.label}
+                      </span>
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform duration-200 ${groupOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                  ) : (
+                    <Link
+                      to={n.to}
+                      onClick={() => setOpen(false)}
+                      className={`flex items-center gap-2.5 py-3 font-condensed uppercase tracking-wider text-sm hover:text-orange ${
+                        active ? "text-orange" : "text-navy"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4 opacity-70" />
+                      {n.label}
+                    </Link>
+                  )}
+                  {hasChildren && groupOpen && (
+                    <div className="pl-7 pb-2 flex flex-col">
+                      {n.children!.map((c) => {
+                        const CIcon = iconFor(c.label);
+                        return (
+                          <Link
+                            key={c.label}
+                            to={c.to}
+                            onClick={() => setOpen(false)}
+                            className="flex items-start gap-2.5 py-2 text-foreground/80 hover:text-orange"
+                          >
+                            <CIcon className="h-3.5 w-3.5 mt-1 text-orange/80" />
+                            <span className="flex flex-col">
+                              <span className="text-xs uppercase tracking-wider font-condensed font-semibold">
+                                {c.label}
+                              </span>
+                              {c.description && (
+                                <span className="text-[11px] text-muted-foreground leading-snug">
+                                  {c.description}
+                                </span>
+                              )}
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            <Link
+              to="/submit"
+              onClick={() => setOpen(false)}
+              className="mt-4 inline-flex items-center justify-center gap-2 bg-orange text-white py-3 font-condensed uppercase tracking-wider text-sm hover:brightness-110"
+            >
+              <Send className="h-4 w-4" />
+              Submit Article
+            </Link>
           </div>
         </div>
       )}
