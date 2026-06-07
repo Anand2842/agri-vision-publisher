@@ -259,9 +259,7 @@ export async function performBackupMirror(trigger: "manual" | "cron"): Promise<{
           }
           authUsersSynced += 1;
         } catch (e) {
-          errors.push(
-            `auth user ${u.id}: ${fmtErr(e)}`,
-          );
+          errors.push(`auth user ${u.id}: ${fmtErr(e)}`);
         }
       }
       if (users.length < 200) break;
@@ -272,11 +270,7 @@ export async function performBackupMirror(trigger: "manual" | "cron"): Promise<{
   }
 
   const status: "success" | "partial" | "failed" =
-    errors.length === 0
-      ? "success"
-      : tablesSynced > 0 || filesSynced > 0
-        ? "partial"
-        : "failed";
+    errors.length === 0 ? "success" : tablesSynced > 0 || filesSynced > 0 ? "partial" : "failed";
 
   await supabaseAdmin
     .from("backup_runs")
@@ -328,11 +322,8 @@ async function walkAndCopy(
   onFiles: (n: number) => void,
 ) {
   let offset = 0;
-  // eslint-disable-next-line no-constant-condition
   while (true) {
-    const { data, error } = await primary.storage
-      .from(bucket)
-      .list(prefix, { limit: 100, offset });
+    const { data, error } = await primary.storage.from(bucket).list(prefix, { limit: 100, offset });
     if (error) throw error;
     if (!data || data.length === 0) break;
     for (const item of data) {
@@ -344,21 +335,17 @@ async function walkAndCopy(
         continue;
       }
       // Download from primary
-      const { data: blob, error: dlErr } = await primary.storage
-        .from(bucket)
-        .download(itemPath);
+      const { data: blob, error: dlErr } = await primary.storage.from(bucket).download(itemPath);
       if (dlErr) throw dlErr;
       // Upload to backup (upsert)
       const arrBuf = await blob.arrayBuffer();
       const contentType =
         (item.metadata as { mimetype?: string } | null)?.mimetype ??
         "application/octet-stream";
-      const { error: upErr } = await backup.storage
-        .from(bucket)
-        .upload(itemPath, new Uint8Array(arrBuf), {
-          upsert: true,
-          contentType,
-        });
+      const { error: upErr } = await backup.storage.from(bucket).upload(itemPath, new Uint8Array(arrBuf), {
+        upsert: true,
+        contentType,
+      });
       if (upErr) throw upErr;
       onFiles(1);
     }
@@ -373,8 +360,6 @@ async function loadPrimary() {
   return supabaseAdmin;
 }
 async function loadBackup() {
-  const { backupAdmin } = await import(
-    "@/integrations/supabase/backup-client.server"
-  );
+  const { backupAdmin } = await import("@/integrations/supabase/backup-client.server");
   return backupAdmin;
 }
