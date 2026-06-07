@@ -117,6 +117,11 @@ export type SiteContentKeys = {
   certificate: {
     branding: "magazine_name" | "publisher" | "chief_editor" | "chief_editor_title" | "chief_editor_signature" | "publisher_title" | "publisher_institution" | "publisher_signature" | "seal_text" | "seal_text_membership";
   };
+  faq: {
+    hero: "eyebrow" | "title" | "intro";
+    main: "items";
+    cta: "heading" | "body";
+  };
 };
 
 export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string, string>>> = {
