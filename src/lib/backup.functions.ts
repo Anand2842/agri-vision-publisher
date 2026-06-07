@@ -194,9 +194,9 @@ export async function performBackupMirror(trigger: "manual" | "cron"): Promise<{
         if (error) throw error;
         if (!data || data.length === 0) break;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const backupFrom = (backupAdmin as any).from(name);
-        await clearNaturalKeyConflicts(backupFrom, data as RowData[], conflict, table.naturalKeys);
-        const { error: upErr } = await backupFrom.upsert(data, {
+        const backupTable = () => (backupAdmin as any).from(name);
+        await clearNaturalKeyConflicts(backupTable, data as RowData[], table.naturalKeys);
+        const { error: upErr } = await backupTable().upsert(data, {
           onConflict: conflict,
         });
         if (upErr) throw upErr;
