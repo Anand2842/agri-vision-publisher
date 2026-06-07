@@ -79,7 +79,7 @@ export const testBackupConnection = createServerFn({ method: "POST" })
       return {
         ok: false,
         buckets: [],
-        message: e instanceof Error ? e.message : "Unknown error",
+        message: fmtErr(e),
       };
     }
   });
@@ -168,7 +168,7 @@ export async function performBackupMirror(
       rowsSynced += tableRows;
       tablesSynced += 1;
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
+      const msg = fmtErr(e);
       tableDetails[name] = `error: ${msg}`;
       errors.push(`table ${name}: ${msg}`);
     }
@@ -184,7 +184,7 @@ export async function performBackupMirror(
       tableDetails[`bucket:${bucket}`] = bucketFiles;
       filesSynced += bucketFiles;
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
+      const msg = fmtErr(e);
       tableDetails[`bucket:${bucket}`] = `error: ${msg}`;
       errors.push(`bucket ${bucket}: ${msg}`);
     }
@@ -224,7 +224,7 @@ export async function performBackupMirror(
           authUsersSynced += 1;
         } catch (e) {
           errors.push(
-            `auth user ${u.id}: ${e instanceof Error ? e.message : String(e)}`,
+            `auth user ${u.id}: ${fmtErr(e)}`,
           );
         }
       }
@@ -232,7 +232,7 @@ export async function performBackupMirror(
       page += 1;
     }
   } catch (e) {
-    errors.push(`auth listUsers: ${e instanceof Error ? e.message : String(e)}`);
+    errors.push(`auth listUsers: ${fmtErr(e)}`);
   }
 
   const status: "success" | "partial" | "failed" =
