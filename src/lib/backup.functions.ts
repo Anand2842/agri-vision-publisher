@@ -76,10 +76,7 @@ async function clearNaturalKeyConflicts(
         continue;
       }
 
-      const { error } = await backupFrom
-        .delete()
-        .match(match)
-        .neq(primaryKey, primaryValue);
+      const { error } = await backupFrom.delete().match(match).neq(primaryKey, primaryValue);
       if (error) throw error;
     }
   }
@@ -103,9 +100,7 @@ export const testBackupConnection = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     await ensureAdmin(context.userId);
     try {
-      const { backupAdmin } = await import(
-        "@/integrations/supabase/backup-client.server"
-      );
+      const { backupAdmin } = await import("@/integrations/supabase/backup-client.server");
       // Try a harmless metadata call - list storage buckets
       const { data, error } = await backupAdmin.storage.listBuckets();
       if (error) throw error;
@@ -146,9 +141,7 @@ export const runBackupMirror = createServerFn({ method: "POST" })
   });
 
 // Shared core called by both the manual server fn and the cron webhook.
-export async function performBackupMirror(
-  trigger: "manual" | "cron",
-): Promise<{
+export async function performBackupMirror(trigger: "manual" | "cron"): Promise<{
   runId: string;
   status: "success" | "partial" | "failed";
   tablesSynced: number;
@@ -184,19 +177,21 @@ export async function performBackupMirror(
     try {
       let from = 0;
       let tableRows = 0;
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         // Dynamic table name: bypass generated Database literal-union typing.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const primaryFrom = (supabaseAdmin as any).from(name);
-        const { data, error } = await primaryFrom
-          .select("*")
-          .range(from, from + PAGE_SIZE - 1);
+        const { data, error } = await primaryFrom.select("*").range(from, from + PAGE_SIZE - 1);
         if (error) throw error;
         if (!data || data.length === 0) break;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const backupFrom = (backupAdmin as any).from(name);
-        await clearNaturalKeyConflicts(backupFrom, data as RowData[], conflict, table.naturalKeys);
+        await clearNaturalKeyConflicts(
+          backupFrom,
+          data as RowData[],
+          conflict,
+          table.naturalKeys,
+        );
         const { error: upErr } = await backupFrom.upsert(data, {
           onConflict: conflict,
         });
