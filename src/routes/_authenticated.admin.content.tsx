@@ -651,4 +651,36 @@ function AdvertiseCms() {
   );
 }
 
+function FaqCms() {
+  const { get, loading } = useSiteContent("faq");
+  if (loading) return <Loader2 className="animate-spin" />;
+  return (
+    <div className="space-y-6">
+      <CmsSection title="Page Header">
+        <TextFieldEditor page="faq" section="hero" contentKey="eyebrow" label="Eyebrow" initialValue={get("hero", "eyebrow")} />
+        <TextFieldEditor page="faq" section="hero" contentKey="title" label="Page Title (H1)" initialValue={get("hero", "title")} />
+        <TextareaEditor page="faq" section="hero" contentKey="intro" label="Intro Paragraph" initialValue={get("hero", "intro")} />
+      </CmsSection>
+      <CmsSection title="Questions & Answers (shown on /faq and published as Google FAQ schema)">
+        <JsonObjectArrayEditor
+          page="faq"
+          section="main"
+          contentKey="items"
+          label="FAQ Items"
+          initialValue={get("main", "items")}
+          fields={[
+            { key: "q", label: "Question", type: "text" },
+            { key: "a", label: "Answer", type: "textarea" },
+          ]}
+        />
+      </CmsSection>
+      <CmsSection title="Bottom CTA">
+        <TextFieldEditor page="faq" section="cta" contentKey="heading" label="Heading" initialValue={get("cta", "heading")} />
+        <TextareaEditor page="faq" section="cta" contentKey="body" label="Body (a link to /contact is appended automatically)" initialValue={get("cta", "body")} />
+      </CmsSection>
+    </div>
+  );
+}
+
+
 
