@@ -334,9 +334,7 @@ async function walkAndCopy(
       if (dlErr) throw dlErr;
       // Upload to backup (upsert)
       const arrBuf = await blob.arrayBuffer();
-      const contentType =
-        (item.metadata as { mimetype?: string } | null)?.mimetype ??
-        "application/octet-stream";
+      const contentType = (item.metadata as { mimetype?: string } | null)?.mimetype ?? "application/octet-stream";
       const { error: upErr } = await backup.storage
         .from(bucket)
         .upload(itemPath, new Uint8Array(arrBuf), {
