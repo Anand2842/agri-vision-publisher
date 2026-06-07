@@ -444,6 +444,19 @@ function Dashboard() {
             </div>
           </section>
         )}
+
+        {/* Help / FAQ */}
+        <section className="mt-16 border-t border-rule pt-8">
+          <div className="eyebrow">Need help?</div>
+          <p className="text-sm text-muted-foreground mt-3 max-w-2xl">
+            Read answers to the most common questions about submissions, peer review, fees,
+            membership, and certificates on our{" "}
+            <Link to="/faq" className="text-primary underline-offset-2 hover:underline">
+              FAQ page
+            </Link>
+            .
+          </p>
+        </section>
       </main>
       <SiteFooter />
     </>
