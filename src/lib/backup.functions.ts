@@ -56,6 +56,35 @@ function fmtErr(e: unknown): string {
   return String(e);
 }
 
+async function clearNaturalKeyConflicts(
+  // Dynamic Supabase table builder; generated types cannot model runtime table names.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  backupFrom: any,
+  rows: RowData[],
+  primaryKey: string,
+  naturalKeys: string[][] | undefined,
+) {
+  if (!naturalKeys?.length) return;
+
+  for (const row of rows) {
+    const primaryValue = row[primaryKey];
+    if (primaryValue === null || primaryValue === undefined) continue;
+
+    for (const keys of naturalKeys) {
+      const match = Object.fromEntries(keys.map((key) => [key, row[key]]));
+      if (Object.values(match).some((value) => value === null || value === undefined)) {
+        continue;
+      }
+
+      const { error } = await backupFrom
+        .delete()
+        .match(match)
+        .neq(primaryKey, primaryValue);
+      if (error) throw error;
+    }
+  }
+}
+
 async function ensureAdmin(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
