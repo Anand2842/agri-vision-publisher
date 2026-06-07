@@ -150,7 +150,8 @@ export async function performBackupMirror(
   const tableDetails: Record<string, number | string> = {};
 
   // 1. Mirror tables
-  for (const { name, conflict } of TABLES) {
+  for (const table of TABLES) {
+    const { name, conflict } = table;
     try {
       let from = 0;
       let tableRows = 0;
@@ -166,6 +167,7 @@ export async function performBackupMirror(
         if (!data || data.length === 0) break;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const backupFrom = (backupAdmin as any).from(name);
+        await clearNaturalKeyConflicts(backupFrom, data as RowData[], conflict, table.naturalKeys);
         const { error: upErr } = await backupFrom.upsert(data, {
           onConflict: conflict,
         });
