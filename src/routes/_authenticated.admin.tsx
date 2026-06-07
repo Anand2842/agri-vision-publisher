@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tansta
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutGrid, BookOpen, FileText, FolderTree, Inbox, ListChecks, Users, LayoutTemplate, ShieldCheck, Mail } from "lucide-react";
+import { LayoutGrid, BookOpen, FileText, FolderTree, Inbox, ListChecks, Users, LayoutTemplate, ShieldCheck, Mail, DatabaseBackup } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ location }) => {
@@ -97,6 +97,7 @@ const items: {
   { to: "/admin/categories", label: "Categories", icon: FolderTree, roles: ["admin"] },
   { to: "/admin/content", label: "Site Content", icon: LayoutTemplate, roles: ["admin"] },
   { to: "/admin/messages", label: "Messages", icon: Mail, roles: ["admin"] },
+  { to: "/admin/backups", label: "Backups", icon: DatabaseBackup, roles: ["admin"] },
 ];
 
 function AdminLayout() {
