@@ -15,6 +15,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as PublicationEthicsRouteImport } from './routes/publication-ethics'
 import { Route as ModerateRouteImport } from './routes/moderate'
 import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EditorialBoardRouteImport } from './routes/editorial-board'
 import { Route as CurrentIssueRouteImport } from './routes/current-issue'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -72,6 +73,11 @@ const ModerateRoute = ModerateRouteImport.update({
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EditorialBoardRoute = EditorialBoardRouteImport.update({
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
+  '/faq': typeof FaqRoute
   '/membership': typeof MembershipRouteWithChildren
   '/moderate': typeof ModerateRoute
   '/publication-ethics': typeof PublicationEthicsRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
+  '/faq': typeof FaqRoute
   '/membership': typeof MembershipRouteWithChildren
   '/moderate': typeof ModerateRoute
   '/publication-ethics': typeof PublicationEthicsRoute
@@ -305,6 +313,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
+  '/faq': typeof FaqRoute
   '/membership': typeof MembershipRouteWithChildren
   '/moderate': typeof ModerateRoute
   '/publication-ethics': typeof PublicationEthicsRoute
@@ -342,6 +351,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/current-issue'
     | '/editorial-board'
+    | '/faq'
     | '/membership'
     | '/moderate'
     | '/publication-ethics'
@@ -377,6 +387,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/current-issue'
     | '/editorial-board'
+    | '/faq'
     | '/membership'
     | '/moderate'
     | '/publication-ethics'
@@ -412,6 +423,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/current-issue'
     | '/editorial-board'
+    | '/faq'
     | '/membership'
     | '/moderate'
     | '/publication-ethics'
@@ -449,6 +461,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CurrentIssueRoute: typeof CurrentIssueRoute
   EditorialBoardRoute: typeof EditorialBoardRoute
+  FaqRoute: typeof FaqRoute
   MembershipRoute: typeof MembershipRouteWithChildren
   ModerateRoute: typeof ModerateRoute
   PublicationEthicsRoute: typeof PublicationEthicsRoute
@@ -503,6 +516,13 @@ declare module '@tanstack/react-router' {
       path: '/membership'
       fullPath: '/membership'
       preLoaderRoute: typeof MembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/editorial-board': {
@@ -773,6 +793,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CurrentIssueRoute: CurrentIssueRoute,
   EditorialBoardRoute: EditorialBoardRoute,
+  FaqRoute: FaqRoute,
   MembershipRoute: MembershipRouteWithChildren,
   ModerateRoute: ModerateRoute,
   PublicationEthicsRoute: PublicationEthicsRoute,
@@ -787,3 +808,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
