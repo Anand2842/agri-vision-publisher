@@ -1,0 +1,2 @@
+DROP POLICY "Users create own payments" ON public.membership_payments;
+CREATE POLICY "Users create own payments" ON public.membership_payments FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id AND status = 'pending');
