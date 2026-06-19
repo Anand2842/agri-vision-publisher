@@ -1,41 +1,28 @@
 ## Root cause
 
-The latest backup runs show the same failures the user reported:
+Google can't fetch `/sitemap.xml` — it returns **404**. The file is `src/routes/sitemap.xml.ts` with `createFileRoute("/sitemap/xml")`, so in TanStack Router the dots in the filename become slashes and the route actually serves at `/sitemap/xml` (also 404 because the generated route ID doesn't match either). To serve a literal `/sitemap.xml`, the dot must be escaped with `[.]` in the filename.
 
-- `categories` fails because the backup project already has a seeded row with the same `slug` (`agronomy`) but a different `id`.
-- `site_content` fails for the same reason on its natural unique key: `(page, section, key)`.
-- `articles` and `submissions` then fail because their `category_id` values point to the production category IDs, but those category rows were not inserted into the backup project.
+`robots.txt` advertises `https://agriculturemagazine.in/sitemap.xml`, so every sitemap Google tried (`/sitemap.xml.ts`, `/sitemap`, `/sitemap.xml`) 404s. That alone blocks crawl/indexing of article pages.
 
-The intended cleanup was added, but it deletes conflicting rows using the primary-key column named in `conflict`. That only works when the mirror conflict target is a real column named `id`. It is not robust enough for tables where the backup schema’s uniqueness is enforced by natural keys, and it does not guarantee the mirror uses the backup table’s actual unique constraints.
+## Fixes
 
-## Implementation plan
+1. **Make the sitemap resolve at `/sitemap.xml`**
+   - Rename `src/routes/sitemap.xml.ts` → `src/routes/sitemap[.]xml.ts`
+   - Update the route to `createFileRoute("/sitemap.xml")`
+   - Keep the existing loader logic (static routes + published articles from DB)
+   - Verify with `curl -I https://agriculturemagazine.in/sitemap.xml` → expect `200` + `Content-Type: application/xml`
 
-1. Update the mirror table configuration in `src/lib/backup.functions.ts`
-   - Separate the primary key used for preserving production IDs from the unique conflict target used by the backup database.
-   - Use natural unique keys directly for tables that have them:
-     - `categories`: `slug`
-     - `issues`: `volume,issue_number`
-     - `user_roles`: `user_id,role`
-     - `site_content`: `page,section,key`
-     - `membership_payments`: `member_id`
-     - `articles`: `slug`
-   - Keep `id` for tables that do not have a better natural key.
+2. **Resubmit in Google Search Console**
+   - Remove the three broken entries (`/sitemap.xml.ts`, `/sitemap`, `/sitemap.xml`)
+   - Submit only `https://agriculturemagazine.in/sitemap.xml`
 
-2. Make conflict cleanup deterministic
-   - Before upserting each batch, delete backup rows that match any configured natural key but have a different production `id`.
-   - This removes bootstrap/seed rows that would otherwise block preserving production IDs.
-   - Keep parent tables first (`categories` before `articles`/`submissions`) so foreign keys resolve.
+3. **Ranking / indexability improvements** (addressing "not ranking good")
+   - Add `<lastmod>` to all static entries in the sitemap (currently only article URLs have it) — helps Google prioritize recrawls
+   - Confirm canonical + `og:url` on article pages self-reference (per project rules); spot-check `src/routes/articles.$slug.tsx`
+   - Run the SEO scanner (`seo_chat--trigger_scan`) to surface missing titles/descriptions/H1s across routes
+   - Verify Google site verification file (`googlecb6e303629c2e21e.html`) is reachable and that the property is verified in GSC
+   - After redeploy, use GSC "URL Inspection" → "Request indexing" on the homepage and 3–5 top articles to speed up recrawl
 
-3. Improve diagnostics for the next run
-   - Record whether a table was cleaned/upserted or failed in `backup_runs.details`.
-   - Keep the existing admin UI behavior, but the stored run details will make future failures easier to identify.
+## Note
 
-4. Verification after implementation
-   - Run lint/type validation through the normal harness.
-   - Re-run the backup mirror from `/admin/backups` or the backup hook.
-   - Confirm the next `backup_runs` row no longer has duplicate-key errors for `categories`/`site_content` and no longer has missing-category foreign-key errors for `articles`/`submissions`.
-
-## Notes
-
-- The backup URL/key you pasted appear to be the backup project credentials. I will not hardcode them into the app; the existing secrets are already used for this connection.
-- No database schema migration is needed for the primary app database. This is a mirror logic fix.
+Ranking improvements from a sitemap fix typically take days to weeks — the immediate win is Google being able to fetch the sitemap and discover article URLs. Deeper ranking work (content/keywords/backlinks) is a separate follow-up I can scope with Semrush data if you want.
