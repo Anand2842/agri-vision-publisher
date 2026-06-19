@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SubmissionGuidelinesRouteImport } from './routes/submission-guidelines'
 import { Route as StartupSpotlightRouteImport } from './routes/startup-spotlight'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as PublicationEthicsRouteImport } from './routes/publication-ethics'
 import { Route as ModerateRouteImport } from './routes/moderate'
@@ -25,7 +26,6 @@ import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 import { Route as AuthenticatedSubmitRouteImport } from './routes/_authenticated.submit'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
@@ -53,6 +53,11 @@ const SubmissionGuidelinesRoute = SubmissionGuidelinesRouteImport.update({
 const StartupSpotlightRoute = StartupSpotlightRouteImport.update({
   id: '/startup-spotlight',
   path: '/startup-spotlight',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -122,11 +127,6 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapXmlRoute = SitemapXmlRouteImport.update({
-  id: '/sitemap/xml',
-  path: '/sitemap/xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
@@ -245,13 +245,13 @@ export interface FileRoutesByFullPath {
   '/moderate': typeof ModerateRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/admin/backups': typeof AuthenticatedAdminBackupsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -281,12 +281,12 @@ export interface FileRoutesByTo {
   '/moderate': typeof ModerateRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/admin/backups': typeof AuthenticatedAdminBackupsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -318,13 +318,13 @@ export interface FileRoutesById {
   '/moderate': typeof ModerateRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
   '/_authenticated/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/_authenticated/admin/backups': typeof AuthenticatedAdminBackupsRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -356,13 +356,13 @@ export interface FileRouteTypes {
     | '/moderate'
     | '/publication-ethics'
     | '/search'
+    | '/sitemap.xml'
     | '/startup-spotlight'
     | '/submission-guidelines'
     | '/admin'
     | '/dashboard'
     | '/submit'
     | '/articles/$slug'
-    | '/sitemap/xml'
     | '/admin/articles'
     | '/admin/backups'
     | '/admin/categories'
@@ -392,12 +392,12 @@ export interface FileRouteTypes {
     | '/moderate'
     | '/publication-ethics'
     | '/search'
+    | '/sitemap.xml'
     | '/startup-spotlight'
     | '/submission-guidelines'
     | '/dashboard'
     | '/submit'
     | '/articles/$slug'
-    | '/sitemap/xml'
     | '/admin/articles'
     | '/admin/backups'
     | '/admin/categories'
@@ -428,13 +428,13 @@ export interface FileRouteTypes {
     | '/moderate'
     | '/publication-ethics'
     | '/search'
+    | '/sitemap.xml'
     | '/startup-spotlight'
     | '/submission-guidelines'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/submit'
     | '/articles/$slug'
-    | '/sitemap/xml'
     | '/_authenticated/admin/articles'
     | '/_authenticated/admin/backups'
     | '/_authenticated/admin/categories'
@@ -466,10 +466,10 @@ export interface RootRouteChildren {
   ModerateRoute: typeof ModerateRoute
   PublicationEthicsRoute: typeof PublicationEthicsRoute
   SearchRoute: typeof SearchRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
-  SitemapXmlRoute: typeof SitemapXmlRoute
   ArticleCertificateSubmissionIdRoute: typeof ArticleCertificateSubmissionIdRoute
   ApiPublicHooksBackupMirrorRoute: typeof ApiPublicHooksBackupMirrorRoute
 }
@@ -488,6 +488,13 @@ declare module '@tanstack/react-router' {
       path: '/startup-spotlight'
       fullPath: '/startup-spotlight'
       preLoaderRoute: typeof StartupSpotlightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -586,13 +593,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap/xml': {
-      id: '/sitemap/xml'
-      path: '/sitemap/xml'
-      fullPath: '/sitemap/xml'
-      preLoaderRoute: typeof SitemapXmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/articles/$slug': {
@@ -798,23 +798,13 @@ const rootRouteChildren: RootRouteChildren = {
   ModerateRoute: ModerateRoute,
   PublicationEthicsRoute: PublicationEthicsRoute,
   SearchRoute: SearchRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
-  SitemapXmlRoute: SitemapXmlRoute,
   ArticleCertificateSubmissionIdRoute: ArticleCertificateSubmissionIdRoute,
   ApiPublicHooksBackupMirrorRoute: ApiPublicHooksBackupMirrorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
