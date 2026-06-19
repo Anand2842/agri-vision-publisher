@@ -10,24 +10,25 @@ interface SitemapEntry {
   priority?: string;
 }
 
-export const Route = createFileRoute("/sitemap/xml")({
+export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
+        const now = new Date().toISOString();
         const entries: SitemapEntry[] = [
-          { path: "/", changefreq: "weekly", priority: "1.0" },
-          { path: "/about", changefreq: "monthly", priority: "0.7" },
-          { path: "/advertise", changefreq: "monthly", priority: "0.6" },
-          { path: "/archives", changefreq: "weekly", priority: "0.8" },
-          { path: "/contact", changefreq: "monthly", priority: "0.6" },
-          { path: "/faq", changefreq: "monthly", priority: "0.7" },
-          { path: "/current-issue", changefreq: "weekly", priority: "0.9" },
-          { path: "/editorial-board", changefreq: "monthly", priority: "0.6" },
-          { path: "/membership", changefreq: "monthly", priority: "0.7" },
-          { path: "/publication-ethics", changefreq: "monthly", priority: "0.6" },
-          { path: "/search", changefreq: "weekly", priority: "0.7" },
-          { path: "/startup-spotlight", changefreq: "weekly", priority: "0.7" },
-          { path: "/submission-guidelines", changefreq: "monthly", priority: "0.7" },
+          { path: "/", lastmod: now, changefreq: "weekly", priority: "1.0" },
+          { path: "/about", lastmod: now, changefreq: "monthly", priority: "0.7" },
+          { path: "/advertise", lastmod: now, changefreq: "monthly", priority: "0.6" },
+          { path: "/archives", lastmod: now, changefreq: "weekly", priority: "0.8" },
+          { path: "/contact", lastmod: now, changefreq: "monthly", priority: "0.6" },
+          { path: "/faq", lastmod: now, changefreq: "monthly", priority: "0.7" },
+          { path: "/current-issue", lastmod: now, changefreq: "weekly", priority: "0.9" },
+          { path: "/editorial-board", lastmod: now, changefreq: "monthly", priority: "0.6" },
+          { path: "/membership", lastmod: now, changefreq: "monthly", priority: "0.7" },
+          { path: "/publication-ethics", lastmod: now, changefreq: "monthly", priority: "0.6" },
+          { path: "/search", lastmod: now, changefreq: "weekly", priority: "0.7" },
+          { path: "/startup-spotlight", lastmod: now, changefreq: "weekly", priority: "0.7" },
+          { path: "/submission-guidelines", lastmod: now, changefreq: "monthly", priority: "0.7" },
         ];
 
         // Fetch published articles for dynamic URLs
