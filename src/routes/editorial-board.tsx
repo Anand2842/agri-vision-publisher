@@ -2,12 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useSiteContent, fetchSeoMetadata } from "@/hooks/useSiteContent";
+import { Mail } from "lucide-react";
 
 export type BoardMember = {
   name: string;
   role?: string;
   title?: string;
   inst?: string;
+  email?: string;
   country?: string;
   photo_url?: string;
 };
@@ -64,6 +66,15 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
       )}
       <div className="text-sm text-foreground/70 mt-1.5 leading-snug">{m.inst}</div>
       {m.country && <div className="text-xs text-foreground/55 mt-1 italic">{m.country}</div>}
+      {m.email && (
+        <a
+          href={`mailto:${m.email}`}
+          className="mt-2 inline-flex items-center gap-1.5 text-xs text-[oklch(var(--navy))]/60 hover:text-[oklch(var(--orange))] transition-colors break-all"
+        >
+          <Mail className="h-3 w-3 shrink-0" />
+          {m.email}
+        </a>
+      )}
     </article>
   );
 }
@@ -135,10 +146,21 @@ function Board() {
           {advisoryCommittee.map((m) => (
             <div
               key={`${m.name}-${m.inst}`}
-              className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-baseline gap-4"
+              className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-start gap-4"
             >
-              <div className="font-display text-lg text-[oklch(var(--navy))] flex-1">{m.name}</div>
-              <div className="text-sm text-foreground/65 text-right max-w-[60%] leading-snug">
+              <div className="flex-1 min-w-0">
+                <div className="font-display text-lg text-[oklch(var(--navy))] leading-snug">{m.name}</div>
+                {m.email && (
+                  <a
+                    href={`mailto:${m.email}`}
+                    className="inline-flex items-center gap-1 mt-1 text-[11px] text-[oklch(var(--navy))]/55 hover:text-[oklch(var(--orange))] transition-colors break-all"
+                  >
+                    <Mail className="h-3 w-3 shrink-0" />
+                    {m.email}
+                  </a>
+                )}
+              </div>
+              <div className="text-sm text-foreground/65 text-right max-w-[55%] leading-snug shrink-0">
                 <span className="italic">{m.inst}</span>
                 {m.country && <span className="block text-foreground/50">{m.country}</span>}
               </div>
@@ -154,11 +176,22 @@ function Board() {
           {reviewers.map((r, i) => (
             <div
               key={`${r.name}-${i}`}
-              className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-baseline gap-4"
+              className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-start gap-4"
             >
-              <div className="font-display text-lg text-[oklch(var(--navy))] flex-1">{r.name}</div>
+              <div className="flex-1 min-w-0">
+                <div className="font-display text-lg text-[oklch(var(--navy))] leading-snug">{r.name}</div>
+                {r.email && (
+                  <a
+                    href={`mailto:${r.email}`}
+                    className="inline-flex items-center gap-1 mt-1 text-[11px] text-[oklch(var(--navy))]/55 hover:text-[oklch(var(--orange))] transition-colors break-all"
+                  >
+                    <Mail className="h-3 w-3 shrink-0" />
+                    {r.email}
+                  </a>
+                )}
+              </div>
               {r.inst && (
-                <div className="text-sm text-foreground/65 text-right max-w-[60%] leading-snug">
+                <div className="text-sm text-foreground/65 text-right max-w-[55%] leading-snug shrink-0">
                   {r.dept && <span className="block">{r.dept}</span>}
                   <span className="italic">{r.inst}</span>
                 </div>

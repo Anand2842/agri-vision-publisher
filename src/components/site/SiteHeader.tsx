@@ -92,7 +92,7 @@ export function SiteHeader() {
   const [q, setQ] = useState("");
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { getHeader, getHeaderJson } = useGlobalSiteContent();
+  const { getHeader, getHeaderJson, getFooter } = useGlobalSiteContent();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const rawNav = getHeaderJson("navigation", "items");
@@ -150,6 +150,23 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 bg-background border-b border-rule">
+      {/* ISSN identification strip — visible globally, required by ISSN India */}
+      <div className="bg-primary/[0.06] border-b border-primary/10 py-1 text-center">
+        <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-foreground/50 font-sans">
+          {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
+          {getHeader("branding", "title_line2") || "Popular Article Magazine"}
+          {" "}·{" "}
+          <span className="text-[oklch(var(--orange))]">
+            {getFooter("legal", "eissn")
+              ? `E-ISSN: ${getFooter("legal", "eissn")}`
+              : getFooter("legal", "pissn")
+              ? `ISSN: ${getFooter("legal", "pissn")}`
+              : "ISSN: Applied for"}
+          </span>
+          {" "}· Published Monthly · Online · India
+        </span>
+      </div>
+
       {/* Utility bar */}
       <div className="bg-navy text-white text-xs">
         <div className="container-editorial flex items-center justify-between h-9">
@@ -255,7 +272,7 @@ export function SiteHeader() {
             </Link>
           )}
           <Link to="/current-issue" className="btn-orange">
-            {getHeader("cta", "special_issue_label")}
+            Current Issue
           </Link>
           <button
             onClick={() => setOpen(!open)}

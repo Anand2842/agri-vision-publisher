@@ -21,6 +21,8 @@ type Article = {
   category_id: string | null;
   issue_id: string | null;
   published_at: string | null;
+  page_start: number | null;
+  page_end: number | null;
 };
 type Issue = { id: string; volume: number; issue_number: number; title: string };
 type Cat = { id: string; name: string };
@@ -44,7 +46,7 @@ function AdminArticles() {
       supabase.from("categories").select("id,name").order("name"),
     ]);
     if (a.error) toast.error(a.error.message);
-    setRows(a.data || []);
+    setRows((a.data || []) as unknown as Article[]);
     setIssues(i.data || []);
     setCats(c.data || []);
   };
@@ -87,12 +89,14 @@ function AdminArticles() {
       read_time: Number(fd.get("read_time") || 5),
       category_id: String(fd.get("category_id") || "") || null,
       issue_id: String(fd.get("issue_id") || "") || null,
+      page_start: fd.get("page_start") ? Number(fd.get("page_start")) : null,
+      page_end: fd.get("page_end") ? Number(fd.get("page_end")) : null,
       published_at:
         status === "published" ? editing?.published_at || new Date().toISOString() : null,
     };
     const op = editing?.id
-      ? supabase.from("articles").update(payload).eq("id", editing.id)
-      : supabase.from("articles").insert(payload);
+      ? supabase.from("articles").update(payload as any).eq("id", editing.id)
+      : supabase.from("articles").insert(payload as any);
     const { error } = await op;
     if (error) return toast.error(error.message);
     toast.success(editing?.id ? "Article updated" : "Article created");
@@ -204,6 +208,18 @@ function AdminArticles() {
             label="Read time (min)"
             type="number"
             defaultValue={editing.read_time ?? 8}
+          />
+          <Field
+            name="page_start"
+            label="Page Start"
+            type="number"
+            defaultValue={editing.page_start ?? ""}
+          />
+          <Field
+            name="page_end"
+            label="Page End"
+            type="number"
+            defaultValue={editing.page_end ?? ""}
           />
           <div className="sm:col-span-2">
             <label className="eyebrow block mb-2">Cover image</label>

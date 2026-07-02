@@ -264,6 +264,12 @@ function CurrentIssue() {
                             </span>
                             <span className="mx-2 text-[oklch(var(--navy))]/30">·</span>
                             <span className="italic">{a.affiliation}</span>
+                            <div className="mt-1 flex items-center gap-1.5 font-sans">
+                              Vol. {issue.volume} · Issue {issue.number}
+                              {(a.pageStart || a.pageEnd) && (
+                                <span>· pp. {a.pageStart ?? "—"}{a.pageEnd ? `–${a.pageEnd}` : ""}</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                         <div className="hidden sm:flex col-span-3 flex-col items-end gap-2 text-xs text-foreground/55">

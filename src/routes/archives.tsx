@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { fetchIssues, type IssueRow } from "@/lib/data";
-import { useMemo, useState } from "react";
+import { fetchIssues, fetchPublishedArticles, articlePdf, type IssueRow, type DBArticle } from "@/lib/data";
+import { useMemo, useState, useEffect } from "react";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
+import { Download, ChevronDown, ChevronUp, FileText } from "lucide-react";
+
 
 const escapeJsonLd = (json: string) => json.replace(/<\/script/gi, "<\\/script");
 
@@ -136,33 +138,159 @@ function Archives() {
           <div className="mt-16 text-center text-muted-foreground">No issues to show yet.</div>
         )}
 
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
-          {filtered.map((i) => (
-            <div key={i.id} className="hover-lift">
-              <div className="bg-paper border border-rule aspect-[3/4] overflow-hidden flex items-center justify-center">
-                <img
-                  src={i.cover || undefined}
-                  alt={i.title}
-                  className="w-full h-full object-contain bg-stone-50/50 p-2"
-                  loading="lazy"
-                />
-              </div>
-              <div className="text-xs text-foreground/60 uppercase font-semibold tracking-wider mt-5">
-                Vol {i.volume} · Issue {i.number} · {i.date}
-              </div>
-              <h2 className="font-display text-2xl md:text-[28px] leading-tight mt-2">{i.title}</h2>
-              <p className="text-[15px] text-foreground/70 mt-3 leading-relaxed">{i.desc}</p>
-              <Link
-                to="/current-issue"
-                className="text-xs text-primary mt-4 inline-block hover:underline"
-              >
-                Open issue →
-              </Link>
-            </div>
+        <div className="mt-14 space-y-10">
+          {filtered.map((issue) => (
+            <IssueCard key={issue.id} issue={issue} />
           ))}
         </div>
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+/** Lazily loaded expandable issue card with per-article PDF Table of Contents */
+function IssueCard({ issue }: { issue: IssueRow }) {
+  const [open, setOpen] = useState(false);
+  const [articles, setArticles] = useState<DBArticle[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [fetched, setFetched] = useState(false);
+
+  const handleToggle = async () => {
+    setOpen((prev) => !prev);
+    if (!fetched) {
+      setLoading(true);
+      try {
+        // Fetch articles that belong to this issue's volume/number
+        const all = await fetchPublishedArticles();
+        const filtered = all.filter(
+          (a) => a.volume === issue.volume && a.issueNumber === issue.number
+        );
+        setArticles(filtered);
+      } catch {
+        setArticles([]);
+      } finally {
+        setLoading(false);
+        setFetched(true);
+      }
+    }
+  };
+
+  return (
+    <div className="border border-rule bg-white">
+      {/* Issue header row */}
+      <div className="grid sm:grid-cols-[auto_1fr] gap-6 p-6">
+        <div className="bg-paper border border-rule w-28 sm:w-36 aspect-[3/4] overflow-hidden flex items-center justify-center shrink-0">
+          <img
+            src={issue.cover || undefined}
+            alt={issue.title}
+            className="w-full h-full object-contain bg-stone-50/50 p-1"
+            loading="lazy"
+          />
+        </div>
+        <div className="flex flex-col justify-between gap-4">
+          <div>
+            <div className="text-xs text-foreground/55 uppercase font-semibold tracking-wider">
+              Vol {issue.volume} · Issue {issue.number} · {issue.date}
+            </div>
+            <h2 className="font-display text-2xl md:text-3xl leading-tight mt-2">{issue.title}</h2>
+            <p className="text-[14px] text-foreground/65 mt-2 leading-relaxed line-clamp-2">{issue.desc}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {issue.pdfUrl && (
+              <a
+                href={issue.pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-[oklch(var(--navy))] border border-[oklch(var(--navy))]/25 px-3 py-1.5 hover:bg-[oklch(var(--navy))]/5 transition-colors"
+              >
+                <Download className="h-3.5 w-3.5" /> Full Issue PDF
+              </a>
+            )}
+            <button
+              onClick={handleToggle}
+              className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-primary border border-primary/25 px-3 py-1.5 hover:bg-primary/5 transition-colors"
+            >
+              {open ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              {open ? "Hide" : "View"} Table of Contents
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Expandable Table of Contents */}
+      {open && (
+        <div className="border-t border-rule bg-paper px-6 py-5">
+          <div className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[oklch(var(--orange))] mb-4">
+            Table of Contents — Vol {issue.volume}, Issue {issue.number}
+          </div>
+          {loading ? (
+            <div className="py-4 text-sm text-muted-foreground animate-pulse">Loading articles…</div>
+          ) : articles.length === 0 ? (
+            <div className="py-3 text-sm text-muted-foreground">
+              No articles indexed for this issue yet.
+            </div>
+          ) : (
+            <ol className="divide-y divide-rule">
+              {articles.map((a, idx) => {
+                const pdf = articlePdf(a.pdfPath);
+                return (
+                  <li key={a.slug} className="flex items-start gap-4 py-3">
+                    <span className="font-display text-base text-[oklch(var(--orange))] tabular-nums shrink-0 w-6 text-right">
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[10px] uppercase tracking-wider text-foreground/50 font-semibold">{a.category}</div>
+                      <Link
+                        to="/articles/$slug"
+                        params={{ slug: a.slug }}
+                        className="font-display text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] transition-colors leading-snug block mt-0.5"
+                      >
+                        {a.title}
+                      </Link>
+                      <div className="text-xs text-foreground/55 mt-1 font-sans">
+                        <span className="font-medium text-foreground/80">{a.author}</span>
+                        {a.affiliation && <span className="italic"> · {a.affiliation}</span>}
+                        <div className="mt-0.5">
+                          Vol. {issue.volume} · Issue {issue.number}
+                          {(a.pageStart || a.pageEnd) && (
+                            <span className="ml-1 text-foreground/40">
+                              · pp. {a.pageStart ?? "—"}{a.pageEnd ? `–${a.pageEnd}` : ""}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="shrink-0 flex items-center gap-2 ml-2">
+                      <Link
+                        to="/articles/$slug"
+                        params={{ slug: a.slug }}
+                        className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold text-[oklch(var(--navy))]/60 hover:text-[oklch(var(--navy))] transition-colors"
+                      >
+                        <FileText className="h-3 w-3" /> Read
+                      </Link>
+                      {pdf ? (
+                        <a
+                          href={pdf}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold text-[oklch(var(--orange))] hover:text-[oklch(var(--orange))]/80 transition-colors"
+                        >
+                          <Download className="h-3 w-3" /> PDF
+                        </a>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold text-foreground/25 cursor-not-allowed">
+                          <Download className="h-3 w-3" /> PDF
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

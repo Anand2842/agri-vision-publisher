@@ -14,6 +14,7 @@ import { Route as StartupSpotlightRouteImport } from './routes/startup-spotlight
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as PublicationEthicsRouteImport } from './routes/publication-ethics'
+import { Route as PlagiarismPolicyRouteImport } from './routes/plagiarism-policy'
 import { Route as ModerateRouteImport } from './routes/moderate'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -68,6 +69,11 @@ const SearchRoute = SearchRouteImport.update({
 const PublicationEthicsRoute = PublicationEthicsRouteImport.update({
   id: '/publication-ethics',
   path: '/publication-ethics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlagiarismPolicyRoute = PlagiarismPolicyRouteImport.update({
+  id: '/plagiarism-policy',
+  path: '/plagiarism-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModerateRoute = ModerateRouteImport.update({
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/membership': typeof MembershipRouteWithChildren
   '/moderate': typeof ModerateRoute
+  '/plagiarism-policy': typeof PlagiarismPolicyRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -279,6 +286,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/membership': typeof MembershipRouteWithChildren
   '/moderate': typeof ModerateRoute
+  '/plagiarism-policy': typeof PlagiarismPolicyRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -316,6 +324,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/membership': typeof MembershipRouteWithChildren
   '/moderate': typeof ModerateRoute
+  '/plagiarism-policy': typeof PlagiarismPolicyRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -354,6 +363,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/membership'
     | '/moderate'
+    | '/plagiarism-policy'
     | '/publication-ethics'
     | '/search'
     | '/sitemap.xml'
@@ -390,6 +400,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/membership'
     | '/moderate'
+    | '/plagiarism-policy'
     | '/publication-ethics'
     | '/search'
     | '/sitemap.xml'
@@ -426,6 +437,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/membership'
     | '/moderate'
+    | '/plagiarism-policy'
     | '/publication-ethics'
     | '/search'
     | '/sitemap.xml'
@@ -464,6 +476,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   MembershipRoute: typeof MembershipRouteWithChildren
   ModerateRoute: typeof ModerateRoute
+  PlagiarismPolicyRoute: typeof PlagiarismPolicyRoute
   PublicationEthicsRoute: typeof PublicationEthicsRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -509,6 +522,13 @@ declare module '@tanstack/react-router' {
       path: '/publication-ethics'
       fullPath: '/publication-ethics'
       preLoaderRoute: typeof PublicationEthicsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plagiarism-policy': {
+      id: '/plagiarism-policy'
+      path: '/plagiarism-policy'
+      fullPath: '/plagiarism-policy'
+      preLoaderRoute: typeof PlagiarismPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/moderate': {
@@ -796,6 +816,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   MembershipRoute: MembershipRouteWithChildren,
   ModerateRoute: ModerateRoute,
+  PlagiarismPolicyRoute: PlagiarismPolicyRoute,
   PublicationEthicsRoute: PublicationEthicsRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -808,3 +829,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

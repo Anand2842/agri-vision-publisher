@@ -175,6 +175,70 @@ function Intro() {
       <p className="max-w-4xl mx-auto text-center text-foreground/75 leading-[1.9] text-[0.97rem]">
         {get("intro", "body")}
       </p>
+
+      {/* ISSN Required Journal Particulars Table */}
+      <div className="max-w-3xl mx-auto mt-12 bg-paper border border-rule overflow-hidden">
+        <div className="bg-primary/5 py-3 border-b border-rule px-6">
+          <h3 className="font-display text-lg text-primary uppercase tracking-wider text-center">
+            Journal Particulars
+          </h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left font-sans">
+            <tbody className="divide-y divide-rule/50">
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink w-1/3">Title</th>
+                <td className="py-3 px-6 text-foreground/80">The Agriculture Popular Article Magazine</td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">Frequency</th>
+                <td className="py-3 px-6 text-foreground/80">Monthly</td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">ISSN</th>
+                <td className="py-3 px-6 text-foreground/80">Applied for</td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">Publisher name</th>
+                <td className="py-3 px-6 text-foreground/80">Ram Mangalam Agri – Rural Development Foundation</td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">Publisher address</th>
+                <td className="py-3 px-6 text-foreground/80">ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India</td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">Starting Year</th>
+                <td className="py-3 px-6 text-foreground/80">2026</td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">Subject</th>
+                <td className="py-3 px-6 text-foreground/80">Agriculture and Allied Sciences</td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">Language</th>
+                <td className="py-3 px-6 text-foreground/80">English</td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">Publication Format</th>
+                <td className="py-3 px-6 text-foreground/80">Online</td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">Email Id</th>
+                <td className="py-3 px-6 text-foreground/80">
+                  <a href="mailto:dkdkdangi@gmail.com" className="text-primary hover:underline">
+                    dkdkdangi@gmail.com
+                  </a>
+                </td>
+              </tr>
+              <tr className="hover:bg-primary/5 transition-colors">
+                <th className="py-3 px-6 font-semibold text-ink">Mobile No.</th>
+                <td className="py-3 px-6 text-foreground/80">+91 9509164410</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div className="mt-10 flex justify-center">
         <Link to="/about" className="btn-orange">
           Know more
@@ -255,6 +319,16 @@ function RecentBlogs() {
                       {a.title}
                     </Link>
                   </h3>
+                  <div className="mt-2 text-xs text-foreground/60 font-sans leading-relaxed">
+                    <span className="font-medium text-foreground/80">{a.author}</span>
+                    <br />
+                    <span className="inline-flex items-center gap-1 mt-0.5">
+                      Vol. {a.volume} · Issue {a.issueNumber}
+                      {(a.pageStart || a.pageEnd) && (
+                        <span>· pp. {a.pageStart ?? "—"}{a.pageEnd ? `–${a.pageEnd}` : ""}</span>
+                      )}
+                    </span>
+                  </div>
                   <p className="mt-3 text-[15px] text-foreground/70 leading-relaxed line-clamp-3 flex-1">
                     {a.abstract}
                   </p>

@@ -139,6 +139,39 @@ function Article() {
                 <Eye className="h-3 w-3" /> {a.views}
               </span>
             </div>
+
+            {/* ISSN-required bibliographic strip */}
+            <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-primary/5 border border-primary/15 rounded-sm px-5 py-2.5 text-[11px] uppercase tracking-[0.15em] font-semibold text-foreground/60 font-sans">
+              <span className="text-primary font-bold">{siteTitle}</span>
+              {(a.volume || a.issueNumber) && (
+                <>
+                  <span className="text-foreground/30">·</span>
+                  <span>
+                    {a.volume ? `Vol. ${a.volume}` : ""}
+                    {a.volume && a.issueNumber ? ", " : ""}
+                    {a.issueNumber ? `No. ${a.issueNumber}` : ""}
+                  </span>
+                </>
+              )}
+              {a.date && (
+                <>
+                  <span className="text-foreground/30">·</span>
+                  <span>{a.date}</span>
+                </>
+              )}
+              {(a.pageStart || a.pageEnd) && (
+                <>
+                  <span className="text-foreground/30">·</span>
+                  <span>
+                    pp.{" "}
+                    {a.pageStart ?? "—"}
+                    {a.pageEnd ? `–${a.pageEnd}` : ""}
+                  </span>
+                </>
+              )}
+              <span className="text-foreground/30">·</span>
+              <span className="text-orange/80">ISSN: Applied for</span>
+            </div>
           </div>
         </header>
 

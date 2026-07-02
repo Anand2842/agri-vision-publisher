@@ -36,12 +36,20 @@ export function SiteFooter() {
       title: "Authors",
       links: [
         { label: "Submit Article", href: "/submit" },
-        { label: "Submission Guidelines", href: "/submission-guidelines" },
-        { label: "Publication Ethics", href: "/publication-ethics" },
+        { label: "Author Guidelines", href: "/author-guidelines" },
         { label: "Membership", href: "/membership" },
-        { label: "Advertise", href: "/advertise" },
         { label: "Author Dashboard", href: "/dashboard" },
-      ]
+      ],
+    },
+    {
+      title: "Legal",
+      links: [
+        { label: "Publication Ethics", href: "/publication-ethics" },
+        { label: "Plagiarism Policy", href: "/plagiarism-policy" },
+        { label: "Open Access Policy", href: "/open-access" },
+        { label: "Terms & Conditions", href: "/terms" },
+        { label: "Privacy Policy", href: "/privacy" },
+      ],
     }
   ];
 
