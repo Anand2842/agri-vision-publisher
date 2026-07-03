@@ -8,10 +8,18 @@ export type BoardMember = {
   name: string;
   role?: string;
   title?: string;
+  /** Official designation (e.g. "Senior Scientist") — required by ISSN India */
+  designation?: string;
+  /** Department (e.g. "Agriculture Extension") — required by ISSN India */
+  department?: string;
   inst?: string;
+  /** Full official postal address — required by ISSN India */
+  address?: string;
   email?: string;
   country?: string;
   photo_url?: string;
+  /** Institutional profile URL — shown if available */
+  profile_url?: string;
 };
 
 export const Route = createFileRoute("/editorial-board")({
@@ -41,6 +49,19 @@ const initials = (name: string) =>
     .toUpperCase();
 
 function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
+  const nameNode = m.profile_url ? (
+    <a
+      href={m.profile_url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:text-[oklch(var(--orange))] transition-colors"
+    >
+      {m.name}
+    </a>
+  ) : (
+    m.name
+  );
+
   return (
     <article className="group">
       <div
@@ -57,14 +78,24 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
       <h4
         className={`font-display ${large ? "text-2xl" : "text-lg"} mt-4 text-[oklch(var(--navy))] leading-tight`}
       >
-        {m.name}
+        {nameNode}
       </h4>
       {m.title && (
         <div className="text-xs uppercase tracking-wide text-[oklch(var(--orange))] mt-1.5 font-medium">
           {m.title}
         </div>
       )}
+      {(m.designation || m.department) && (
+        <div className="text-xs text-foreground/65 mt-1 leading-snug">
+          {m.designation}
+          {m.designation && m.department && <span className="mx-1 opacity-40">·</span>}
+          {m.department}
+        </div>
+      )}
       <div className="text-sm text-foreground/70 mt-1.5 leading-snug">{m.inst}</div>
+      {m.address && (
+        <div className="text-xs text-foreground/45 mt-1 leading-tight">{m.address}</div>
+      )}
       {m.country && <div className="text-xs text-foreground/55 mt-1 italic">{m.country}</div>}
       {m.email && (
         <a
