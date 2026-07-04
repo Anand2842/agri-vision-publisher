@@ -33,6 +33,34 @@ function Auth() {
   const [resetMode, setResetMode] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
+  const [recoveryMode, setRecoveryMode] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = z.string().min(8).max(72).safeParse(newPassword);
+    if (!parsed.success) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      toast.success("Password updated. You're signed in.");
+      setRecoveryMode(false);
+      nav({ to: redirectUrl || "/dashboard" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update password");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,9 +85,23 @@ function Auth() {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) nav({ to: redirectUrl || "/dashboard" });
+    // Detect password recovery flow (from email link with #type=recovery)
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+    const isRecoveryHash = hash.includes("type=recovery");
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setRecoveryMode(true);
     });
+
+    if (isRecoveryHash) {
+      setRecoveryMode(true);
+    } else {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) nav({ to: redirectUrl || "/dashboard" });
+      });
+    }
+
+    return () => sub.subscription.unsubscribe();
   }, [nav, redirectUrl]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -110,6 +152,50 @@ function Auth() {
       setLoading(false);
     }
   };
+
+  if (recoveryMode) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="container-editorial py-20 max-w-md">
+          <div className="eyebrow">Account recovery</div>
+          <h1 className="font-display text-4xl mt-3 text-ink">Set a new password</h1>
+          <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+            Choose a new password for your account. You'll be signed in automatically.
+          </p>
+          <form onSubmit={handleUpdatePassword} className="mt-8 space-y-4">
+            <input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="New password (min 8 characters)"
+              className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+            />
+            <input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+              className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+            />
+            <button
+              disabled={loading}
+              className="w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
+            >
+              {loading ? "Updating…" : "Update password"}
+            </button>
+          </form>
+        </main>
+        <SiteFooter />
+      </>
+    );
+  }
 
   if (signUpPending) {
     return (

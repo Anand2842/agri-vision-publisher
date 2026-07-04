@@ -25,6 +25,8 @@ export type Database = {
           created_at: string
           id: string
           issue_id: string | null
+          page_end: number | null
+          page_start: number | null
           pdf_url: string | null
           published_at: string | null
           read_time: number | null
@@ -43,6 +45,8 @@ export type Database = {
           created_at?: string
           id?: string
           issue_id?: string | null
+          page_end?: number | null
+          page_start?: number | null
           pdf_url?: string | null
           published_at?: string | null
           read_time?: number | null
@@ -61,6 +65,8 @@ export type Database = {
           created_at?: string
           id?: string
           issue_id?: string | null
+          page_end?: number | null
+          page_start?: number | null
           pdf_url?: string | null
           published_at?: string | null
           read_time?: number | null
