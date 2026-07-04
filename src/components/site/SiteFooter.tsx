@@ -136,6 +136,19 @@ export function SiteFooter() {
           <div>Published monthly · Peer reviewed · Open access</div>
         </div>
       </div>
+      <div className="border-t border-white/10">
+        <div className="container-editorial py-3 text-center text-[11px] text-white/40">
+          Designed &amp; developed by{" "}
+          <a
+            href="https://anandbuild.dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-orange transition-colors"
+          >
+            Anand
+          </a>
+        </div>
+      </div>
     </footer>
   );
 }
