@@ -85,9 +85,23 @@ function Auth() {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) nav({ to: redirectUrl || "/dashboard" });
+    // Detect password recovery flow (from email link with #type=recovery)
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+    const isRecoveryHash = hash.includes("type=recovery");
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setRecoveryMode(true);
     });
+
+    if (isRecoveryHash) {
+      setRecoveryMode(true);
+    } else {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) nav({ to: redirectUrl || "/dashboard" });
+      });
+    }
+
+    return () => sub.subscription.unsubscribe();
   }, [nav, redirectUrl]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
