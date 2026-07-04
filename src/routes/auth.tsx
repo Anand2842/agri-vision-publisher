@@ -153,6 +153,50 @@ function Auth() {
     }
   };
 
+  if (recoveryMode) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="container-editorial py-20 max-w-md">
+          <div className="eyebrow">Account recovery</div>
+          <h1 className="font-display text-4xl mt-3 text-ink">Set a new password</h1>
+          <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+            Choose a new password for your account. You'll be signed in automatically.
+          </p>
+          <form onSubmit={handleUpdatePassword} className="mt-8 space-y-4">
+            <input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="New password (min 8 characters)"
+              className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+            />
+            <input
+              type="password"
+              required
+              minLength={8}
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+              className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+            />
+            <button
+              disabled={loading}
+              className="w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
+            >
+              {loading ? "Updating…" : "Update password"}
+            </button>
+          </form>
+        </main>
+        <SiteFooter />
+      </>
+    );
+  }
+
   if (signUpPending) {
     return (
       <>
