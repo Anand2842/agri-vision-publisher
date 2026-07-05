@@ -1,11 +1,11 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
-import { FileText, Upload, LockKeyhole } from "lucide-react";
+import { FileText, Upload } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/submit")({
   component: Submit,
@@ -30,51 +30,6 @@ function Submit() {
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [membershipStatus, setMembershipStatus] = useState<"checking" | "approved" | "pending" | "none">("checking");
-
-  // Check membership status before allowing submission
-  useEffect(() => {
-    const checkMembership = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setMembershipStatus("none"); return; }
-
-      try {
-        // Staff (admin/moderator) bypass the membership gate.
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id);
-        const roleList = (roles || []).map((r) => r.role);
-        if (roleList.includes("admin") || roleList.includes("moderator")) {
-          setMembershipStatus("approved");
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from("membership_payments")
-          .select("status")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
-
-        if (error) throw error;
-
-        const approved = data?.find((c) => c.status === "approved");
-        const pending = data?.find((c) => c.status === "pending");
-        
-        if (approved) {
-          setMembershipStatus("approved");
-        } else if (pending) {
-          setMembershipStatus("pending");
-        } else {
-          setMembershipStatus("none");
-        }
-      } catch (err) {
-        console.error("Database membership check failed:", err);
-        setMembershipStatus("none");
-      }
-    };
-    checkMembership();
-  }, []);
 
   useEffect(() => {
     supabase
@@ -160,63 +115,7 @@ function Submit() {
     nav({ to: "/dashboard" });
   };
 
-  // Show membership gate if not approved
-  if (membershipStatus === "checking") {
-    return (
-      <>
-        <SiteHeader />
-        <main className="container-editorial py-24 max-w-2xl text-center">
-          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto" />
-          <p className="mt-4 text-sm text-muted-foreground">Checking membership status…</p>
-        </main>
-        <SiteFooter />
-      </>
-    );
-  }
 
-  if (membershipStatus === "pending") {
-    return (
-      <>
-        <SiteHeader />
-        <main className="container-editorial py-24 max-w-2xl">
-          <div className="border border-ochre/40 bg-ochre/5 p-8 text-center">
-            <LockKeyhole className="h-10 w-10 mx-auto text-ochre mb-4" />
-            <div className="eyebrow text-ochre">Membership Pending</div>
-            <h1 className="font-display text-3xl mt-3 text-ink">Verification in Progress</h1>
-            <p className="mt-4 text-sm text-foreground/70 max-w-md mx-auto">
-              Your payment claim is currently under review by our editorial team. You'll be able to submit manuscripts once your membership is approved — usually within 1–2 business days.
-            </p>
-            <Link to="/dashboard" className="mt-6 inline-block bg-primary text-primary-foreground px-6 py-3 text-sm hover:bg-primary/90">
-              View Claim Status →
-            </Link>
-          </div>
-        </main>
-        <SiteFooter />
-      </>
-    );
-  }
-
-  if (membershipStatus === "none") {
-    return (
-      <>
-        <SiteHeader />
-        <main className="container-editorial py-24 max-w-2xl">
-          <div className="border border-rule bg-paper p-8 text-center">
-            <LockKeyhole className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
-            <div className="eyebrow">Membership Required</div>
-            <h1 className="font-display text-3xl mt-3 text-ink">Active Membership Needed</h1>
-            <p className="mt-4 text-sm text-foreground/70 max-w-md mx-auto">
-              To submit a manuscript for review, you need an active membership. Choose a plan that suits your research needs.
-            </p>
-            <Link to="/membership" className="mt-6 inline-block bg-orange text-white px-6 py-3 text-sm hover:bg-orange/90">
-              View Membership Plans →
-            </Link>
-          </div>
-        </main>
-        <SiteFooter />
-      </>
-    );
-  }
 
   return (
     <>
