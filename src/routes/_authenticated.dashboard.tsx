@@ -16,6 +16,7 @@ import {
   CreditCard,
   Award
 } from "lucide-react";
+import { SubmissionRowSkeleton, StatCardSkeleton } from "@/components/site/Skeletons";
 
 function getClaimMemberId(claim: { member_id?: string | null; notes?: string | null }) {
   if (claim.member_id) return claim.member_id;
