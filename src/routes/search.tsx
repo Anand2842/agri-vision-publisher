@@ -98,12 +98,13 @@ function SearchPage() {
           {loading ? "Refreshing..." : `${results.length} result${results.length !== 1 ? "s" : ""}`}
         </div>
         <ul className="mt-10 divide-y divide-[var(--color-rule)]">
+          {loading && <ListSkeleton count={5} />}
           {!loading && results.length === 0 && (
             <li className="py-12 text-center text-muted-foreground text-sm font-sans">
               No matching articles found. Try different keywords.
             </li>
           )}
-          {results.map((a) => (
+          {!loading && results.map((a) => (
             <li key={a.slug} className="py-7">
               <Link to="/articles/$slug" params={{ slug: a.slug }} className="group block">
                 <div className="eyebrow">{a.category}</div>
