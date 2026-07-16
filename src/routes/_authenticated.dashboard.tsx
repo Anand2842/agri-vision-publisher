@@ -343,9 +343,19 @@ function Dashboard() {
 
         {/* Stats Grid */}
         <div className="mt-12 grid sm:grid-cols-3 gap-6">
-          <Stat label="Total submissions" value={total} />
-          <Stat label="In review" value={pending} />
-          <Stat label="Published" value={published} />
+          {subs === null ? (
+            <>
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+              <StatCardSkeleton />
+            </>
+          ) : (
+            <>
+              <Stat label="Total submissions" value={total} />
+              <Stat label="In review" value={pending} />
+              <Stat label="Published" value={published} />
+            </>
+          )}
         </div>
 
         {/* Submissions Section */}
