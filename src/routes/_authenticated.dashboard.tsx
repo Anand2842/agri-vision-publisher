@@ -363,7 +363,11 @@ function Dashboard() {
           <div className="eyebrow">My Submissions</div>
           <div className="rule-thick mt-3" />
           {subs === null ? (
-            <div className="py-16 text-center text-muted-foreground">Loading…</div>
+            <ul className="divide-y divide-[var(--color-rule)]">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <SubmissionRowSkeleton key={i} />
+              ))}
+            </ul>
           ) : subs.length === 0 ? (
             <div className="py-16 text-center">
               <p className="text-muted-foreground">No submissions yet.</p>
