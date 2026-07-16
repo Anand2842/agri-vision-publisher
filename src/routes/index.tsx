@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { fetchPublishedArticles, type DBArticle } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { useSiteContent, fetchSeoMetadata } from "@/hooks/useSiteContent";
+import { ArticleGridSkeleton } from "@/components/site/Skeletons";
 
 export const Route = createFileRoute("/")({
   component: Home,
