@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { AdminSubmissionsSkeleton, StatChipSkeleton } from "@/components/site/Skeletons";
 
 export const Route = createFileRoute("/_authenticated/admin/submissions")({
   component: AdminSubmissions,
