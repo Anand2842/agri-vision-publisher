@@ -337,7 +337,7 @@ function AdminSubmissions() {
 
       <div className="mt-6 border border-rule">
         {rows === null ? (
-          <div className="p-10 text-center text-muted-foreground">Loading…</div>
+          <AdminSubmissionsSkeleton count={6} />
         ) : filtered.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No submissions match your filters.</div>
         ) : (
