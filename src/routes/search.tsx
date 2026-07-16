@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Search as SearchIcon } from "lucide-react";
 
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
+import { ListSkeleton } from "@/components/site/Skeletons";
 
 const searchSchema = z.object({ q: z.string().optional().catch("") });
 
