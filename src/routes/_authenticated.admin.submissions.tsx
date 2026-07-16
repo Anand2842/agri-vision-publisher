@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { AdminSubmissionsSkeleton, StatChipSkeleton } from "@/components/site/Skeletons";
 
 export const Route = createFileRoute("/_authenticated/admin/submissions")({
   component: AdminSubmissions,
@@ -267,10 +268,21 @@ function AdminSubmissions() {
 
       {/* Summary chips */}
       <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatChip icon={<CalendarDays className="h-4 w-4" />} label="Total" value={stats.total} />
-        <StatChip icon={<Clock className="h-4 w-4" />} label="This week" value={stats.week} tone="orange" />
-        <StatChip icon={<Users className="h-4 w-4" />} label="Pending review" value={stats.pending} tone="amber" />
-        <StatChip icon={<CheckCircle2 className="h-4 w-4" />} label="Paid members" value={stats.paid} tone="green" />
+        {rows === null ? (
+          <>
+            <StatChipSkeleton />
+            <StatChipSkeleton />
+            <StatChipSkeleton />
+            <StatChipSkeleton />
+          </>
+        ) : (
+          <>
+            <StatChip icon={<CalendarDays className="h-4 w-4" />} label="Total" value={stats.total} />
+            <StatChip icon={<Clock className="h-4 w-4" />} label="This week" value={stats.week} tone="orange" />
+            <StatChip icon={<Users className="h-4 w-4" />} label="Pending review" value={stats.pending} tone="amber" />
+            <StatChip icon={<CheckCircle2 className="h-4 w-4" />} label="Paid members" value={stats.paid} tone="green" />
+          </>
+        )}
       </div>
 
       {/* Filter bar */}
@@ -325,7 +337,7 @@ function AdminSubmissions() {
 
       <div className="mt-6 border border-rule">
         {rows === null ? (
-          <div className="p-10 text-center text-muted-foreground">Loading…</div>
+          <AdminSubmissionsSkeleton count={6} />
         ) : filtered.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No submissions match your filters.</div>
         ) : (

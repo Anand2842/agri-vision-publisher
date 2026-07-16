@@ -225,7 +225,18 @@ function IssueCard({ issue }: { issue: IssueRow }) {
             Table of Contents — Vol {issue.volume}, Issue {issue.number}
           </div>
           {loading ? (
-            <div className="py-4 text-sm text-muted-foreground animate-pulse">Loading articles…</div>
+            <ol className="divide-y divide-rule">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <li key={i} className="flex items-start gap-4 py-3">
+                  <div className="h-4 w-6 rounded-sm bg-foreground/8 animate-pulse shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-24 rounded-sm bg-orange/15 animate-pulse" />
+                    <div className="h-5 w-[80%] rounded-sm bg-foreground/10 animate-pulse" />
+                    <div className="h-3 w-52 rounded-sm bg-foreground/8 animate-pulse" />
+                  </div>
+                </li>
+              ))}
+            </ol>
           ) : articles.length === 0 ? (
             <div className="py-3 text-sm text-muted-foreground">
               No articles indexed for this issue yet.

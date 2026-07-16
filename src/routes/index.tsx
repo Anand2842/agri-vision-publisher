@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { fetchPublishedArticles, type DBArticle } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { useSiteContent, fetchSeoMetadata } from "@/hooks/useSiteContent";
+import { ArticleGridSkeleton } from "@/components/site/Skeletons";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -276,9 +277,7 @@ function RecentBlogs() {
         </div>
 
         {loading ? (
-          <div className="py-12 text-center text-muted-foreground text-sm">
-            Loading recent articles...
-          </div>
+          <ArticleGridSkeleton count={4} />
         ) : error ? (
           <div className="py-12 text-center text-muted-foreground text-sm border border-dashed border-rule bg-white max-w-lg mx-auto">
             Articles are temporarily unavailable. Please try again later.
