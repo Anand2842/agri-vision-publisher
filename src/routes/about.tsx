@@ -27,6 +27,7 @@ function About() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="eyebrow">About</div>
         <h1 className="font-display text-5xl md:text-7xl mt-4 text-ink leading-[1.02] max-w-4xl">
@@ -74,6 +75,7 @@ function About() {
             </div>
           </aside>
         </div>
+      </main>
       </main>
       <SiteFooter />
     </>

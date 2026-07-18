@@ -30,6 +30,7 @@ function Guidelines() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="eyebrow">Authors</div>
         <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink max-w-3xl leading-[1.05]">
@@ -129,6 +130,7 @@ function Guidelines() {
             Begin a submission →
           </Link>
         </div>
+      </main>
       </main>
       <SiteFooter />
     </>

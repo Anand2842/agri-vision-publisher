@@ -66,6 +66,7 @@ function Advertise() {
     <>
       <SiteHeader />
       
+      <main id="main-content">
       {/* Hero Section */}
       <section className="bg-navy text-white py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
@@ -205,6 +206,7 @@ function Advertise() {
           </div>
         </div>
       </section>
+      </main>
       <SiteFooter />
     </>
   );

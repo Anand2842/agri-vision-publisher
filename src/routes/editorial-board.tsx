@@ -136,6 +136,7 @@ function Board() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="border-b border-[oklch(var(--navy))]/15 pb-12">
           <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
@@ -230,6 +231,7 @@ function Board() {
             </div>
           ))}
         </div>
+      </main>
       </main>
       <SiteFooter />
     </>

@@ -15,11 +15,13 @@ export const Route = createFileRoute("/articles/$slug")({
   notFoundComponent: () => (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-32 text-center">
         <h1 className="font-display text-4xl">Article not found</h1>
         <Link to="/archives" className="text-primary mt-4 inline-block">
           Browse archives →
         </Link>
+      </main>
       </main>
       <SiteFooter />
     </>
@@ -119,6 +121,7 @@ function Article() {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(articleSchema) }} />
       )}
       <SiteHeader />
+      <main id="main-content">
       <main>
         <header className="container-editorial pt-16 pb-12">
           <div className="max-w-3xl mx-auto text-center">
@@ -281,6 +284,7 @@ function Article() {
             </div>
           </aside>
         </div>
+      </main>
       </main>
       <SiteFooter />
     </>

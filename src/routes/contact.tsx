@@ -63,6 +63,7 @@ function Contact() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="grid md:grid-cols-12 gap-12">
           <div className="md:col-span-5">
@@ -174,6 +175,7 @@ function Contact() {
             </ul>
           </div>
         </div>
+      </main>
       </main>
       <SiteFooter />
     </>

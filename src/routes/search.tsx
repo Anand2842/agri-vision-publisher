@@ -69,6 +69,7 @@ function SearchPage() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="eyebrow">Search</div>
         <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink">
@@ -117,6 +118,7 @@ function SearchPage() {
             </li>
           ))}
         </ul>
+      </main>
       </main>
       <SiteFooter />
     </>

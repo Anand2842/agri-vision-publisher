@@ -27,6 +27,7 @@ function PublicationEthics() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="eyebrow">{get("hero", "eyebrow")}</div>
         <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink max-w-3xl leading-[1.05]">
@@ -70,6 +71,7 @@ function PublicationEthics() {
         <Section title={get("reporting", "title")}>
           <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(get("reporting", "body")) }} />
         </Section>
+      </main>
       </main>
       <SiteFooter />
     </>

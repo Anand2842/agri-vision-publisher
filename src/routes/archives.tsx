@@ -90,6 +90,7 @@ function Archives() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(collectionSchema) }} />
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="eyebrow">Archives</div>
         <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink">{get("hero", "headline")}</h1>
@@ -143,6 +144,7 @@ function Archives() {
             <IssueCard key={issue.id} issue={issue} />
           ))}
         </div>
+      </main>
       </main>
       <SiteFooter />
     </>

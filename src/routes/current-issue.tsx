@@ -38,6 +38,7 @@ export const Route = createFileRoute("/current-issue")({
     return (
       <>
         <SiteHeader />
+      <main id="main-content">
         <main className="container-editorial py-24">
           <ErrorComponent error={error} />
           <button
@@ -47,6 +48,7 @@ export const Route = createFileRoute("/current-issue")({
             Retry
           </button>
         </main>
+        </main>
         <SiteFooter />
       </>
     );
@@ -54,9 +56,11 @@ export const Route = createFileRoute("/current-issue")({
   notFoundComponent: () => (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-24 text-center">
         <h1 className="font-display text-3xl text-[oklch(var(--navy))]">No issue published yet</h1>
         <p className="mt-3 text-foreground/70">Please check back soon.</p>
+      </main>
       </main>
       <SiteFooter />
     </>
@@ -71,6 +75,7 @@ function CurrentIssue() {
     return (
       <>
         <SiteHeader />
+      <main id="main-content">
         <main className="container-editorial py-24 text-center">
           <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
             Current Issue
@@ -87,6 +92,7 @@ function CurrentIssue() {
           >
             Browse Archives <ArrowRight className="h-4 w-4" />
           </Link>
+        </main>
         </main>
         <SiteFooter />
       </>
@@ -125,6 +131,7 @@ function CurrentIssue() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(issueSchema) }} />
       <SiteHeader />
+      <main id="main-content">
       <main>
         {/* Masthead band */}
         <section className="border-b border-[oklch(var(--navy))]/15 bg-[oklch(var(--navy))]/[0.02]">
@@ -319,6 +326,7 @@ function CurrentIssue() {
             </div>
           </div>
         </section>
+      </main>
       </main>
       <SiteFooter />
     </>
