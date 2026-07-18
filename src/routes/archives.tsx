@@ -186,10 +186,13 @@ function IssueCard({ issue }: { issue: IssueRow }) {
           <img
             src={issue.cover || undefined}
             alt={issue.title}
-            className="w-full h-full object-contain bg-stone-50/50 p-1"
+            width={288}
+            height={384}
+            className="w-full h-full object-cover"
             loading="lazy"
           />
         </div>
+
         <div className="flex flex-col justify-between gap-4">
           <div>
             <div className="text-xs text-foreground/55 uppercase font-semibold tracking-wider">

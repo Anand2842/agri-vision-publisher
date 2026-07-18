@@ -182,11 +182,14 @@ function Article() {
           <img
             src={a.cover || "/placeholder.svg"}
             alt={a.title}
+            width={1600}
+            height={900}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = "/placeholder.svg";
             }}
-            className="w-full aspect-[16/9] object-contain bg-stone-50/50 p-2 border border-rule rounded-sm"
+            className="w-full aspect-[4/5] sm:aspect-[16/9] object-cover border border-rule rounded-sm bg-paper"
           />
+
         </div>
 
         <div className="container-editorial grid md:grid-cols-12 gap-12 mt-14">

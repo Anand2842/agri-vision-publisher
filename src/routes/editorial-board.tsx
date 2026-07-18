@@ -70,7 +70,7 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
         } text-[oklch(var(--navy))]/30 border border-rule overflow-hidden`}
       >
         {m.photo_url ? (
-          <img src={m.photo_url} alt={m.name} className="h-full w-full object-cover" loading="lazy" />
+          <img src={m.photo_url} alt={m.name} width={480} height={600} className="h-full w-full object-cover object-top" loading="lazy" />
         ) : (
           <span className="tracking-wider">{initials(m.name)}</span>
         )}
