@@ -86,7 +86,7 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
         </div>
       )}
       {(m.designation || m.department) && (
-        <div className="text-xs text-foreground/65 mt-1 leading-snug">
+        <div className="text-xs text-muted-foreground mt-1 leading-snug">
           {m.designation}
           {m.designation && m.department && <span className="mx-1 opacity-40">·</span>}
           {m.department}
@@ -192,7 +192,7 @@ function Board() {
                   </a>
                 )}
               </div>
-              <div className="text-sm text-foreground/65 text-right max-w-[55%] leading-snug shrink-0">
+              <div className="text-sm text-muted-foreground text-right max-w-[55%] leading-snug shrink-0">
                 <span className="italic">{m.inst}</span>
                 {m.country && <span className="block text-foreground/50">{m.country}</span>}
               </div>
@@ -223,7 +223,7 @@ function Board() {
                 )}
               </div>
               {r.inst && (
-                <div className="text-sm text-foreground/65 text-right max-w-[55%] leading-snug shrink-0">
+                <div className="text-sm text-muted-foreground text-right max-w-[55%] leading-snug shrink-0">
                   {r.dept && <span className="block">{r.dept}</span>}
                   <span className="italic">{r.inst}</span>
                 </div>

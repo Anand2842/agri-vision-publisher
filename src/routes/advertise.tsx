@@ -126,7 +126,7 @@ function Advertise() {
             {stats.map((s, i) => (
               <div key={i} className="p-4 border-r border-rule last:border-0 max-lg:[&:nth-child(2n)]:border-r-0">
                 <div className="font-display text-4xl font-bold text-primary">{s.value}</div>
-                <div className="text-xs uppercase tracking-wider text-foreground/60 mt-1 font-semibold">{s.label}</div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mt-1 font-semibold">{s.label}</div>
               </div>
             ))}
           </div>

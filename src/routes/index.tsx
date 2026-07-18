@@ -71,7 +71,7 @@ function Home() {
                 Submit Online →
               </Link>
               <span className="h-3 w-px bg-rule hidden sm:inline" />
-              <Link to="/submission-guidelines" className="text-xs uppercase tracking-wider font-semibold text-foreground/60 hover:text-ink transition-colors font-sans">
+              <Link to="/submission-guidelines" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground hover:text-ink transition-colors font-sans">
                 Author Guidelines
               </Link>
             </div>
@@ -328,7 +328,7 @@ function RecentBlogs() {
                       {a.title}
                     </Link>
                   </h3>
-                  <div className="mt-2 text-xs text-foreground/60 font-sans leading-relaxed">
+                  <div className="mt-2 text-xs text-muted-foreground font-sans leading-relaxed">
                     <span className="font-medium text-foreground/80">{a.author}</span>
                     <br />
                     <span className="inline-flex items-center gap-1 mt-0.5">

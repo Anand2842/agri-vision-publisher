@@ -199,7 +199,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
               Vol {issue.volume} · Issue {issue.number} · {issue.date}
             </div>
             <h2 className="font-display text-2xl md:text-3xl leading-tight mt-2">{issue.title}</h2>
-            <p className="text-[14px] text-foreground/65 mt-2 leading-relaxed line-clamp-2">{issue.desc}</p>
+            <p className="text-[14px] text-muted-foreground mt-2 leading-relaxed line-clamp-2">{issue.desc}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {issue.pdfUrl && (

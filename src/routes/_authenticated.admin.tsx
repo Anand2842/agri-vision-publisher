@@ -137,7 +137,7 @@ function AdminLayout() {
           </div>
           <Link
             to="/dashboard"
-            className="text-xs uppercase tracking-wider text-foreground/60 hover:text-orange"
+            className="text-xs uppercase tracking-wider text-muted-foreground hover:text-orange"
           >
             Back to dashboard
           </Link>

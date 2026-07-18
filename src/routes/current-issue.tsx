@@ -214,7 +214,7 @@ function CurrentIssue() {
                 <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
                   How to cite
                 </div>
-                <p className="mt-2 text-xs text-foreground/65 font-mono leading-relaxed">
+                <p className="mt-2 text-xs text-muted-foreground font-mono leading-relaxed">
                   The Agriculture Popular Article Magazine, Vol. {issue.volume}, Iss. {issue.number}{" "}
                   ({issue.date}).
                 </p>
@@ -242,7 +242,7 @@ function CurrentIssue() {
                   <h3 className="font-display text-2xl text-[oklch(var(--navy))]">
                     Read the articles
                   </h3>
-                  <span className="text-xs uppercase tracking-wider text-foreground/60">
+                  <span className="text-xs uppercase tracking-wider text-muted-foreground">
                     {articles.length} papers
                   </span>
                 </div>
@@ -261,11 +261,11 @@ function CurrentIssue() {
                             <h4 className="font-display text-xl md:text-2xl mt-1.5 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] transition-colors leading-snug">
                               {a.title}
                             </h4>
-                            <p className="mt-2 text-sm text-foreground/65 leading-relaxed line-clamp-2">
+                            <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">
                               {a.abstract}
                             </p>
                           </Link>
-                          <div className="mt-3 text-xs text-foreground/60">
+                          <div className="mt-3 text-xs text-muted-foreground">
                             <span className="text-[oklch(var(--navy))] font-medium">
                               {a.author}
                             </span>

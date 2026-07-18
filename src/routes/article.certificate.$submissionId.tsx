@@ -104,7 +104,7 @@ function PublicationCertificate() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-paper flex flex-col items-center justify-center p-6 text-center font-sans">
+      <div className="min-h-dvh bg-paper flex flex-col items-center justify-center p-6 text-center font-sans">
         <Loader2 className="h-8 w-8 text-primary animate-spin mb-4" />
         <p className="text-sm text-foreground/77">Verifying peer-review and publication credentials…</p>
       </div>
@@ -113,7 +113,7 @@ function PublicationCertificate() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-paper flex flex-col items-center justify-center p-6 text-center font-sans max-w-md mx-auto">
+      <div className="min-h-dvh bg-paper flex flex-col items-center justify-center p-6 text-center font-sans max-w-md mx-auto">
         <Award className="h-12 w-12 text-destructive mb-4" />
         <h1 className="font-display text-2xl text-ink font-bold">Certificate Error</h1>
         <p className="text-sm text-foreground/75 mt-3 leading-relaxed">
@@ -131,7 +131,7 @@ function PublicationCertificate() {
 
   if (submission.status !== "published") {
     return (
-      <div className="min-h-screen bg-paper flex flex-col items-center justify-center p-6 text-center font-sans max-w-md mx-auto">
+      <div className="min-h-dvh bg-paper flex flex-col items-center justify-center p-6 text-center font-sans max-w-md mx-auto">
         <ShieldCheck className="h-12 w-12 text-ochre mb-4 animate-pulse" />
         <h1 className="font-display text-2xl text-ink font-bold">Under Review</h1>
         <p className="text-sm text-foreground/75 mt-3 leading-relaxed">
@@ -151,7 +151,7 @@ function PublicationCertificate() {
   });
 
   return (
-    <div className="min-h-screen bg-stone-100 py-10 print:py-0 print:bg-white flex flex-col items-center select-none">
+    <div className="min-h-dvh bg-stone-100 py-10 print:py-0 print:bg-white flex flex-col items-center select-none">
       
       {/* Floating Control Bar */}
       <div className="w-full max-w-4xl mb-6 px-4 flex justify-between items-center print:hidden font-sans">
@@ -204,7 +204,7 @@ function PublicationCertificate() {
             <div className="font-serif italic text-3xl md:text-4xl font-bold text-navy px-12 border-b border-[#8C6D3E]/30 pb-1.5 inline-block min-w-[340px] max-w-[650px] break-words leading-tight drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)]">
               {authorName}
             </div>
-            <div className="text-[10px] font-sans font-semibold text-foreground/60 uppercase tracking-widest mt-1.5 max-w-[600px] break-words leading-normal mx-auto">
+            <div className="text-[10px] font-sans font-semibold text-muted-foreground uppercase tracking-widest mt-1.5 max-w-[600px] break-words leading-normal mx-auto">
               {institution ? `${institution}, ${country}` : "Registered Agricultural Researcher"}
             </div>
           </div>

@@ -372,7 +372,7 @@ function Row({
                         key={f}
                         type="button"
                         onClick={() => setAuditFilter(f)}
-                        className={`px-2 py-1 transition-colors ${auditFilter === f ? "bg-orange text-white" : "text-foreground/60 hover:text-orange"}`}
+                        className={`px-2 py-1 transition-colors ${auditFilter === f ? "bg-orange text-white" : "text-muted-foreground hover:text-orange"}`}
                       >
                         {f === "all" ? "All" : f === "status" ? "Status" : "Notes"}
                       </button>
