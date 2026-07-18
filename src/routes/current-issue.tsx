@@ -38,6 +38,7 @@ export const Route = createFileRoute("/current-issue")({
     return (
       <>
         <SiteHeader />
+      <main id="main-content">
         <main className="container-editorial py-24">
           <ErrorComponent error={error} />
           <button
@@ -47,6 +48,7 @@ export const Route = createFileRoute("/current-issue")({
             Retry
           </button>
         </main>
+        </main>
         <SiteFooter />
       </>
     );
@@ -54,9 +56,11 @@ export const Route = createFileRoute("/current-issue")({
   notFoundComponent: () => (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-24 text-center">
         <h1 className="font-display text-3xl text-[oklch(var(--navy))]">No issue published yet</h1>
         <p className="mt-3 text-foreground/70">Please check back soon.</p>
+      </main>
       </main>
       <SiteFooter />
     </>
@@ -71,6 +75,7 @@ function CurrentIssue() {
     return (
       <>
         <SiteHeader />
+      <main id="main-content">
         <main className="container-editorial py-24 text-center">
           <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
             Current Issue
@@ -87,6 +92,7 @@ function CurrentIssue() {
           >
             Browse Archives <ArrowRight className="h-4 w-4" />
           </Link>
+        </main>
         </main>
         <SiteFooter />
       </>
@@ -125,6 +131,7 @@ function CurrentIssue() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(issueSchema) }} />
       <SiteHeader />
+      <main id="main-content">
       <main>
         {/* Masthead band */}
         <section className="border-b border-[oklch(var(--navy))]/15 bg-[oklch(var(--navy))]/[0.02]">
@@ -207,7 +214,7 @@ function CurrentIssue() {
                 <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
                   How to cite
                 </div>
-                <p className="mt-2 text-xs text-foreground/65 font-mono leading-relaxed">
+                <p className="mt-2 text-xs text-muted-foreground font-mono leading-relaxed">
                   The Agriculture Popular Article Magazine, Vol. {issue.volume}, Iss. {issue.number}{" "}
                   ({issue.date}).
                 </p>
@@ -235,7 +242,7 @@ function CurrentIssue() {
                   <h3 className="font-display text-2xl text-[oklch(var(--navy))]">
                     Read the articles
                   </h3>
-                  <span className="text-xs uppercase tracking-wider text-foreground/60">
+                  <span className="text-xs uppercase tracking-wider text-muted-foreground">
                     {articles.length} papers
                   </span>
                 </div>
@@ -254,11 +261,11 @@ function CurrentIssue() {
                             <h4 className="font-display text-xl md:text-2xl mt-1.5 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] transition-colors leading-snug">
                               {a.title}
                             </h4>
-                            <p className="mt-2 text-sm text-foreground/65 leading-relaxed line-clamp-2">
+                            <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">
                               {a.abstract}
                             </p>
                           </Link>
-                          <div className="mt-3 text-xs text-foreground/60">
+                          <div className="mt-3 text-xs text-muted-foreground">
                             <span className="text-[oklch(var(--navy))] font-medium">
                               {a.author}
                             </span>
@@ -319,6 +326,7 @@ function CurrentIssue() {
             </div>
           </div>
         </section>
+      </main>
       </main>
       <SiteFooter />
     </>

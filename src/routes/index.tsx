@@ -71,7 +71,7 @@ function Home() {
                 Submit Online →
               </Link>
               <span className="h-3 w-px bg-rule hidden sm:inline" />
-              <Link to="/submission-guidelines" className="text-xs uppercase tracking-wider font-semibold text-foreground/60 hover:text-ink transition-colors font-sans">
+              <Link to="/submission-guidelines" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground hover:text-ink transition-colors font-sans">
                 Author Guidelines
               </Link>
             </div>
@@ -103,7 +103,8 @@ function HeroSlider() {
 
   if (slides.length === 0) {
     return (
-      <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
+      <section className="relative w-full overflow-hidden bg-navy aspect-[4/5] sm:aspect-[16/9]">
+
         <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-primary/30 animate-pulse" />
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-white/60 font-display text-sm uppercase tracking-widest">Loading featured stories…</div>
@@ -113,7 +114,7 @@ function HeroSlider() {
   }
 
   return (
-    <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
+    <section className="relative w-full overflow-hidden bg-navy aspect-[4/5] sm:aspect-[16/9]">
       {slides.map((s, idx) => (
         <img
           key={idx}
@@ -152,12 +153,18 @@ function HeroSlider() {
       </button>
       <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
         {slides.map((_, idx) => (
+          // dot button — tap-target expanded, inner pill is the visible indicator
+          
           <button
             key={idx}
             onClick={() => setI(idx)}
-            aria-label={`Slide ${idx + 1}`}
-            className={`h-2 rounded-full transition-all ${idx === i ? "w-8 bg-white" : "w-2 bg-white/50"}`}
-          />
+            aria-label={`Go to slide ${idx + 1}`}
+            aria-current={idx === i ? "true" : undefined}
+            className={`min-h-11 min-w-11 grid place-items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange rounded-full`}
+          >
+            <span className={`block h-2 rounded-full transition-all ${idx === i ? "w-8 bg-white" : "w-2 bg-white/50"}`} />
+          </button>
+
         ))}
       </div>
     </section>
@@ -298,7 +305,10 @@ function RecentBlogs() {
                   <img
                     src={a.cover || "/placeholder.svg"}
                     alt={a.title}
-                    className="w-full h-full object-contain bg-stone-50/50 p-1 border-b border-rule hover:scale-105 transition-transform duration-700"
+                    width={800}
+                    height={450}
+                    className="w-full h-full object-cover border-b border-rule hover:scale-105 transition-transform duration-700"
+
                     loading="lazy"
                     onError={(e) => {
                       const t = e.currentTarget as HTMLImageElement;
@@ -318,7 +328,7 @@ function RecentBlogs() {
                       {a.title}
                     </Link>
                   </h3>
-                  <div className="mt-2 text-xs text-foreground/60 font-sans leading-relaxed">
+                  <div className="mt-2 text-xs text-muted-foreground font-sans leading-relaxed">
                     <span className="font-medium text-foreground/80">{a.author}</span>
                     <br />
                     <span className="inline-flex items-center gap-1 mt-0.5">
@@ -456,10 +466,11 @@ function Partners() {
           {partners.map((p, idx) => (
             <div
               key={p.name + "-" + idx}
-              className="aspect-square bg-white border border-rule grid place-items-center text-center p-2 hover-lift overflow-hidden"
+              className="aspect-[3/2] bg-white border border-rule grid place-items-center text-center p-3 hover-lift overflow-hidden"
             >
               {p.logo_url ? (
-                <img src={p.logo_url} alt={p.name} className="max-h-full max-w-full object-contain" />
+                <img src={p.logo_url} alt={p.name} width={240} height={160} loading="lazy" className="max-h-full max-w-full object-contain" />
+
               ) : (
                 <span className="font-display text-navy text-sm md:text-base leading-tight font-semibold">{p.name}</span>
               )}

@@ -100,6 +100,7 @@ function FaqPage() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-dashboard py-16 font-sans">
         <header className="max-w-3xl">
           <div className="eyebrow">{eyebrow}</div>
@@ -142,6 +143,7 @@ function FaqPage() {
             .
           </p>
         </section>
+      </main>
       </main>
       <SiteFooter />
     </>

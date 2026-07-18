@@ -335,16 +335,16 @@ function AdminSubmissions() {
         </div>
       </div>
 
-      <div className="mt-6 border border-rule">
+      <div className="mt-6 border border-rule" role="table" aria-label="Submissions">
         {rows === null ? (
           <AdminSubmissionsSkeleton count={6} />
         ) : filtered.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No submissions match your filters.</div>
         ) : (
           grouped.map(([day, items]) => (
-            <div key={day}>
-              <div className="bg-secondary/50 border-b border-rule px-5 py-2 text-xs uppercase tracking-wider text-muted-foreground flex justify-between">
-                <span>{day}</span>
+            <div key={day} role="rowgroup">
+              <div role="row" className="bg-secondary/50 border-b border-rule px-5 py-2 text-xs uppercase tracking-wider text-muted-foreground flex justify-between">
+                <span role="columnheader">{day}</span>
                 <span>{items.length} submission{items.length !== 1 ? "s" : ""}</span>
               </div>
               <ul className="divide-y divide-rule">
@@ -352,8 +352,9 @@ function AdminSubmissions() {
                   const profile = profiles[s.user_id];
                   const payment = payments[s.user_id];
                   return (
-                    <li key={s.id} className={`p-5 ${idx % 2 ? "bg-paper/50" : ""}`}>
+                    <li key={s.id} role="row" className={`p-5 ${idx % 2 ? "bg-paper/50" : ""}`}>
                       <div className="grid md:grid-cols-[1.6fr_1fr_auto_auto] gap-4 items-start">
+
                         <div className="min-w-0">
                           <div className="font-display text-lg text-ink truncate">{s.title}</div>
                           <div className="text-xs text-muted-foreground mt-1">

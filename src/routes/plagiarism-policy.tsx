@@ -23,6 +23,7 @@ function PlagiarismPolicy() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16 max-w-4xl">
         <div className="eyebrow">Policies</div>
         <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink max-w-3xl leading-[1.05]">
@@ -67,6 +68,7 @@ function PlagiarismPolicy() {
             If plagiarism is detected after publication, the editorial board reserves the right to formally retract the article from the magazine's archives, remove the PDF, and publish a notice of retraction. The author's affiliated institution may also be notified.
           </p>
         </Section>
+      </main>
       </main>
       <SiteFooter />
     </>

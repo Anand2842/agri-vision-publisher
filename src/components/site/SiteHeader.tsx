@@ -150,6 +150,15 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 bg-background border-b border-rule">
+
+      {/* Skip-to-content — visible on keyboard focus only */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-navy focus:text-white focus:rounded-sm focus:outline-none focus:ring-2 focus:ring-orange"
+      >
+        Skip to main content
+      </a>
+
       {/* ISSN identification strip — visible globally, required by ISSN India */}
       <div className="bg-primary/[0.06] border-b border-primary/10 py-1 text-center">
         <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-foreground/50 font-sans">
@@ -401,6 +410,7 @@ export function SiteHeader() {
                         active ? "text-orange" : "text-navy"
                       }`}
                       aria-expanded={groupOpen}
+                      aria-controls={`mobile-group-${n.label.replace(/\s+/g, "-")}`}
                     >
                       <span className="flex items-center gap-2.5">
                         <Icon className="h-4 w-4 opacity-70" />
@@ -414,16 +424,18 @@ export function SiteHeader() {
                     <Link
                       to={n.to}
                       onClick={() => setOpen(false)}
+                      aria-current={active ? "page" : undefined}
                       className={`flex items-center gap-2.5 py-3 font-condensed uppercase tracking-wider text-sm hover:text-orange ${
                         active ? "text-orange" : "text-navy"
                       }`}
+
                     >
                       <Icon className="h-4 w-4 opacity-70" />
                       {n.label}
                     </Link>
                   )}
                   {hasChildren && groupOpen && (
-                    <div className="pl-7 pb-2 flex flex-col">
+                    <div id={`mobile-group-${n.label.replace(/\s+/g, "-")}`} className="pl-7 pb-2 flex flex-col">
                       {n.children!.map((c) => {
                         const CIcon = iconFor(c.label);
                         return (

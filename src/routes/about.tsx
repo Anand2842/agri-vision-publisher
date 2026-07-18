@@ -27,6 +27,7 @@ function About() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="eyebrow">About</div>
         <h1 className="font-display text-5xl md:text-7xl mt-4 text-ink leading-[1.02] max-w-4xl">
@@ -64,7 +65,7 @@ function About() {
               <dl className="mt-6 divide-y divide-rule">
                 {particulars.map(([k, v]) => (
                   <div key={k} className="grid grid-cols-[110px_1fr] gap-4 py-3">
-                    <dt className="text-xs uppercase tracking-wider text-foreground/60 font-semibold pt-0.5">
+                    <dt className="text-xs uppercase tracking-wider text-muted-foreground font-semibold pt-0.5">
                       {k}
                     </dt>
                     <dd className="text-sm text-ink leading-relaxed">{v}</dd>
@@ -74,6 +75,7 @@ function About() {
             </div>
           </aside>
         </div>
+      </main>
       </main>
       <SiteFooter />
     </>

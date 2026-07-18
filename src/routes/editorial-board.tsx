@@ -70,7 +70,7 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
         } text-[oklch(var(--navy))]/30 border border-rule overflow-hidden`}
       >
         {m.photo_url ? (
-          <img src={m.photo_url} alt={m.name} className="h-full w-full object-cover" loading="lazy" />
+          <img src={m.photo_url} alt={m.name} width={480} height={600} className="h-full w-full object-cover object-top" loading="lazy" />
         ) : (
           <span className="tracking-wider">{initials(m.name)}</span>
         )}
@@ -86,7 +86,7 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
         </div>
       )}
       {(m.designation || m.department) && (
-        <div className="text-xs text-foreground/65 mt-1 leading-snug">
+        <div className="text-xs text-muted-foreground mt-1 leading-snug">
           {m.designation}
           {m.designation && m.department && <span className="mx-1 opacity-40">·</span>}
           {m.department}
@@ -136,6 +136,7 @@ function Board() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="border-b border-[oklch(var(--navy))]/15 pb-12">
           <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
@@ -191,7 +192,7 @@ function Board() {
                   </a>
                 )}
               </div>
-              <div className="text-sm text-foreground/65 text-right max-w-[55%] leading-snug shrink-0">
+              <div className="text-sm text-muted-foreground text-right max-w-[55%] leading-snug shrink-0">
                 <span className="italic">{m.inst}</span>
                 {m.country && <span className="block text-foreground/50">{m.country}</span>}
               </div>
@@ -222,7 +223,7 @@ function Board() {
                 )}
               </div>
               {r.inst && (
-                <div className="text-sm text-foreground/65 text-right max-w-[55%] leading-snug shrink-0">
+                <div className="text-sm text-muted-foreground text-right max-w-[55%] leading-snug shrink-0">
                   {r.dept && <span className="block">{r.dept}</span>}
                   <span className="italic">{r.inst}</span>
                 </div>
@@ -230,6 +231,7 @@ function Board() {
             </div>
           ))}
         </div>
+      </main>
       </main>
       <SiteFooter />
     </>

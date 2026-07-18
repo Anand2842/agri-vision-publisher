@@ -320,7 +320,7 @@ function Auth() {
           {mode === "signin" && (
             <button
               onClick={() => setResetMode(true)}
-              className="text-foreground/60 hover:text-orange hover:underline"
+              className="text-muted-foreground hover:text-orange hover:underline"
             >
               Forgot password?
             </button>

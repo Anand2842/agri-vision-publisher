@@ -321,7 +321,7 @@ function Dashboard() {
             // No membership active
             <div className="bg-paper border border-rule p-6 rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-sm">
               <div className="flex items-start gap-4">
-                <div className="bg-secondary/40 p-3 rounded text-foreground/60 shrink-0">
+                <div className="bg-secondary/40 p-3 rounded text-muted-foreground shrink-0">
                   <CreditCard className="h-6 w-6" />
                 </div>
                 <div>

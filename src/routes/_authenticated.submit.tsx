@@ -167,7 +167,7 @@ function Submit() {
                 <>
                   <FileText className="h-5 w-5 text-primary" />
                   <span className="font-display">{file.name}</span>
-                  <span className="text-foreground/60">({(file.size / 1024).toFixed(0)} KB)</span>
+                  <span className="text-muted-foreground">({(file.size / 1024).toFixed(0)} KB)</span>
                 </>
               ) : (
                 <>

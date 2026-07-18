@@ -66,6 +66,7 @@ function Advertise() {
     <>
       <SiteHeader />
       
+      <main id="main-content">
       {/* Hero Section */}
       <section className="bg-navy text-white py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
@@ -125,7 +126,7 @@ function Advertise() {
             {stats.map((s, i) => (
               <div key={i} className="p-4 border-r border-rule last:border-0 max-lg:[&:nth-child(2n)]:border-r-0">
                 <div className="font-display text-4xl font-bold text-primary">{s.value}</div>
-                <div className="text-xs uppercase tracking-wider text-foreground/60 mt-1 font-semibold">{s.label}</div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mt-1 font-semibold">{s.label}</div>
               </div>
             ))}
           </div>
@@ -205,6 +206,7 @@ function Advertise() {
           </div>
         </div>
       </section>
+      </main>
       <SiteFooter />
     </>
   );

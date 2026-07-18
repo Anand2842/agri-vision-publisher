@@ -137,7 +137,7 @@ function AdminLayout() {
           </div>
           <Link
             to="/dashboard"
-            className="text-xs uppercase tracking-wider text-foreground/60 hover:text-orange"
+            className="text-xs uppercase tracking-wider text-muted-foreground hover:text-orange"
           >
             Back to dashboard
           </Link>
@@ -166,7 +166,8 @@ function AdminLayout() {
                     <Link
                       key={it.to}
                       to={it.to}
-                      className={`flex items-center gap-2 px-3 py-2.5 text-xs uppercase tracking-wider font-condensed border-l-2 transition-colors whitespace-nowrap ${
+                      aria-current={active ? "page" : undefined}
+                      className={`flex items-center gap-2 px-3 py-2.5 text-xs uppercase tracking-wider font-condensed border-l-2 transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange ${
                         active
                           ? "border-orange text-navy bg-secondary/40"
                           : "border-transparent text-foreground/70 hover:text-orange"
@@ -175,6 +176,7 @@ function AdminLayout() {
                       <it.icon className="h-4 w-4" />
                       {it.label}
                     </Link>
+
                   );
                 })}
               </nav>

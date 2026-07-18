@@ -15,11 +15,13 @@ export const Route = createFileRoute("/articles/$slug")({
   notFoundComponent: () => (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-32 text-center">
         <h1 className="font-display text-4xl">Article not found</h1>
         <Link to="/archives" className="text-primary mt-4 inline-block">
           Browse archives →
         </Link>
+      </main>
       </main>
       <SiteFooter />
     </>
@@ -119,6 +121,7 @@ function Article() {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(articleSchema) }} />
       )}
       <SiteHeader />
+      <main id="main-content">
       <main>
         <header className="container-editorial pt-16 pb-12">
           <div className="max-w-3xl mx-auto text-center">
@@ -141,7 +144,7 @@ function Article() {
             </div>
 
             {/* ISSN-required bibliographic strip */}
-            <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-primary/5 border border-primary/15 rounded-sm px-5 py-2.5 text-[11px] uppercase tracking-[0.15em] font-semibold text-foreground/60 font-sans">
+            <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-primary/5 border border-primary/15 rounded-sm px-5 py-2.5 text-[11px] uppercase tracking-[0.15em] font-semibold text-muted-foreground font-sans">
               <span className="text-primary font-bold">{siteTitle}</span>
               {(a.volume || a.issueNumber) && (
                 <>
@@ -179,11 +182,14 @@ function Article() {
           <img
             src={a.cover || "/placeholder.svg"}
             alt={a.title}
+            width={1600}
+            height={900}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = "/placeholder.svg";
             }}
-            className="w-full aspect-[16/9] object-contain bg-stone-50/50 p-2 border border-rule rounded-sm"
+            className="w-full aspect-[4/5] sm:aspect-[16/9] object-cover border border-rule rounded-sm bg-paper"
           />
+
         </div>
 
         <div className="container-editorial grid md:grid-cols-12 gap-12 mt-14">
@@ -281,6 +287,7 @@ function Article() {
             </div>
           </aside>
         </div>
+      </main>
       </main>
       <SiteFooter />
     </>

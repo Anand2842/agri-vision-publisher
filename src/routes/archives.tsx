@@ -90,6 +90,7 @@ function Archives() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(collectionSchema) }} />
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="eyebrow">Archives</div>
         <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink">{get("hero", "headline")}</h1>
@@ -144,6 +145,7 @@ function Archives() {
           ))}
         </div>
       </main>
+      </main>
       <SiteFooter />
     </>
   );
@@ -184,17 +186,20 @@ function IssueCard({ issue }: { issue: IssueRow }) {
           <img
             src={issue.cover || undefined}
             alt={issue.title}
-            className="w-full h-full object-contain bg-stone-50/50 p-1"
+            width={288}
+            height={384}
+            className="w-full h-full object-cover"
             loading="lazy"
           />
         </div>
+
         <div className="flex flex-col justify-between gap-4">
           <div>
             <div className="text-xs text-foreground/55 uppercase font-semibold tracking-wider">
               Vol {issue.volume} · Issue {issue.number} · {issue.date}
             </div>
             <h2 className="font-display text-2xl md:text-3xl leading-tight mt-2">{issue.title}</h2>
-            <p className="text-[14px] text-foreground/65 mt-2 leading-relaxed line-clamp-2">{issue.desc}</p>
+            <p className="text-[14px] text-muted-foreground mt-2 leading-relaxed line-clamp-2">{issue.desc}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {issue.pdfUrl && (

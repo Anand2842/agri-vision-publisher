@@ -279,6 +279,7 @@ function Membership() {
   return (
     <>
       <SiteHeader />
+      <main id="main-content">
       <main className="container-editorial py-16">
         <div className="eyebrow text-center">Membership</div>
         <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink text-center max-w-3xl mx-auto leading-[1.05]">
@@ -697,10 +698,11 @@ function Membership() {
             </div>
           </div>
 
-          <p className="mt-12 text-center text-sm text-foreground/60 max-w-2xl mx-auto bg-muted/30 border border-rule/50 p-4 rounded-lg leading-relaxed">
+          <p className="mt-12 text-center text-sm text-muted-foreground max-w-2xl mx-auto bg-muted/30 border border-rule/50 p-4 rounded-lg leading-relaxed">
             <strong>Next Steps:</strong>Settle your membership fee via the scannable UPI code or direct bank deposit details on the left. Once paid, fill out the <strong>Settle Claim Proof</strong> form on the right. After verification, your profile will be updated immediately.
           </p>
         </section>
+      </main>
       </main>
       <SiteFooter />
     </>
