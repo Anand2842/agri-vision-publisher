@@ -36,10 +36,7 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
       });
     }
 
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id);
+    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
 
     const list = (roles || []).map((r) => r.role);
     if (!list.includes("admin")) {
@@ -197,7 +194,7 @@ function AdminUsers() {
         </p>
       </div>
 
-      <div className="flex items-center gap-3 max-w-md">
+      <div className="flex items-center gap-3 max-w-md" role="search" aria-label="Search users">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -210,117 +207,119 @@ function AdminUsers() {
       </div>
 
       <div className="border border-rule rounded-sm bg-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[250px] font-condensed uppercase tracking-wider text-xs px-4 py-3">
-                Profile
-              </TableHead>
-              <TableHead className="font-condensed uppercase tracking-wider text-xs px-4 py-3">
-                Institution
-              </TableHead>
-              <TableHead className="font-condensed uppercase tracking-wider text-xs px-4 py-3">
-                Country
-              </TableHead>
-              <TableHead className="font-condensed uppercase tracking-wider text-xs px-4 py-3">
-                Current Roles
-              </TableHead>
-              <TableHead className="w-[120px] text-right font-condensed uppercase tracking-wider text-xs px-4 py-3">
-                Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredProfiles.length === 0 ? (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
-                  No profiles found matching search criteria.
-                </TableCell>
+                <TableHead className="w-[250px] font-condensed uppercase tracking-wider text-xs px-4 py-3">
+                  Profile
+                </TableHead>
+                <TableHead className="font-condensed uppercase tracking-wider text-xs px-4 py-3">
+                  Institution
+                </TableHead>
+                <TableHead className="font-condensed uppercase tracking-wider text-xs px-4 py-3">
+                  Country
+                </TableHead>
+                <TableHead className="font-condensed uppercase tracking-wider text-xs px-4 py-3">
+                  Current Roles
+                </TableHead>
+                <TableHead className="w-[120px] text-right font-condensed uppercase tracking-wider text-xs px-4 py-3">
+                  Actions
+                </TableHead>
               </TableRow>
-            ) : (
-              filteredProfiles.map((p) => {
-                const roles = getUserRolesList(p.id);
-                return (
-                  <TableRow key={p.id}>
-                    <TableCell className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center font-display text-sm text-ink shrink-0 font-medium">
-                          {(p.full_name || "U")[0].toUpperCase()}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-display font-medium text-ink truncate text-sm">
-                            {p.full_name || "Unnamed User"}
+            </TableHeader>
+            <TableBody>
+              {filteredProfiles.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
+                    No profiles found matching search criteria.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredProfiles.map((p) => {
+                  const roles = getUserRolesList(p.id);
+                  return (
+                    <TableRow key={p.id}>
+                      <TableCell className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center font-display text-sm text-ink shrink-0 font-medium">
+                            {(p.full_name || "U")[0].toUpperCase()}
                           </div>
-                          <div className="text-[10px] text-muted-foreground">
-                            Joined {new Date(p.created_at).toLocaleDateString()}
+                          <div className="min-w-0">
+                            <div className="font-display font-medium text-ink truncate text-sm">
+                              {p.full_name || "Unnamed User"}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              Joined {new Date(p.created_at).toLocaleDateString()}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-ink font-sans truncate max-w-[200px]">
-                      {p.institution || <span className="text-muted-foreground/50">—</span>}
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-sm text-ink font-sans">
-                      {p.country || <span className="text-muted-foreground/50">—</span>}
-                    </TableCell>
-                    <TableCell className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {roles.length === 0 ? (
-                          <Badge
-                            variant="outline"
-                            className="bg-slate-50 text-slate-400 border-slate-200"
-                          >
-                            No Role
-                          </Badge>
-                        ) : (
-                          roles.map((r) => (
-                            <Badge key={r} variant="outline" className={getRoleBadgeColor(r)}>
-                              {r}
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-sm text-ink font-sans truncate max-w-[200px]">
+                        {p.institution || <span className="text-muted-foreground/50">—</span>}
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-sm text-ink font-sans">
+                        {p.country || <span className="text-muted-foreground/50">—</span>}
+                      </TableCell>
+                      <TableCell className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {roles.length === 0 ? (
+                            <Badge
+                              variant="outline"
+                              className="bg-slate-50 text-slate-400 border-slate-200"
+                            >
+                              No Role
                             </Badge>
-                          ))
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 border-rule text-xs uppercase tracking-wider font-condensed"
-                          >
-                            <UserCog className="h-3.5 w-3.5 mr-1.5" /> Roles
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48 bg-popover border-rule">
-                          <DropdownMenuLabel className="font-condensed text-xs uppercase tracking-wide">
-                            Modify Roles
-                          </DropdownMenuLabel>
-                          <DropdownMenuSeparator className="bg-rule" />
-                          {AVAILABLE_ROLES.map((r) => {
-                            const isAssigned = roles.includes(r);
-                            const isSelfAdmin = p.id === currentUserId && r === "admin";
-                            return (
-                              <DropdownMenuCheckboxItem
-                                key={r}
-                                checked={isAssigned}
-                                disabled={isSelfAdmin}
-                                onCheckedChange={() => toggleRole(p.id, r, isAssigned)}
-                                className="text-xs font-sans cursor-pointer focus:bg-secondary focus:text-ink"
-                              >
-                                {r.charAt(0).toUpperCase() + r.slice(1)}
-                              </DropdownMenuCheckboxItem>
-                            );
-                          })}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
+                          ) : (
+                            roles.map((r) => (
+                              <Badge key={r} variant="outline" className={getRoleBadgeColor(r)}>
+                                {r}
+                              </Badge>
+                            ))
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-3 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 border-rule text-xs uppercase tracking-wider font-condensed"
+                            >
+                              <UserCog className="h-3.5 w-3.5 mr-1.5" /> Roles
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48 bg-popover border-rule">
+                            <DropdownMenuLabel className="font-condensed text-xs uppercase tracking-wide">
+                              Modify Roles
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-rule" />
+                            {AVAILABLE_ROLES.map((r) => {
+                              const isAssigned = roles.includes(r);
+                              const isSelfAdmin = p.id === currentUserId && r === "admin";
+                              return (
+                                <DropdownMenuCheckboxItem
+                                  key={r}
+                                  checked={isAssigned}
+                                  disabled={isSelfAdmin}
+                                  onCheckedChange={() => toggleRole(p.id, r, isAssigned)}
+                                  className="text-xs font-sans cursor-pointer focus:bg-secondary focus:text-ink"
+                                >
+                                  {r.charAt(0).toUpperCase() + r.slice(1)}
+                                </DropdownMenuCheckboxItem>
+                              );
+                            })}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

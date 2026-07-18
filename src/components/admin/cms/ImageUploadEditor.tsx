@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { updateSiteContentCache } from "@/hooks/useSiteContent";
 
-
 interface ImageUploadEditorProps {
   label: string;
   page: string;
@@ -65,7 +64,7 @@ export function ImageUploadEditor({
           value: publicUrl,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: "page,section,key" }
+        { onConflict: "page,section,key" },
       );
 
       if (dbError) {
@@ -106,7 +105,7 @@ export function ImageUploadEditor({
           value: "",
           updated_at: new Date().toISOString(),
         },
-        { onConflict: "page,section,key" }
+        { onConflict: "page,section,key" },
       );
 
       if (dbError) {
@@ -201,9 +200,7 @@ export function ImageUploadEditor({
               </Button>
             </div>
           )}
-          <p className="text-xs text-muted-foreground">
-            JPG, PNG, WebP, SVG or GIF. Max 5MB.
-          </p>
+          <p className="text-xs text-muted-foreground">JPG, PNG, WebP, SVG or GIF. Max 5MB.</p>
         </div>
       </div>
     </div>

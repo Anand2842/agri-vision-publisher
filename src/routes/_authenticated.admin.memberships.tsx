@@ -393,7 +393,7 @@ function AdminMemberships() {
           <div>
             <h3 className="font-display text-sm text-ink font-bold">Offline Local Storage Mode Active</h3>
             <p className="text-xs text-foreground/80 mt-1 leading-relaxed">
-              Remote database table <code className="bg-orange/10 px-1 py-0.5 rounded font-mono text-[10px] text-orange">membership_payments</code> was not detected. All claim audits and approvals are stored in local storage for local demonstration.
+              Remote database table <code className="bg-orange/10 px-1 py-0.5 rounded font-mono text-xs text-orange">membership_payments</code> was not detected. All claim audits and approvals are stored in local storage for local demonstration.
             </p>
           </div>
         </div>
@@ -477,11 +477,11 @@ function AdminMemberships() {
                 {/* Left Side: Submitter and Claim Info */}
                 <div className="md:col-span-8 space-y-4">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-[10px] text-muted-foreground font-mono">
+                    <span className="text-xs text-muted-foreground font-mono">
                       CLAIM ID: #{claim.id.slice(0, 8).toUpperCase()}
                     </span>
                     {getStatusBadge(claim.status)}
-                    <span className={`px-2 py-0.5 border text-[10px] uppercase font-semibold tracking-wider rounded-sm ${getPlanBadgeStyle(claim.plan)}`}>
+                    <span className={`px-2 py-0.5 border text-xs uppercase font-semibold tracking-wider rounded-sm ${getPlanBadgeStyle(claim.plan)}`}>
                       {claim.plan} Plan
                     </span>
                   </div>
@@ -493,7 +493,7 @@ function AdminMemberships() {
                         <User className="h-4 w-4" />
                       </div>
                       <div className="overflow-hidden">
-                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Submitted By</span>
+                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Submitted By</span>
                         <span className="font-display text-ink font-bold block truncate">
                           {profile?.full_name || "Unknown Author"}
                         </span>
@@ -511,7 +511,7 @@ function AdminMemberships() {
                         <CreditCard className="h-4 w-4" />
                       </div>
                       <div>
-                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Payment Verification</span>
+                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">Payment Verification</span>
                         <span className="font-display text-ink font-bold block">
                           ₹{claim.amount.toLocaleString()} via <span className="uppercase text-xs">{claim.payment_method}</span>
                         </span>
@@ -519,7 +519,7 @@ function AdminMemberships() {
                           Ref / UTR: {claim.transaction_ref}
                         </span>
                         {getClaimMemberId(claim) && (
-                          <span className="inline-flex items-center bg-primary/10 text-primary text-[10px] font-semibold px-2 py-0.5 rounded-sm mt-1.5 font-sans">
+                          <span className="inline-flex items-center bg-primary/10 text-primary text-xs font-semibold px-2 py-0.5 rounded-sm mt-1.5 font-sans">
                             Member ID: {getClaimMemberId(claim)}
                           </span>
                         )}
@@ -554,7 +554,7 @@ function AdminMemberships() {
                 <div className="md:col-span-4 flex flex-col justify-between gap-4 border-t md:border-t-0 md:border-l border-rule pt-6 md:pt-0 md:pl-6">
                   {/* Receipt Preview Thumbnail */}
                   <div>
-                    <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-2">Receipt Screenshot</span>
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">Receipt Screenshot</span>
                     {receiptUrl ? (
                       <div 
                         onClick={() => setSelectedReceipt(receiptUrl)}
@@ -566,7 +566,7 @@ function AdminMemberships() {
                           className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                         />
                         <div className="absolute inset-0 bg-ink/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                          <span className="bg-paper text-ink px-2.5 py-1 text-[10px] uppercase font-bold flex items-center gap-1 shadow">
+                          <span className="bg-paper text-ink px-2.5 py-1 text-xs uppercase font-bold flex items-center gap-1 shadow">
                             <ImageIcon className="h-3.5 w-3.5" /> Inspect
                           </span>
                         </div>
@@ -597,14 +597,14 @@ function AdminMemberships() {
                     </div>
                   ) : (
                     <div className="mt-4 md:mt-0 space-y-2">
-                      <span className="text-[10px] text-center text-muted-foreground block font-medium">
+                      <span className="text-xs text-center text-muted-foreground block font-medium">
                         Change verification state:
                       </span>
                       <div className="flex gap-2">
                         {claim.status !== "approved" && (
                           <button
                             onClick={() => handleUpdateStatus(claim.id, "approved")}
-                            className="flex-1 py-1.5 border border-sage text-ink text-[10px] font-semibold flex items-center justify-center gap-1 hover:bg-sage hover:text-ink transition"
+                            className="flex-1 py-1.5 border border-sage text-ink text-xs font-semibold flex items-center justify-center gap-1 hover:bg-sage hover:text-ink transition"
                           >
                             <Check className="h-3 w-3" /> Set Approved
                           </button>
@@ -612,7 +612,7 @@ function AdminMemberships() {
                         {claim.status !== "rejected" && (
                           <button
                             onClick={() => handleUpdateStatus(claim.id, "rejected")}
-                            className="flex-1 py-1.5 border border-destructive/30 text-destructive text-[10px] font-semibold flex items-center justify-center gap-1 hover:bg-destructive/5 transition"
+                            className="flex-1 py-1.5 border border-destructive/30 text-destructive text-xs font-semibold flex items-center justify-center gap-1 hover:bg-destructive/5 transition"
                           >
                             <X className="h-3 w-3" /> Set Rejected
                           </button>
@@ -691,14 +691,14 @@ function MembershipNotesField({ claimId, initialNotes, onSave }: MembershipNotes
   return (
     <div className="bg-muted/30 border border-rule/50 p-4 rounded space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1.5">
+        <label className="text-xs uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-1.5">
           <MessageSquare className="h-3.5 w-3.5" /> Editorial/Verification Notes
         </label>
         {hasChanged && (
           <button
             onClick={handleSave}
             disabled={saving}
-            className="text-[10px] text-orange hover:underline font-bold disabled:opacity-50"
+            className="text-xs text-orange hover:underline font-bold disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Notes"}
           </button>

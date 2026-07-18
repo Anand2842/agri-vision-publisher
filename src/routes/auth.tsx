@@ -4,8 +4,10 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import { friendlyZodError } from "@/lib/form-errors";
 
 const authSearchSchema = z.object({
   redirect: z.string().optional(),
@@ -14,7 +16,10 @@ const authSearchSchema = z.object({
 export const Route = createFileRoute("/auth")({
   validateSearch: (search) => authSearchSchema.parse(search),
   component: Auth,
-  head: () => ({ meta: [{ title: "Sign in — The Agriculture Popular Article Magazine" }], links: [{ rel: "canonical", href: "https://agriculturemagazine.in/auth" }] }),
+  head: () => ({
+    meta: [{ title: "Sign in — The Agriculture Popular Article Magazine" }],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/auth" }],
+  }),
 });
 
 const schema = z.object({
@@ -24,7 +29,10 @@ const schema = z.object({
 
 function Auth() {
   const { get: getHeader } = useSiteContent("header");
-  const siteTitle = (getHeader("branding", "title_line1") || "The Agriculture") + " " + (getHeader("branding", "title_line2") || "Popular Article Magazine");
+  const siteTitle =
+    (getHeader("branding", "title_line1") || "The Agriculture") +
+    " " +
+    (getHeader("branding", "title_line2") || "Popular Article Magazine");
   const nav = useNavigate();
   const { redirect: redirectUrl } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -36,6 +44,7 @@ function Auth() {
   const [recoveryMode, setRecoveryMode] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,7 +119,7 @@ function Auth() {
     const data = { email: String(fd.get("email")), password: String(fd.get("password")) };
     const r = schema.safeParse(data);
     if (!r.success) {
-      toast.error(r.error.issues[0].message);
+      toast.error(friendlyZodError(r.error));
       return;
     }
     setLoading(true);
@@ -125,14 +134,18 @@ function Auth() {
           },
         });
         if (error) throw error;
-        
+
         // Detect if the email is already taken under Supabase Email Enumeration Prevention
-        if (signUpData.user && signUpData.user.identities && signUpData.user.identities.length === 0) {
+        if (
+          signUpData.user &&
+          signUpData.user.identities &&
+          signUpData.user.identities.length === 0
+        ) {
           toast.error("An account with this email already exists. Please sign in instead.");
           setLoading(false);
           return;
         }
-        
+
         if (!signUpData.session) {
           toast.success("Signup successful! Please check your email.");
           setSignUpPending(true);
@@ -157,36 +170,56 @@ function Auth() {
     return (
       <>
         <SiteHeader />
-        <main className="container-editorial py-20 max-w-md">
+        <main id="main-content" className="container-editorial py-20 max-w-md">
           <div className="eyebrow">Account recovery</div>
-          <h1 className="font-display text-4xl mt-3 text-ink">Set a new password</h1>
+          <h1 className="font-display text-2xl mt-3 text-ink">Set a new password</h1>
           <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
             Choose a new password for your account. You'll be signed in automatically.
           </p>
           <form onSubmit={handleUpdatePassword} className="mt-8 space-y-4">
-            <input
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="New password (min 8 characters)"
-              className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
-            />
-            <input
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-              className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={8}
+                autoComplete="new-password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="New password (min 8 characters)"
+                className="w-full h-10 bg-paper border border-rule px-4 pr-10 rounded-sm text-sm focus:outline-none focus:border-primary"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={8}
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm new password"
+                className="w-full h-10 bg-paper border border-rule px-4 pr-10 rounded-sm text-sm focus:outline-none focus:border-primary"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             <button
               disabled={loading}
-              className="w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
+              className="w-full h-10 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
             >
               {loading ? "Updating…" : "Update password"}
             </button>
@@ -201,15 +234,16 @@ function Auth() {
     return (
       <>
         <SiteHeader />
-        <main className="container-editorial py-20 max-w-md text-center">
+        <main id="main-content" className="container-editorial py-20 max-w-md text-center">
           <div className="eyebrow text-primary">Verification Required</div>
-          <h1 className="font-display text-4xl mt-3 text-ink">Check your email</h1>
+          <h1 className="font-display text-2xl mt-3 text-ink">Check your email</h1>
           <p className="mt-6 text-sm text-muted-foreground leading-relaxed">
-            We have sent a verification link to your email address. Please click the link to confirm your account and sign in.
+            We have sent a verification link to your email address. Please click the link to confirm
+            your account and sign in.
           </p>
           <button
             onClick={() => setSignUpPending(false)}
-            className="mt-8 w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="mt-8 w-full h-10 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 transition-colors"
           >
             Back to Sign In
           </button>
@@ -223,17 +257,19 @@ function Auth() {
     return (
       <>
         <SiteHeader />
-        <main className="container-editorial py-20 max-w-md">
+        <main id="main-content" className="container-editorial py-20 max-w-md">
           <div className="eyebrow">Account recovery</div>
-          <h1 className="font-display text-4xl mt-3 text-ink">Reset your password</h1>
+          <h1 className="font-display text-2xl mt-3 text-ink">Reset your password</h1>
           {resetSent ? (
             <p className="mt-6 text-sm text-muted-foreground leading-relaxed">
-              If an account exists for <strong>{resetEmail}</strong>, we've sent a password reset link. Please check your inbox (and spam folder).
+              If an account exists for <strong>{resetEmail}</strong>, we've sent a password reset
+              link. Please check your inbox (and spam folder).
             </p>
           ) : (
             <>
               <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                Enter the email associated with your account and we'll send you a secure link to set a new password.
+                Enter the email associated with your account and we'll send you a secure link to set
+                a new password.
               </p>
               <form onSubmit={handleReset} className="mt-8 space-y-4">
                 <input
@@ -243,11 +279,11 @@ function Auth() {
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
                   placeholder="Email"
-                  className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+                  className="w-full h-10 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
                 />
                 <button
                   disabled={loading}
-                  className="w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
+                  className="w-full h-10 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
                 >
                   {loading ? "Sending…" : "Send reset link"}
                 </button>
@@ -255,7 +291,10 @@ function Auth() {
             </>
           )}
           <button
-            onClick={() => { setResetMode(false); setResetSent(false); }}
+            onClick={() => {
+              setResetMode(false);
+              setResetSent(false);
+            }}
             className="mt-6 text-sm text-primary hover:underline"
           >
             ← Back to sign in
@@ -269,22 +308,20 @@ function Auth() {
   return (
     <>
       <SiteHeader />
-      <main className="container-editorial py-20 max-w-md">
-        <div className="eyebrow">
-          {mode === "signin" ? "Welcome back" : `Join ${siteTitle}`}
-        </div>
-        <h1 className="font-display text-4xl mt-3 text-ink">
+      <main id="main-content" className="container-editorial py-20 max-w-md">
+        <div className="eyebrow">{mode === "signin" ? "Welcome back" : `Join ${siteTitle}`}</div>
+        <h1 className="font-display text-2xl mt-3 text-ink">
           {mode === "signin" ? "Sign in" : "Create your account"}
         </h1>
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
           {mode === "signup" && (
-              <input
-                name="full_name"
-                required
-                autoComplete="name"
-                placeholder="Full name *"
-                className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
-              />
+            <input
+              name="full_name"
+              required
+              autoComplete="name"
+              placeholder="Full name *"
+              className="w-full h-10 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+            />
           )}
           <input
             name="email"
@@ -292,20 +329,30 @@ function Auth() {
             required
             autoComplete="email"
             placeholder="Email"
-            className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+            className="w-full h-10 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
           />
-          <input
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            minLength={8}
-            placeholder="Password (min 8 characters)"
-            className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
-          />
+          <div className="relative">
+            <input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              autoComplete="current-password"
+              minLength={8}
+              placeholder="Password (min 8 characters)"
+              className="w-full h-10 bg-paper border border-rule px-4 pr-10 rounded-sm text-sm focus:outline-none focus:border-primary"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
           <button
             disabled={loading}
-            className="w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
+            className="w-full h-10 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60"
           >
             {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>

@@ -3,11 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  getBackupRuns,
-  runBackupMirror,
-  testBackupConnection,
-} from "@/lib/backup.functions";
+import { getBackupRuns, runBackupMirror, testBackupConnection } from "@/lib/backup.functions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DatabaseBackup, PlayCircle, Plug, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
@@ -15,10 +11,7 @@ import { DatabaseBackup, PlayCircle, Plug, AlertTriangle, CheckCircle2, Clock } 
 export const Route = createFileRoute("/_authenticated/admin/backups")({
   component: AdminBackupsPage,
   head: () => ({
-    meta: [
-      { title: "Backups — Admin" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Backups — Admin" }, { name: "robots", content: "noindex" }],
   }),
 });
 
@@ -85,9 +78,9 @@ function AdminBackupsPage() {
             <h2 className="font-display text-2xl text-ink">Disaster Recovery Backups</h2>
           </div>
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-            Nightly automated mirror of all tables, storage files, and auth users
-            to a secondary Supabase project you control. See{" "}
-            <code className="text-xs">BACKUP_RECOVERY.md</code> for the failover runbook.
+            Nightly automated mirror of all tables, storage files, and auth users to a secondary
+            Supabase project you control. See <code className="text-xs">BACKUP_RECOVERY.md</code>{" "}
+            for the failover runbook.
           </p>
         </div>
         <div className="flex gap-2 shrink-0">
@@ -100,11 +93,7 @@ function AdminBackupsPage() {
             <Plug className="h-4 w-4 mr-2" />
             {testMut.isPending ? "Testing…" : "Test connection"}
           </Button>
-          <Button
-            size="sm"
-            onClick={() => runMut.mutate()}
-            disabled={runMut.isPending}
-          >
+          <Button size="sm" onClick={() => runMut.mutate()} disabled={runMut.isPending}>
             <PlayCircle className="h-4 w-4 mr-2" />
             {runMut.isPending ? "Running…" : "Run backup now"}
           </Button>
@@ -143,67 +132,71 @@ function AdminBackupsPage() {
           <div className="p-6 text-sm text-muted-foreground">Loading…</div>
         ) : runs.length === 0 ? (
           <div className="p-6 text-sm text-muted-foreground">
-            No backup runs yet. Click <strong>Test connection</strong> first,
-            then <strong>Run backup now</strong> to perform the initial mirror.
+            No backup runs yet. Click <strong>Test connection</strong> first, then{" "}
+            <strong>Run backup now</strong> to perform the initial mirror.
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground border-b border-border">
-                <th className="px-4 py-2">Started</th>
-                <th className="px-4 py-2">Status</th>
-                <th className="px-4 py-2">Trigger</th>
-                <th className="px-4 py-2 text-right">Tables</th>
-                <th className="px-4 py-2 text-right">Rows</th>
-                <th className="px-4 py-2 text-right">Files</th>
-                <th className="px-4 py-2 text-right">Users</th>
-                <th className="px-4 py-2">Duration</th>
-                <th className="px-4 py-2">Error</th>
-              </tr>
-            </thead>
-            <tbody>
-              {runs.map((r) => {
-                const dur =
-                  r.finished_at && r.started_at
-                    ? Math.round(
-                        (new Date(r.finished_at).getTime() -
-                          new Date(r.started_at).getTime()) /
-                          1000,
-                      )
-                    : null;
-                return (
-                  <tr key={r.id} className="border-b border-border/50 last:border-0">
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      {new Date(r.started_at).toLocaleString()}
-                    </td>
-                    <td className="px-4 py-2">
-                      <StatusBadge status={r.status} />
-                    </td>
-                    <td className="px-4 py-2 text-xs uppercase tracking-wider text-muted-foreground">
-                      {r.trigger}
-                    </td>
-                    <td className="px-4 py-2 text-right">{r.tables_synced}</td>
-                    <td className="px-4 py-2 text-right">{r.rows_synced}</td>
-                    <td className="px-4 py-2 text-right">{r.files_synced}</td>
-                    <td className="px-4 py-2 text-right">{r.auth_users_synced}</td>
-                    <td className="px-4 py-2 text-xs text-muted-foreground">
-                      {dur !== null ? (
-                        <span className="inline-flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {dur}s
-                        </span>
-                      ) : (
-                        "—"
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-xs text-red-700 max-w-xs truncate" title={r.error ?? ""}>
-                      {r.error ?? "—"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground border-b border-border">
+                  <th className="px-4 py-2">Started</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">Trigger</th>
+                  <th className="px-4 py-2 text-right">Tables</th>
+                  <th className="px-4 py-2 text-right">Rows</th>
+                  <th className="px-4 py-2 text-right">Files</th>
+                  <th className="px-4 py-2 text-right">Users</th>
+                  <th className="px-4 py-2">Duration</th>
+                  <th className="px-4 py-2">Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {runs.map((r) => {
+                  const dur =
+                    r.finished_at && r.started_at
+                      ? Math.round(
+                          (new Date(r.finished_at).getTime() - new Date(r.started_at).getTime()) /
+                            1000,
+                        )
+                      : null;
+                  return (
+                    <tr key={r.id} className="border-b border-border/50 last:border-0">
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        {new Date(r.started_at).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-2">
+                        <StatusBadge status={r.status} />
+                      </td>
+                      <td className="px-4 py-2 text-xs uppercase tracking-wider text-muted-foreground">
+                        {r.trigger}
+                      </td>
+                      <td className="px-4 py-2 text-right">{r.tables_synced}</td>
+                      <td className="px-4 py-2 text-right">{r.rows_synced}</td>
+                      <td className="px-4 py-2 text-right">{r.files_synced}</td>
+                      <td className="px-4 py-2 text-right">{r.auth_users_synced}</td>
+                      <td className="px-4 py-2 text-xs text-muted-foreground">
+                        {dur !== null ? (
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {dur}s
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td
+                        className="px-4 py-2 text-xs text-red-700 max-w-xs truncate"
+                        title={r.error ?? ""}
+                      >
+                        {r.error ?? "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

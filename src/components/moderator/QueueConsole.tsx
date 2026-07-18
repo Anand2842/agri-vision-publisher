@@ -265,7 +265,7 @@ function Row({
           </div>
         </div>
         <span
-          className={`text-[0.65rem] uppercase tracking-widest px-2 py-1 rounded-sm shrink-0 ${STATUS_TONE[s.status] || "bg-muted"}`}
+          className={`text-xs uppercase tracking-widest px-2 py-1 rounded-sm shrink-0 ${STATUS_TONE[s.status] || "bg-muted"}`}
         >
           {s.status.replace("_", " ")}
         </span>
@@ -354,7 +354,7 @@ function Row({
                   Reject
                 </ActionButton>
               </div>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Approval keeps the article in queue. An admin then promotes it to a published
                 article in an issue.
               </p>
@@ -366,7 +366,7 @@ function Row({
                   <History className="h-3 w-3" /> Audit history
                 </div>
                 {events && events.length > 0 && (
-                  <div className="inline-flex border border-rule rounded-sm overflow-hidden text-[10px] uppercase tracking-wider">
+                  <div className="inline-flex border border-rule rounded-sm overflow-hidden text-xs uppercase tracking-wider">
                     {(["all", "status", "notes"] as const).map((f) => (
                       <button
                         key={f}

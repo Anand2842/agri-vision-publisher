@@ -88,8 +88,7 @@ function FaqPage() {
   const { items: initialItems } = Route.useLoaderData();
 
   const cmsItems = getJson<"main", "items", FaqItem[]>("main", "items");
-  const items: FaqItem[] =
-    Array.isArray(cmsItems) && cmsItems.length > 0 ? cmsItems : initialItems;
+  const items: FaqItem[] = Array.isArray(cmsItems) && cmsItems.length > 0 ? cmsItems : initialItems;
 
   const eyebrow = get("hero", "eyebrow");
   const title = get("hero", "title");
@@ -100,11 +99,10 @@ function FaqPage() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-dashboard py-16 font-sans">
+      <main id="main-content" className="container-dashboard py-16 font-sans">
         <header className="max-w-3xl">
           <div className="eyebrow">{eyebrow}</div>
-          <h1 className="font-display text-5xl mt-3 text-ink">{title}</h1>
+          <h1 className="font-display text-2xl mt-3 text-ink">{title}</h1>
           <p className="text-base text-muted-foreground mt-4 leading-relaxed">{intro}</p>
         </header>
 
@@ -143,7 +141,6 @@ function FaqPage() {
             .
           </p>
         </section>
-      </main>
       </main>
       <SiteFooter />
     </>

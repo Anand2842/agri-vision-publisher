@@ -22,23 +22,26 @@ export const Route = createFileRoute("/submission-guidelines")({
 function Guidelines() {
   const { get, getJson } = useSiteContent("guidelines");
   const steps = getJson<"process", "steps", string[]>("process", "steps");
-  const formatting = getJson<"formatting", "items", { l: string; v: string }[]>("formatting", "items");
-  const fees = getJson<"fees", "items", { who: string; fee: string; note: string }[]>("fees", "items");
+  const formatting = getJson<"formatting", "items", { l: string; v: string }[]>(
+    "formatting",
+    "items",
+  );
+  const fees = getJson<"fees", "items", { who: string; fee: string; note: string }[]>(
+    "fees",
+    "items",
+  );
   const requirements = getJson<"requirements", "items", string[]>("requirements", "items");
   const originality = getJson<"originality", "items", string[]>("originality", "items");
 
   return (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-16">
+      <main id="main-content" className="container-editorial py-16">
         <div className="eyebrow">Authors</div>
-        <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink max-w-3xl leading-[1.05]">
+        <h1 className="font-display text-2xl md:text-3xl mt-3 text-ink max-w-3xl leading-[1.05]">
           {get("hero", "heading")}
         </h1>
-        <p className="mt-6 max-w-2xl text-foreground/75 leading-relaxed">
-          {get("hero", "intro")}
-        </p>
+        <p className="mt-6 max-w-2xl text-foreground/75 leading-relaxed">{get("hero", "intro")}</p>
 
         <Section title="1. Editorial & Review Process">
           <ol className="grid grid-cols-2 md:grid-cols-6 gap-4">
@@ -88,9 +91,7 @@ function Guidelines() {
         <Section title="4. Submission Requirements">
           <ul className="space-y-3 text-foreground/80 leading-relaxed max-w-3xl">
             {requirements.map((req: string, i: number) => (
-              <li key={i}>
-                • {req}
-              </li>
+              <li key={i}>• {req}</li>
             ))}
           </ul>
         </Section>
@@ -109,9 +110,7 @@ function Guidelines() {
         <Section title="6. Originality & Plagiarism">
           <ul className="space-y-3 text-foreground/80 leading-relaxed max-w-3xl">
             {originality.map((orig: string, i: number) => (
-              <li key={i}>
-                • {orig}
-              </li>
+              <li key={i}>• {orig}</li>
             ))}
           </ul>
         </Section>
@@ -130,7 +129,6 @@ function Guidelines() {
             Begin a submission →
           </Link>
         </div>
-      </main>
       </main>
       <SiteFooter />
     </>

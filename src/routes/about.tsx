@@ -27,18 +27,15 @@ function About() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-16">
+      <main id="main-content" className="container-editorial py-16">
         <div className="eyebrow">About</div>
-        <h1 className="font-display text-5xl md:text-7xl mt-4 text-ink leading-[1.02] max-w-4xl">
+        <h1 className="font-display text-2xl md:text-3xl mt-4 text-ink leading-[1.02] max-w-4xl">
           {get("hero", "tagline")}
         </h1>
 
         <div className="grid md:grid-cols-12 gap-12 mt-16">
-          <div className="md:col-span-7 space-y-8 text-foreground/85 leading-[1.8]">
-            <p className="drop-cap text-lg">
-              {get("hero", "para1")}
-            </p>
+          <div className="md:col-span-7 space-y-8 text-foreground/85 leading-relaxed">
+            <p className="drop-cap text-lg">{get("hero", "para1")}</p>
             <p>{get("hero", "para2")}</p>
             <p>{get("hero", "para3")}</p>
             <p>{get("hero", "para4")}</p>
@@ -60,7 +57,7 @@ function About() {
           </div>
 
           <aside className="md:col-span-5">
-            <div className="md:sticky md:top-28 bg-paper border border-rule p-8">
+            <div className="md:sticky md:top-36 bg-paper border border-rule p-8">
               <div className="eyebrow">Journal Particulars</div>
               <dl className="mt-6 divide-y divide-rule">
                 {particulars.map(([k, v]) => (
@@ -75,7 +72,6 @@ function About() {
             </div>
           </aside>
         </div>
-      </main>
       </main>
       <SiteFooter />
     </>

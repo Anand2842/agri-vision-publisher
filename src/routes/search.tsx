@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { searchArticles, type DBArticle } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { Search as SearchIcon } from "lucide-react";
+import { Search as SearchIcon, X } from "lucide-react";
 
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 import { ListSkeleton } from "@/components/site/Skeletons";
@@ -69,17 +69,16 @@ function SearchPage() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-16">
+      <main id="main-content" className="container-editorial py-16">
         <div className="eyebrow">Search</div>
-        <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink">
+        <h1 className="font-display text-2xl md:text-3xl mt-3 text-ink">
           {get("hero", "headline")}
         </h1>
         <div className="mt-10">
           <label htmlFor="search-input" className="sr-only">
             Search published articles
           </label>
-          <div className="flex items-center gap-3 border-b-2 border-foreground pb-3">
+          <div className="relative flex items-center gap-3 border-b-2 border-foreground pb-3">
             <SearchIcon className="h-5 w-5 text-muted-foreground" />
             <input
               id="search-input"
@@ -88,6 +87,18 @@ function SearchPage() {
               placeholder="e.g. soil carbon, paddy, vertical farming"
               className="flex-1 bg-transparent text-2xl font-display outline-none placeholder:text-muted-foreground/60"
             />
+            {q && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQ("");
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
             {loading && (
               <span className="text-xs text-muted-foreground animate-pulse font-mono shrink-0">
                 Searching...
@@ -105,20 +116,22 @@ function SearchPage() {
               No matching articles found. Try different keywords.
             </li>
           )}
-          {!loading && results.map((a) => (
-            <li key={a.slug} className="py-7">
-              <Link to="/articles/$slug" params={{ slug: a.slug }} className="group block">
-                <div className="eyebrow">{a.category}</div>
-                <div className="font-display text-2xl mt-1 group-hover:text-primary">{a.title}</div>
-                <div className="text-sm text-foreground/70 mt-2 max-w-2xl">{a.abstract}</div>
-                <div className="text-xs text-muted-foreground mt-3">
-                  {a.author} · {a.affiliation} · {a.date}
-                </div>
-              </Link>
-            </li>
-          ))}
+          {!loading &&
+            results.map((a) => (
+              <li key={a.slug} className="py-7">
+                <Link to="/articles/$slug" params={{ slug: a.slug }} className="group block">
+                  <div className="eyebrow">{a.category}</div>
+                  <div className="font-display text-2xl mt-1 group-hover:text-primary">
+                    {a.title}
+                  </div>
+                  <div className="text-sm text-foreground/70 mt-2 max-w-2xl">{a.abstract}</div>
+                  <div className="text-xs text-muted-foreground mt-3">
+                    {a.author} · {a.affiliation} · {a.date}
+                  </div>
+                </Link>
+              </li>
+            ))}
         </ul>
-      </main>
       </main>
       <SiteFooter />
     </>

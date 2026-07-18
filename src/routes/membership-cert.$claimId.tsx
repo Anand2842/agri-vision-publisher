@@ -5,15 +5,30 @@ import { getLocalStorageClaims, MOCK_PROFILES, PaymentClaim } from "@/lib/paymen
 import { getClaimMemberId } from "./_authenticated.admin.memberships";
 import { Printer, ArrowLeft, Loader2, Award, ShieldCheck } from "lucide-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import logo from "@/assets/logo.png";
 
-export const Route = createFileRoute("/membership/certificate/$claimId")({
+const MOCK_MEMBERSHIP_CERT: PaymentClaim = {
+  id: "m1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  user_id: "mock-user-001",
+  plan: "annual",
+  amount: 500,
+  status: "approved",
+  payment_method: "upi",
+  transaction_ref: "MOCK-TXN-2026-07-10-001",
+  receipt_path: null,
+  notes: null,
+  created_at: "2026-06-20T09:15:00Z",
+  updated_at: "2026-07-10T16:45:00Z",
+};
+
+export const Route = createFileRoute("/membership-cert/$claimId")({
   component: MembershipCertificate,
   head: ({ params }) => ({
     meta: [
       { title: "Membership Certificate — The Agriculture Popular Article Magazine" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: `https://agriculturemagazine.in/membership/certificate/${params.claimId}` }],
+    links: [{ rel: "canonical", href: `https://agriculturemagazine.in/membership-cert/${params.claimId}` }],
   }),
 });
 
@@ -40,7 +55,7 @@ function fmtPlan(plan: string) {
 }
 
 function MembershipCertificate() {
-  const { claimId } = useParams({ from: "/membership/certificate/$claimId" });
+  const { claimId } = useParams({ from: "/membership-cert/$claimId" });
   const [data, setData] = useState<CertificateData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +65,19 @@ function MembershipCertificate() {
     const loadCertificateData = async () => {
       setLoading(true);
       setError(null);
+
+      // Preview mode: show mock data without database
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("preview") === "true") {
+        setData({
+          claim: MOCK_MEMBERSHIP_CERT,
+          authorName: "Dr. Anand Kumar",
+          institution: "Indian Agricultural Research Institute (IARI)",
+          country: "India",
+        });
+        setLoading(false);
+        return;
+      }
 
       // 1. Try local storage first to support fully offline mode seamlessly
       const localClaims = getLocalStorageClaims();
@@ -195,10 +223,11 @@ function MembershipCertificate() {
           
           {/* Header */}
           <div className="space-y-2">
-            <div className="text-[11px] font-sans font-semibold text-primary uppercase tracking-[0.3em] font-semibold">
+            <img src={logo} alt="TAPAM Logo" className="h-14 mx-auto mb-2" />
+            <div className="text-xs font-sans font-semibold text-primary uppercase tracking-[0.3em] font-semibold">
               {getCert("branding", "magazine_name")}
             </div>
-            <div className="text-[9px] font-sans font-bold text-muted-foreground uppercase tracking-widest">
+            <div className="text-xs font-sans font-bold text-muted-foreground uppercase tracking-widest">
               Published by: {getCert("branding", "publisher")}
             </div>
             <div className="w-40 h-px bg-gradient-to-r from-transparent via-[#8C6D3E]/40 to-transparent mx-auto mt-2" />
@@ -206,7 +235,7 @@ function MembershipCertificate() {
 
           {/* Certificate Title */}
           <div className="my-3">
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-[#8C6D3E] uppercase tracking-[0.15em] leading-none drop-shadow-sm">
+            <h1 className="font-display text-xl md:text-2xl font-bold text-[#8C6D3E] uppercase tracking-[0.15em] leading-none drop-shadow-sm">
               Certificate of Membership
             </h1>
             <p className="font-serif italic text-sm text-foreground/75 mt-3">
@@ -216,10 +245,10 @@ function MembershipCertificate() {
 
           {/* Member Name */}
           <div className="my-2">
-            <div className="font-serif italic text-4xl md:text-5xl font-bold text-navy px-12 border-b border-[#8C6D3E]/30 pb-2 inline-block min-w-[360px] max-w-[650px] break-words leading-tight drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)]">
+            <div className="font-serif italic text-xl md:text-2xl font-bold text-navy px-12 border-b border-[#8C6D3E]/30 pb-2 inline-block min-w-[360px] max-w-[650px] break-words leading-tight drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)]">
               {authorName}
             </div>
-            <div className="text-[11px] font-sans font-semibold text-muted-foreground uppercase tracking-widest mt-2 max-w-[600px] break-words leading-normal mx-auto">
+            <div className="text-xs font-sans font-semibold text-muted-foreground uppercase tracking-widest mt-2 max-w-[600px] break-words leading-normal mx-auto">
               {institution ? `${institution}, ${country}` : "Registered Agricultural Researcher"}
             </div>
           </div>
@@ -249,7 +278,7 @@ function MembershipCertificate() {
                 {getCert("branding", "chief_editor_signature")}
               </div>
               <div className="w-36 h-px bg-foreground/30 mb-2" />
-              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
+              <div className="text-xs font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
                 {getCert("branding", "chief_editor")}
               </div>
               <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest max-w-[220px] break-words leading-tight mt-0.5">
@@ -282,7 +311,7 @@ function MembershipCertificate() {
                 {getCert("branding", "publisher_signature")}
               </div>
               <div className="w-36 h-px bg-foreground/30 mb-2" />
-              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
+              <div className="text-xs font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
                 {getCert("branding", "publisher_title")}
               </div>
               <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest max-w-[220px] break-words leading-tight mt-0.5">

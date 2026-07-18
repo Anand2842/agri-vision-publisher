@@ -27,12 +27,12 @@ import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MembershipCertClaimIdRouteImport } from './routes/membership-cert.$claimId'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 import { Route as AuthenticatedSubmitRouteImport } from './routes/_authenticated.submit'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
-import { Route as MembershipCertificateClaimIdRouteImport } from './routes/membership.certificate.$claimId'
 import { Route as ArticleCertificateSubmissionIdRouteImport } from './routes/article.certificate.$submissionId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated.admin.users'
 import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_authenticated.admin.submissions'
@@ -135,6 +135,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MembershipCertClaimIdRoute = MembershipCertClaimIdRouteImport.update({
+  id: '/membership-cert/$claimId',
+  path: '/membership-cert/$claimId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
   id: '/articles/$slug',
   path: '/articles/$slug',
@@ -160,12 +165,6 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const MembershipCertificateClaimIdRoute =
-  MembershipCertificateClaimIdRouteImport.update({
-    id: '/certificate/$claimId',
-    path: '/certificate/$claimId',
-    getParentRoute: () => MembershipRoute,
-  } as any)
 const ArticleCertificateSubmissionIdRoute =
   ArticleCertificateSubmissionIdRouteImport.update({
     id: '/article/certificate/$submissionId',
@@ -247,7 +246,7 @@ export interface FileRoutesByFullPath {
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/faq': typeof FaqRoute
-  '/membership': typeof MembershipRouteWithChildren
+  '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
   '/plagiarism-policy': typeof PlagiarismPolicyRoute
   '/publication-ethics': typeof PublicationEthicsRoute
@@ -259,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/membership-cert/$claimId': typeof MembershipCertClaimIdRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/admin/backups': typeof AuthenticatedAdminBackupsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -270,7 +270,6 @@ export interface FileRoutesByFullPath {
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
-  '/membership/certificate/$claimId': typeof MembershipCertificateClaimIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/backup-mirror': typeof ApiPublicHooksBackupMirrorRoute
 }
@@ -284,7 +283,7 @@ export interface FileRoutesByTo {
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/faq': typeof FaqRoute
-  '/membership': typeof MembershipRouteWithChildren
+  '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
   '/plagiarism-policy': typeof PlagiarismPolicyRoute
   '/publication-ethics': typeof PublicationEthicsRoute
@@ -295,6 +294,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/membership-cert/$claimId': typeof MembershipCertClaimIdRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/admin/backups': typeof AuthenticatedAdminBackupsRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -306,7 +306,6 @@ export interface FileRoutesByTo {
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
-  '/membership/certificate/$claimId': typeof MembershipCertificateClaimIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/backup-mirror': typeof ApiPublicHooksBackupMirrorRoute
 }
@@ -322,7 +321,7 @@ export interface FileRoutesById {
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/faq': typeof FaqRoute
-  '/membership': typeof MembershipRouteWithChildren
+  '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
   '/plagiarism-policy': typeof PlagiarismPolicyRoute
   '/publication-ethics': typeof PublicationEthicsRoute
@@ -334,6 +333,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/membership-cert/$claimId': typeof MembershipCertClaimIdRoute
   '/_authenticated/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/_authenticated/admin/backups': typeof AuthenticatedAdminBackupsRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -345,7 +345,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
-  '/membership/certificate/$claimId': typeof MembershipCertificateClaimIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/backup-mirror': typeof ApiPublicHooksBackupMirrorRoute
 }
@@ -373,6 +372,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/submit'
     | '/articles/$slug'
+    | '/membership-cert/$claimId'
     | '/admin/articles'
     | '/admin/backups'
     | '/admin/categories'
@@ -384,7 +384,6 @@ export interface FileRouteTypes {
     | '/admin/submissions'
     | '/admin/users'
     | '/article/certificate/$submissionId'
-    | '/membership/certificate/$claimId'
     | '/admin/'
     | '/api/public/hooks/backup-mirror'
   fileRoutesByTo: FileRoutesByTo
@@ -409,6 +408,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/submit'
     | '/articles/$slug'
+    | '/membership-cert/$claimId'
     | '/admin/articles'
     | '/admin/backups'
     | '/admin/categories'
@@ -420,7 +420,6 @@ export interface FileRouteTypes {
     | '/admin/submissions'
     | '/admin/users'
     | '/article/certificate/$submissionId'
-    | '/membership/certificate/$claimId'
     | '/admin'
     | '/api/public/hooks/backup-mirror'
   id:
@@ -447,6 +446,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/submit'
     | '/articles/$slug'
+    | '/membership-cert/$claimId'
     | '/_authenticated/admin/articles'
     | '/_authenticated/admin/backups'
     | '/_authenticated/admin/categories'
@@ -458,7 +458,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/submissions'
     | '/_authenticated/admin/users'
     | '/article/certificate/$submissionId'
-    | '/membership/certificate/$claimId'
     | '/_authenticated/admin/'
     | '/api/public/hooks/backup-mirror'
   fileRoutesById: FileRoutesById
@@ -474,7 +473,7 @@ export interface RootRouteChildren {
   CurrentIssueRoute: typeof CurrentIssueRoute
   EditorialBoardRoute: typeof EditorialBoardRoute
   FaqRoute: typeof FaqRoute
-  MembershipRoute: typeof MembershipRouteWithChildren
+  MembershipRoute: typeof MembershipRoute
   ModerateRoute: typeof ModerateRoute
   PlagiarismPolicyRoute: typeof PlagiarismPolicyRoute
   PublicationEthicsRoute: typeof PublicationEthicsRoute
@@ -483,6 +482,7 @@ export interface RootRouteChildren {
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
+  MembershipCertClaimIdRoute: typeof MembershipCertClaimIdRoute
   ArticleCertificateSubmissionIdRoute: typeof ArticleCertificateSubmissionIdRoute
   ApiPublicHooksBackupMirrorRoute: typeof ApiPublicHooksBackupMirrorRoute
 }
@@ -615,6 +615,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/membership-cert/$claimId': {
+      id: '/membership-cert/$claimId'
+      path: '/membership-cert/$claimId'
+      fullPath: '/membership-cert/$claimId'
+      preLoaderRoute: typeof MembershipCertClaimIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/articles/$slug': {
       id: '/articles/$slug'
       path: '/articles/$slug'
@@ -649,13 +656,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/membership/certificate/$claimId': {
-      id: '/membership/certificate/$claimId'
-      path: '/certificate/$claimId'
-      fullPath: '/membership/certificate/$claimId'
-      preLoaderRoute: typeof MembershipCertificateClaimIdRouteImport
-      parentRoute: typeof MembershipRoute
     }
     '/article/certificate/$submissionId': {
       id: '/article/certificate/$submissionId'
@@ -791,18 +791,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface MembershipRouteChildren {
-  MembershipCertificateClaimIdRoute: typeof MembershipCertificateClaimIdRoute
-}
-
-const MembershipRouteChildren: MembershipRouteChildren = {
-  MembershipCertificateClaimIdRoute: MembershipCertificateClaimIdRoute,
-}
-
-const MembershipRouteWithChildren = MembershipRoute._addFileChildren(
-  MembershipRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -814,7 +802,7 @@ const rootRouteChildren: RootRouteChildren = {
   CurrentIssueRoute: CurrentIssueRoute,
   EditorialBoardRoute: EditorialBoardRoute,
   FaqRoute: FaqRoute,
-  MembershipRoute: MembershipRouteWithChildren,
+  MembershipRoute: MembershipRoute,
   ModerateRoute: ModerateRoute,
   PlagiarismPolicyRoute: PlagiarismPolicyRoute,
   PublicationEthicsRoute: PublicationEthicsRoute,
@@ -823,9 +811,20 @@ const rootRouteChildren: RootRouteChildren = {
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
+  MembershipCertClaimIdRoute: MembershipCertClaimIdRoute,
   ArticleCertificateSubmissionIdRoute: ArticleCertificateSubmissionIdRoute,
   ApiPublicHooksBackupMirrorRoute: ApiPublicHooksBackupMirrorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

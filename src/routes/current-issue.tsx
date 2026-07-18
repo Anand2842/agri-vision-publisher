@@ -1,12 +1,7 @@
 import { createFileRoute, Link, ErrorComponent, useRouter } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import {
-  fetchIssues,
-  fetchPublishedArticles,
-  articlePdf,
-  type DBArticle,
-} from "@/lib/data";
+import { fetchIssues, fetchPublishedArticles, articlePdf, type DBArticle } from "@/lib/data";
 import { Download, FileText, BookOpen, ArrowRight } from "lucide-react";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 
@@ -38,16 +33,14 @@ export const Route = createFileRoute("/current-issue")({
     return (
       <>
         <SiteHeader />
-      <main id="main-content">
-        <main className="container-editorial py-24">
+        <main id="main-content" className="container-editorial py-24">
           <ErrorComponent error={error} />
           <button
             onClick={() => router.invalidate()}
-            className="mt-6 px-4 py-2 bg-[oklch(var(--orange))] text-white text-sm font-semibold uppercase tracking-wider"
+            className="mt-6 px-4 py-2 bg-[oklch(var(--orange))] text-navy text-sm font-semibold uppercase tracking-wider"
           >
             Retry
           </button>
-        </main>
         </main>
         <SiteFooter />
       </>
@@ -56,11 +49,9 @@ export const Route = createFileRoute("/current-issue")({
   notFoundComponent: () => (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-24 text-center">
+      <main id="main-content" className="container-editorial py-24 text-center">
         <h1 className="font-display text-3xl text-[oklch(var(--navy))]">No issue published yet</h1>
         <p className="mt-3 text-foreground/70">Please check back soon.</p>
-      </main>
       </main>
       <SiteFooter />
     </>
@@ -75,8 +66,7 @@ function CurrentIssue() {
     return (
       <>
         <SiteHeader />
-      <main id="main-content">
-        <main className="container-editorial py-24 text-center">
+        <main id="main-content" className="container-editorial py-24 text-center">
           <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
             Current Issue
           </div>
@@ -92,7 +82,6 @@ function CurrentIssue() {
           >
             Browse Archives <ArrowRight className="h-4 w-4" />
           </Link>
-        </main>
         </main>
         <SiteFooter />
       </>
@@ -129,17 +118,19 @@ function CurrentIssue() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(issueSchema) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: escapeJsonLd(issueSchema) }}
+      />
       <SiteHeader />
       <main id="main-content">
-      <main>
         {/* Masthead band */}
         <section className="border-b border-[oklch(var(--navy))]/15 bg-[oklch(var(--navy))]/[0.02]">
           <div className="container-editorial py-12 md:py-16">
             <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
               Current Issue
             </div>
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl mt-3 text-[oklch(var(--navy))] leading-[1.05] max-w-4xl">
+            <h1 className="font-display text-2xl md:text-3xl mt-3 text-[oklch(var(--navy))] leading-[1.05] max-w-4xl">
               Volume {issue.volume}, Issue {issue.number} — {issue.date}
             </h1>
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/70">
@@ -155,14 +146,14 @@ function CurrentIssue() {
         <section className="container-editorial py-16">
           <div className="grid lg:grid-cols-12 gap-12 items-start">
             {/* Cover + download rail */}
-            <aside className="lg:col-span-5 lg:sticky lg:top-28">
+            <aside className="lg:col-span-5 lg:sticky lg:top-36">
               <div className="relative">
                 <img
                   src={issue.cover || undefined}
                   alt={`Cover of Volume ${issue.volume}, Issue ${issue.number} — ${issue.title}`}
                   className="w-full max-w-md mx-auto shadow-2xl ring-1 ring-[oklch(var(--navy))]/10"
                 />
-                <div className="absolute -top-3 -left-3 bg-[oklch(var(--orange))] text-white text-[0.65rem] uppercase tracking-[0.2em] font-semibold px-3 py-1.5">
+                <div className="absolute -top-3 -left-3 bg-[oklch(var(--orange))] text-navy text-xs uppercase tracking-[0.2em] font-semibold px-3 py-1.5">
                   Just Released
                 </div>
               </div>
@@ -182,7 +173,7 @@ function CurrentIssue() {
                         <span className="block text-sm font-semibold">
                           View / Download Full Issue
                         </span>
-                        <span className="block text-[0.7rem] uppercase tracking-wider opacity-70">
+                        <span className="block text-xs uppercase tracking-wider opacity-70">
                           PDF
                         </span>
                       </span>
@@ -211,7 +202,7 @@ function CurrentIssue() {
 
               {/* Citation block */}
               <div className="mt-8 max-w-md mx-auto border-t border-[oklch(var(--navy))]/15 pt-6">
-                <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+                <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
                   How to cite
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground font-mono leading-relaxed">
@@ -233,7 +224,8 @@ function CurrentIssue() {
                 {issue.desc}
               </p>
               <p className="mt-4 text-foreground/70 leading-relaxed">
-                {get("editorial", "description") || "A peer-reviewed selection of original research and field reports curated by the editorial board — covering agronomy, plant protection, horticulture, soil science and rural extension across the Indian sub-continent and beyond."}
+                {get("editorial", "description") ||
+                  "A peer-reviewed selection of original research and field reports curated by the editorial board — covering agronomy, plant protection, horticulture, soil science and rural extension across the Indian sub-continent and beyond."}
               </p>
 
               {/* Read articles */}
@@ -254,7 +246,7 @@ function CurrentIssue() {
                           {String(i + 1).padStart(2, "0")}
                         </div>
                         <div className="col-span-10 sm:col-span-8">
-                          <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
                             {a.category}
                           </div>
                           <Link to="/articles/$slug" params={{ slug: a.slug }} className="block">
@@ -274,7 +266,10 @@ function CurrentIssue() {
                             <div className="mt-1 flex items-center gap-1.5 font-sans">
                               Vol. {issue.volume} · Issue {issue.number}
                               {(a.pageStart || a.pageEnd) && (
-                                <span>· pp. {a.pageStart ?? "—"}{a.pageEnd ? `–${a.pageEnd}` : ""}</span>
+                                <span>
+                                  · pp. {a.pageStart ?? "—"}
+                                  {a.pageEnd ? `–${a.pageEnd}` : ""}
+                                </span>
                               )}
                             </div>
                           </div>
@@ -306,7 +301,7 @@ function CurrentIssue() {
               {/* Submit CTA */}
               <div className="mt-16 border border-[oklch(var(--navy))]/15 bg-[oklch(var(--navy))]/[0.03] p-8 flex flex-col md:flex-row md:items-center gap-6 justify-between">
                 <div>
-                  <div className="text-[0.65rem] uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+                  <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
                     {get("call_for_papers", "heading")}
                   </div>
                   <h4 className="font-display text-2xl mt-2 text-[oklch(var(--navy))]">
@@ -318,7 +313,7 @@ function CurrentIssue() {
                 </div>
                 <Link
                   to="/submit"
-                  className="inline-flex items-center gap-2 bg-[oklch(var(--orange))] text-white px-6 py-3 text-sm font-semibold uppercase tracking-wider hover:bg-[oklch(var(--orange))]/90 transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-2 bg-[oklch(var(--orange))] text-navy px-6 py-3 text-sm font-semibold uppercase tracking-wider hover:bg-[oklch(var(--orange))]/90 transition-colors whitespace-nowrap"
                 >
                   Submit Article <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -326,7 +321,6 @@ function CurrentIssue() {
             </div>
           </div>
         </section>
-      </main>
       </main>
       <SiteFooter />
     </>

@@ -36,7 +36,7 @@ function AdminQueue() {
           </p>
         </div>
       </div>
-      
+
       <div className="mt-6">
         <QueueConsole />
       </div>
@@ -55,40 +55,50 @@ function AdminQueue() {
             </div>
           </div>
           {logs.length > 0 && (
-            <button 
+            <button
               onClick={handleClear}
-              className="text-[10px] uppercase font-bold text-foreground/50 hover:text-destructive transition-colors font-sans flex items-center gap-1 border border-rule px-2.5 py-1.5 bg-background hover:bg-stone-50"
+              className="text-xs uppercase font-bold text-foreground/50 hover:text-destructive transition-colors font-sans flex items-center gap-1 border border-rule px-2.5 py-1.5 bg-background hover:bg-stone-50"
             >
               <Trash2 className="h-3 w-3" /> Clear Logs
             </button>
           )}
         </div>
         <p className="text-xs text-foreground/75 leading-relaxed mb-6 font-sans">
-          This panel logs automated system alerts and notification events triggered by payment claim submissions and status updates. This is utilized for internal auditing and debugging prior to dispatching live emails via Resend.
+          This panel logs automated system alerts and notification events triggered by payment claim
+          submissions and status updates. This is utilized for internal auditing and debugging prior
+          to dispatching live emails via Resend.
         </p>
 
         {logs.length === 0 ? (
           <div className="border border-dashed border-rule bg-background py-8 text-center text-xs text-muted-foreground rounded-sm font-mono flex flex-col items-center justify-center gap-2">
             <ShieldAlert className="h-6 w-6 text-muted-foreground/60" />
-            <span>No notification events recorded in this session yet. Submit a payment claim or approve one to monitor logs.</span>
+            <span>
+              No notification events recorded in this session yet. Submit a payment claim or approve
+              one to monitor logs.
+            </span>
           </div>
         ) : (
           <div className="space-y-4 max-h-[360px] overflow-y-auto pr-2 scrollbar-thin">
             {logs.map((log) => (
-              <div key={log.id} className="border border-rule bg-background p-4 rounded-sm hover-lift font-sans text-xs">
+              <div
+                key={log.id}
+                className="border border-rule bg-background p-4 rounded-sm hover-lift font-sans text-xs"
+              >
                 <div className="flex justify-between items-start gap-4">
                   <div>
-                    <span className="font-semibold text-primary font-mono text-[11px] bg-primary/5 px-2 py-0.5 border border-primary/10 rounded-sm">
+                    <span className="font-semibold text-primary font-mono text-xs bg-primary/5 px-2 py-0.5 border border-primary/10 rounded-sm">
                       {log.type}
                     </span>
-                    <span className="text-[10px] text-muted-foreground block mt-2">To: <span className="font-semibold text-ink">{log.recipient}</span></span>
+                    <span className="text-xs text-muted-foreground block mt-2">
+                      To: <span className="font-semibold text-ink">{log.recipient}</span>
+                    </span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground font-mono bg-secondary/50 px-1.5 py-0.5 rounded-sm">
+                  <span className="text-xs text-muted-foreground font-mono bg-secondary/50 px-1.5 py-0.5 rounded-sm">
                     {new Date(log.timestamp).toLocaleTimeString()}
                   </span>
                 </div>
                 <div className="mt-3 h-px bg-rule/50" />
-                <pre className="mt-3 whitespace-pre-wrap font-mono text-[10px] text-foreground/80 leading-relaxed bg-stone-50 p-3 rounded-sm border border-rule/30 max-w-full overflow-x-auto select-text">
+                <pre className="mt-3 whitespace-pre-wrap font-mono text-xs text-foreground/80 leading-relaxed bg-stone-50 p-3 rounded-sm border border-rule/30 max-w-full overflow-x-auto select-text">
                   {log.payload}
                 </pre>
               </div>

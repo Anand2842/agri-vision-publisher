@@ -29,11 +29,15 @@ const NavItemSchema = z.object({
   to: z.string().optional(),
   href: z.string().optional(),
   label: z.string(),
-  children: z.array(z.object({
-    to: z.string().optional(),
-    href: z.string().optional(),
-    label: z.string(),
-  })).optional()
+  children: z
+    .array(
+      z.object({
+        to: z.string().optional(),
+        href: z.string().optional(),
+        label: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 const NavSchema = z.array(NavItemSchema);
@@ -51,7 +55,11 @@ const defaultNav: NavItem[] = [
     to: "/submission-guidelines",
     label: "Submission",
     children: [
-      { to: "/submission-guidelines", label: "Author Guidelines", description: "Format, scope & review process" },
+      {
+        to: "/submission-guidelines",
+        label: "Author Guidelines",
+        description: "Format, scope & review process",
+      },
       { to: "/submit", label: "Submit Article", description: "Start a new manuscript" },
     ],
   },
@@ -60,7 +68,11 @@ const defaultNav: NavItem[] = [
     to: "/startup-spotlight",
     label: "Resources",
     children: [
-      { to: "/startup-spotlight", label: "Startup Spotlight", description: "Agri-ventures to watch" },
+      {
+        to: "/startup-spotlight",
+        label: "Startup Spotlight",
+        description: "Agri-ventures to watch",
+      },
       { to: "/advertise", label: "Advertise", description: "Reach our readership" },
       { to: "/contact", label: "Contact", description: "Get in touch" },
     ],
@@ -150,7 +162,6 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 bg-background border-b border-rule">
-
       {/* Skip-to-content — visible on keyboard focus only */}
       <a
         href="#main-content"
@@ -161,25 +172,27 @@ export function SiteHeader() {
 
       {/* ISSN identification strip — visible globally, required by ISSN India */}
       <div className="bg-primary/[0.06] border-b border-primary/10 py-1 text-center">
-        <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-foreground/50 font-sans">
+        <span className="text-xs uppercase tracking-[0.2em] font-semibold text-foreground/50 font-sans">
           {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
-          {getHeader("branding", "title_line2") || "Popular Article Magazine"}
-          {" "}·{" "}
+          {getHeader("branding", "title_line2") || "Popular Article Magazine"} ·{" "}
           <span className="text-[oklch(var(--orange))]">
             {getFooter("legal", "eissn")
               ? `E-ISSN: ${getFooter("legal", "eissn")}`
               : getFooter("legal", "pissn")
-              ? `ISSN: ${getFooter("legal", "pissn")}`
-              : "ISSN: Applied for"}
-          </span>
-          {" "}· Published Monthly · Online · India
+                ? `ISSN: ${getFooter("legal", "pissn")}`
+                : "ISSN: Applied for"}
+          </span>{" "}
+          · Published Monthly · Online · India
         </span>
       </div>
 
       {/* Utility bar */}
       <div className="bg-navy text-white text-xs">
-        <div className="container-editorial flex items-center justify-between h-9">
-          <a href={`tel:${getHeader("topbar", "phone")}`} className="flex items-center gap-2 text-orange font-medium">
+        <div className="container-editorial flex items-center justify-between min-h-[44px]">
+          <a
+            href={`tel:${getHeader("topbar", "phone")}`}
+            className="flex items-center gap-2 text-orange font-medium"
+          >
             <Phone className="h-3.5 w-3.5" />
             {getHeader("topbar", "phone")}
           </a>
@@ -207,7 +220,7 @@ export function SiteHeader() {
       </div>
 
       {/* Logo + search + Special Issue */}
-      <div className="container-editorial flex items-center justify-between gap-6 py-4 md:py-5">
+      <div className="container-editorial flex items-center justify-between gap-6 py-3 md:py-4">
         <Link to="/" className="flex items-center gap-3 shrink-0">
           <img
             src={getHeader("branding", "logo_url") || logo}
@@ -218,7 +231,7 @@ export function SiteHeader() {
             }
             width={140}
             height={140}
-            className="h-14 md:h-20 w-auto"
+            className="h-10 md:h-14 w-auto"
           />
           <div className="hidden sm:block leading-tight">
             <div className="font-display font-bold text-navy text-base md:text-lg">
@@ -227,7 +240,7 @@ export function SiteHeader() {
             <div className="font-display font-bold text-navy text-base md:text-lg -mt-1">
               {getHeader("branding", "title_line2") || "Popular Article Magazine"}
             </div>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-orange font-semibold mt-1">
+            <div className="text-xs uppercase tracking-[0.18em] text-orange font-semibold mt-1">
               {getHeader("branding", "tagline")}
             </div>
           </div>
@@ -243,7 +256,7 @@ export function SiteHeader() {
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search articles, authors, topics…"
             aria-label="Search the magazine"
-            className="flex-1 px-4 h-full text-[15px] bg-transparent focus:outline-none placeholder:text-foreground/50"
+            className="flex-1 px-4 h-full text-base bg-transparent focus:outline-none placeholder:text-foreground/50"
           />
           <button
             type="submit"
@@ -258,7 +271,7 @@ export function SiteHeader() {
           {editorRole && (
             <Link
               to="/admin/queue"
-              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 border border-orange/40 bg-orange/10 text-[10px] uppercase tracking-[0.18em] font-condensed font-semibold text-orange hover:bg-orange hover:text-white transition-colors"
+              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 border border-orange/40 bg-orange/10 text-xs uppercase tracking-[0.18em] font-condensed font-semibold text-orange hover:bg-orange hover:text-white transition-colors"
               title={`Signed in as ${editorRole}`}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-orange" />
@@ -285,7 +298,7 @@ export function SiteHeader() {
           </Link>
           <button
             onClick={() => setOpen(!open)}
-            className="lg:hidden p-2 text-navy transition-transform duration-200 active:scale-90"
+            className="lg:hidden p-3 text-navy transition-transform duration-200 active:scale-90"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >
@@ -306,26 +319,36 @@ export function SiteHeader() {
                 <li key={n.label} className="relative group">
                   <Link
                     to={n.to}
-                    className={`relative flex items-center gap-1.5 px-4 py-4 font-condensed uppercase tracking-[0.08em] text-[13px] font-medium transition-colors duration-200 ${
-                      active
-                        ? "text-orange"
-                        : "text-white/90 hover:text-orange"
+                    tabIndex={hasChildren ? 0 : undefined}
+                    onKeyDown={
+                      hasChildren
+                        ? (e) => {
+                            if (e.key === "Escape") {
+                              (e.currentTarget as HTMLElement).blur();
+                            }
+                          }
+                        : undefined
+                    }
+                    className={`relative flex items-center gap-1.5 px-4 py-4 font-condensed uppercase tracking-[0.08em] text-xs font-medium transition-colors duration-200 ${
+                      active ? "text-orange" : "text-white/90 hover:text-orange"
                     }`}
                   >
                     <Icon className="h-3.5 w-3.5 opacity-80 group-hover:opacity-100" />
                     <span>{n.label}</span>
                     {hasChildren && (
-                      <ChevronDown className="h-3 w-3 opacity-70 transition-transform duration-200 group-hover:rotate-180" />
+                      <ChevronDown className="h-3 w-3 opacity-70 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180 motion-safe:transition-transform motion-reduce:transition-none" />
                     )}
                     {/* Animated underline */}
                     <span
-                      className={`pointer-events-none absolute left-3 right-3 bottom-0 h-[2px] bg-orange origin-left transition-transform duration-300 ${
-                        active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                      className={`pointer-events-none absolute left-3 right-3 bottom-0 h-[2px] bg-orange origin-left transition-transform duration-300 motion-reduce:transition-none ${
+                        active
+                          ? "scale-x-100"
+                          : "scale-x-0 group-hover:scale-x-100 group-focus-within:scale-x-100"
                       }`}
                     />
                   </Link>
                   {hasChildren && (
-                    <div className="invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 absolute left-0 top-full z-50 min-w-[320px] bg-background text-foreground border border-rule shadow-2xl">
+                    <div className="invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-200 absolute left-0 top-full z-50 min-w-[320px] bg-background text-foreground border border-rule shadow-2xl">
                       <div className="h-1 bg-orange" />
                       <ul className="py-2">
                         {n.children!.map((c) => {
@@ -385,7 +408,7 @@ export function SiteHeader() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search…"
-              className="flex-1 px-4 h-12 text-[15px] bg-muted focus:outline-none"
+              className="flex-1 px-4 h-12 text-base bg-muted focus:outline-none"
             />
             <button
               type="submit"
@@ -428,14 +451,16 @@ export function SiteHeader() {
                       className={`flex items-center gap-2.5 py-3 font-condensed uppercase tracking-wider text-sm hover:text-orange ${
                         active ? "text-orange" : "text-navy"
                       }`}
-
                     >
                       <Icon className="h-4 w-4 opacity-70" />
                       {n.label}
                     </Link>
                   )}
                   {hasChildren && groupOpen && (
-                    <div id={`mobile-group-${n.label.replace(/\s+/g, "-")}`} className="pl-7 pb-2 flex flex-col">
+                    <div
+                      id={`mobile-group-${n.label.replace(/\s+/g, "-")}`}
+                      className="pl-7 pb-2 flex flex-col"
+                    >
                       {n.children!.map((c) => {
                         const CIcon = iconFor(c.label);
                         return (
@@ -451,7 +476,7 @@ export function SiteHeader() {
                                 {c.label}
                               </span>
                               {c.description && (
-                                <span className="text-[11px] text-muted-foreground leading-snug">
+                                <span className="text-xs text-muted-foreground leading-snug">
                                   {c.description}
                                 </span>
                               )}

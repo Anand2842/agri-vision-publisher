@@ -63,7 +63,7 @@ function AdminArticles() {
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
-      
+
     // Deduplicate slug using a fast single check and random suffix fallback
     let slug = baseSlug;
     const { data: existing } = await supabase
@@ -95,7 +95,10 @@ function AdminArticles() {
         status === "published" ? editing?.published_at || new Date().toISOString() : null,
     };
     const op = editing?.id
-      ? supabase.from("articles").update(payload as any).eq("id", editing.id)
+      ? supabase
+          .from("articles")
+          .update(payload as any)
+          .eq("id", editing.id)
       : supabase.from("articles").insert(payload as any);
     const { error } = await op;
     if (error) return toast.error(error.message);
@@ -108,6 +111,7 @@ function AdminArticles() {
     if (!confirm("Delete this article?")) return;
     const { error } = await supabase.from("articles").delete().eq("id", id);
     if (error) return toast.error(error.message);
+    toast.success("Deleted");
     load();
   };
 
@@ -284,7 +288,7 @@ function AdminArticles() {
                     <div className="text-xs text-muted-foreground font-sans">/{r.slug}</div>
                   </Td>
                   <Td>
-                    <span className="text-[0.65rem] uppercase tracking-widest px-2 py-1 bg-muted rounded-sm">
+                    <span className="text-xs uppercase tracking-widest px-2 py-1 bg-muted rounded-sm">
                       {r.status}
                     </span>
                   </Td>
@@ -375,10 +379,10 @@ function CoverPicker({
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = "/placeholder.svg";
             }}
-            className="h-20 w-32 object-cover border border-rule rounded-sm bg-stone-50"
+            className="h-28 w-40 object-cover border border-rule rounded-sm bg-stone-50"
           />
         ) : (
-          <div className="h-20 w-32 border border-dashed border-rule rounded-sm flex items-center justify-center text-[0.6rem] uppercase tracking-wider text-muted-foreground">
+          <div className="h-28 w-40 border border-dashed border-rule rounded-sm flex items-center justify-center text-[0.6rem] uppercase tracking-wider text-muted-foreground">
             No cover
           </div>
         )}

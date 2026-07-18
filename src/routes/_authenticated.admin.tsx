@@ -2,7 +2,21 @@ import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tansta
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutGrid, BookOpen, FileText, FolderTree, Inbox, ListChecks, Users, LayoutTemplate, ShieldCheck, Mail, DatabaseBackup } from "lucide-react";
+import {
+  LayoutGrid,
+  BookOpen,
+  FileText,
+  FolderTree,
+  Inbox,
+  ListChecks,
+  Users,
+  LayoutTemplate,
+  ShieldCheck,
+  Mail,
+  DatabaseBackup,
+  Menu,
+} from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async ({ location }) => {
@@ -23,10 +37,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       });
     }
 
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id);
+    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
 
     const list = (roles || []).map((r) => r.role);
     const isAdmin = list.includes("admin");
@@ -56,7 +67,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
     if (role === "moderator") {
       const allowedPaths = ["/admin/queue", "/admin/memberships"];
       const isPathAllowed = allowedPaths.some(
-        (p) => location.pathname === p || location.pathname.startsWith(p + "/")
+        (p) => location.pathname === p || location.pathname.startsWith(p + "/"),
       );
       if (!isPathAllowed) {
         throw redirect({
@@ -89,7 +100,12 @@ const items: {
 }[] = [
   { to: "/admin", label: "Overview", icon: LayoutGrid, exact: true, roles: ["admin"] },
   { to: "/admin/queue", label: "Queue", icon: ListChecks, roles: ["admin", "moderator"] },
-  { to: "/admin/memberships", label: "Membership Claims", icon: ShieldCheck, roles: ["admin", "moderator"] },
+  {
+    to: "/admin/memberships",
+    label: "Membership Claims",
+    icon: ShieldCheck,
+    roles: ["admin", "moderator"],
+  },
   { to: "/admin/submissions", label: "Submissions", icon: Inbox, roles: ["admin"] },
   { to: "/admin/users", label: "Users & Roles", icon: Users, roles: ["admin"] },
   { to: "/admin/issues", label: "Issues", icon: BookOpen, roles: ["admin"] },
@@ -159,7 +175,45 @@ function AdminLayout() {
         ) : (
           <div className="mt-8 grid grid-cols-12 gap-8">
             <aside className="col-span-12 md:col-span-3">
-              <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <button className="md:hidden flex items-center gap-2 px-3 py-2 text-xs uppercase tracking-wider font-condensed border border-rule bg-paper hover:bg-secondary transition-colors">
+                    <Menu className="h-4 w-4" /> Navigation
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-64 p-0">
+                  <SheetTitle className="sr-only">Admin navigation</SheetTitle>
+                  <nav
+                    className="flex flex-col gap-1 p-4"
+                    role="navigation"
+                    aria-label="Admin navigation"
+                  >
+                    {visibleItems.map((it) => {
+                      const active = it.exact ? path === it.to : path.startsWith(it.to);
+                      return (
+                        <Link
+                          key={it.to}
+                          to={it.to}
+                          aria-current={active ? "page" : undefined}
+                          className={`flex items-center gap-2 px-3 py-2.5 text-xs uppercase tracking-wider font-condensed border-l-2 transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange ${
+                            active
+                              ? "border-orange text-navy bg-secondary/40"
+                              : "border-transparent text-foreground/70 hover:text-orange"
+                          }`}
+                        >
+                          <it.icon className="h-4 w-4" />
+                          {it.label}
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </SheetContent>
+              </Sheet>
+              <nav
+                className="hidden md:flex md:flex-col gap-1"
+                role="navigation"
+                aria-label="Admin navigation"
+              >
                 {visibleItems.map((it) => {
                   const active = it.exact ? path === it.to : path.startsWith(it.to);
                   return (
@@ -176,7 +230,6 @@ function AdminLayout() {
                       <it.icon className="h-4 w-4" />
                       {it.label}
                     </Link>
-
                   );
                 })}
               </nav>

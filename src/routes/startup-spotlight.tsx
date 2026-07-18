@@ -21,14 +21,17 @@ export const Route = createFileRoute("/startup-spotlight")({
 
 function Spotlight() {
   const { get, getJson } = useSiteContent("startup_spotlight");
-  const startups = getJson<"startups", "items", { name: string; founder: string; innovation: string; logo_url?: string }[]>("startups", "items");
+  const startups = getJson<
+    "startups",
+    "items",
+    { name: string; founder: string; innovation: string; logo_url?: string }[]
+  >("startups", "items");
   return (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-16">
+      <main id="main-content" className="container-editorial py-16">
         <div className="eyebrow">Startup Spotlight</div>
-        <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink max-w-3xl leading-[1.05]">
+        <h1 className="font-display text-2xl md:text-3xl mt-3 text-ink max-w-3xl leading-[1.05]">
           {get("hero", "heading")}
         </h1>
 
@@ -56,7 +59,6 @@ function Spotlight() {
             </div>
           ))}
         </section>
-      </main>
       </main>
       <SiteFooter />
     </>

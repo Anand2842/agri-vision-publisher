@@ -6,15 +6,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Session } from "@supabase/supabase-js";
 import { getLocalStorageClaims, syncOfflineClaims, type PaymentClaim } from "@/lib/paymentStorage";
-import { 
-  ShieldCheck, 
-  Clock, 
-  AlertCircle, 
-  ArrowRight, 
-  CheckCircle2, 
-  XCircle, 
+import {
+  ShieldCheck,
+  Clock,
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  XCircle,
   CreditCard,
-  Award
+  Award,
 } from "lucide-react";
 import { SubmissionRowSkeleton, StatCardSkeleton } from "@/components/site/Skeletons";
 
@@ -30,7 +30,10 @@ function getClaimMemberId(claim: { member_id?: string | null; notes?: string | n
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
   head: () => ({
-    meta: [{ title: "Author Dashboard — The Agriculture Popular Article Magazine" }, { name: "robots", content: "noindex" }],
+    meta: [
+      { title: "Author Dashboard — The Agriculture Popular Article Magazine" },
+      { name: "robots", content: "noindex" },
+    ],
     links: [{ rel: "canonical", href: "https://agriculturemagazine.in/dashboard" }],
   }),
 });
@@ -51,7 +54,9 @@ function Dashboard() {
   useEffect(() => {
     async function initSession() {
       try {
-        const { data: { session: activeSession } } = await supabase.auth.getSession();
+        const {
+          data: { session: activeSession },
+        } = await supabase.auth.getSession();
         setSession(activeSession);
         if (activeSession) {
           const { data: roles } = await supabase
@@ -70,7 +75,9 @@ function Dashboard() {
 
     initSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, activeSession) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, activeSession) => {
       setSession(activeSession);
       if (activeSession) {
         try {
@@ -94,7 +101,7 @@ function Dashboard() {
 
   const loadData = async () => {
     if (!session) return;
-    
+
     try {
       // Fetch only the current user's submissions
       const subPromise = supabase
@@ -106,7 +113,9 @@ function Dashboard() {
       // Fetch only the current user's payment claims
       const paymentPromise = supabase
         .from("membership_payments")
-        .select("id,user_id,plan,amount,transaction_ref,payment_method,receipt_path,status,notes,created_at,updated_at")
+        .select(
+          "id,user_id,plan,amount,transaction_ref,payment_method,receipt_path,status,notes,created_at,updated_at",
+        )
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
@@ -167,23 +176,28 @@ function Dashboard() {
 
   const getPlanName = (plan: string) => {
     switch (plan) {
-      case "single": return "Single Article Plan";
-      case "annual": return "Annual Membership Plan";
-      case "lifetime": return "Lifetime Membership Plan";
-      case "institute": return "Institutional Partnership Plan";
-      default: return plan;
+      case "single":
+        return "Single Article Plan";
+      case "annual":
+        return "Annual Membership Plan";
+      case "lifetime":
+        return "Lifetime Membership Plan";
+      case "institute":
+        return "Institutional Partnership Plan";
+      default:
+        return plan;
     }
   };
 
   return (
     <>
       <SiteHeader />
-      <main className="container-dashboard py-16 font-sans">
+      <main id="main-content" className="container-dashboard py-16 font-sans">
         {/* Welcome Section */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div>
             <div className="eyebrow">Author Dashboard</div>
-            <h1 className="font-display text-5xl mt-3 text-ink">Welcome back</h1>
+            <h1 className="font-display text-2xl mt-3 text-ink">Welcome back</h1>
             {session?.user?.email && (
               <p className="text-sm text-muted-foreground mt-2">{session.user.email}</p>
             )}
@@ -227,7 +241,8 @@ function Dashboard() {
                     Staff Account Privileges Active
                   </h3>
                   <p className="text-xs text-foreground/80 mt-1">
-                    You are logged in as an editor/moderator. You have full access to view, verify, and approve manuscript submissions and payment claims in the Editorial Console.
+                    You are logged in as an editor/moderator. You have full access to view, verify,
+                    and approve manuscript submissions and payment claims in the Editorial Console.
                   </p>
                 </div>
               </div>
@@ -249,16 +264,17 @@ function Dashboard() {
                   <h3 className="font-display text-lg text-ink font-bold flex items-center gap-2.5 flex-wrap">
                     Active Premium Member
                     {getClaimMemberId(activeMembership) && (
-                      <span className="bg-primary/10 text-primary text-[10px] uppercase font-sans font-bold px-2 py-0.5 rounded-sm">
+                      <span className="bg-primary/10 text-primary text-xs uppercase font-sans font-bold px-2 py-0.5 rounded-sm">
                         ID: {getClaimMemberId(activeMembership)}
                       </span>
                     )}
                   </h3>
                   <p className="text-xs text-foreground/80 mt-1 font-sans">
-                    Your {getPlanName(activeMembership.plan)} is verified and fully active. Settle manuscript submissions for priority reviews.
+                    Your {getPlanName(activeMembership.plan)} is verified and fully active. Settle
+                    manuscript submissions for priority reviews.
                   </p>
                   {activeMembership.notes && (
-                    <p className="text-[10px] bg-white border border-green-200/50 text-green-800 px-2 py-1 mt-2 rounded max-w-lg font-sans">
+                    <p className="text-xs bg-white border border-green-200/50 text-green-800 px-2 py-1 mt-2 rounded max-w-lg font-sans">
                       <strong>Editor's note:</strong> {activeMembership.notes}
                     </p>
                   )}
@@ -266,7 +282,7 @@ function Dashboard() {
               </div>
               <div className="flex gap-3 flex-wrap w-full lg:w-auto shrink-0">
                 <Link
-                  to="/membership/certificate/$claimId"
+                  to="/membership-cert/$claimId"
                   params={{ claimId: activeMembership.id }}
                   target="_blank"
                   className="bg-primary hover:bg-primary/95 text-white text-xs px-4 py-2.5 rounded font-semibold uppercase tracking-wider transition inline-flex items-center gap-1.5 cursor-pointer font-sans"
@@ -289,31 +305,46 @@ function Dashboard() {
                   <Clock className="h-6 w-6 animate-spin" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-display text-lg text-ink font-bold">Payment Verification In Progress</h3>
+                  <h3 className="font-display text-lg text-ink font-bold">
+                    Payment Verification In Progress
+                  </h3>
                   <p className="text-xs text-foreground/80 mt-1.5 leading-relaxed max-w-xl">
-                    Your membership payment claim has been submitted successfully and is currently under review by our editorial team. Verification is typically completed within 1–2 business days. Your membership benefits will activate immediately upon approval.
+                    Your membership payment claim has been submitted successfully and is currently
+                    under review by our editorial team. Verification is typically completed within
+                    1–2 business days. Your membership benefits will activate immediately upon
+                    approval.
                   </p>
-                  
+
                   {/* Styled Payment Reference Details */}
                   <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs border-t border-ochre/20 pt-3">
                     <div>
-                      <span className="text-muted-foreground uppercase font-sans font-semibold tracking-wider text-[10px] block">Selected Plan</span>
-                      <span className="font-display text-ink font-semibold mt-0.5 block">{getPlanName(pendingMembership.plan)}</span>
+                      <span className="text-muted-foreground uppercase font-sans font-semibold tracking-wider text-xs block">
+                        Selected Plan
+                      </span>
+                      <span className="font-display text-ink font-semibold mt-0.5 block">
+                        {getPlanName(pendingMembership.plan)}
+                      </span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground uppercase font-sans font-semibold tracking-wider text-[10px] block">Amount Paid</span>
-                      <span className="font-display text-ink font-semibold mt-0.5 block">₹{pendingMembership.amount}</span>
+                      <span className="text-muted-foreground uppercase font-sans font-semibold tracking-wider text-xs block">
+                        Amount Paid
+                      </span>
+                      <span className="font-display text-ink font-semibold mt-0.5 block">
+                        ₹{pendingMembership.amount}
+                      </span>
                     </div>
                     <div className="min-w-0 max-w-xs sm:max-w-md">
-                      <span className="text-muted-foreground uppercase font-sans font-semibold tracking-wider text-[10px] block">Transaction Ref (UTR)</span>
-                      <code className="font-mono bg-ochre/10 text-ink text-[11px] px-1.5 py-0.5 rounded border border-ochre/10 break-all select-all mt-0.5 block whitespace-pre-wrap max-h-24 overflow-y-auto">
+                      <span className="text-muted-foreground uppercase font-sans font-semibold tracking-wider text-xs block">
+                        Transaction Ref (UTR)
+                      </span>
+                      <code className="font-mono bg-ochre/10 text-ink text-xs px-1.5 py-0.5 rounded border border-ochre/10 break-all select-all mt-0.5 block whitespace-pre-wrap max-h-24 overflow-y-auto">
                         {pendingMembership.transaction_ref}
                       </code>
                     </div>
                   </div>
                 </div>
               </div>
-              <span className="bg-ochre/10 border border-ochre/25 text-ink text-[10px] px-3.5 py-2 rounded-sm font-mono uppercase tracking-wider font-bold shrink-0 self-start lg:self-center">
+              <span className="bg-ochre/10 border border-ochre/25 text-ink text-xs px-3.5 py-2 rounded-sm font-mono uppercase tracking-wider font-bold shrink-0 self-start lg:self-center">
                 In Review Queue
               </span>
             </div>
@@ -325,9 +356,13 @@ function Dashboard() {
                   <CreditCard className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-display text-lg text-ink font-bold">Standard Contributor Account</h3>
+                  <h3 className="font-display text-lg text-ink font-bold">
+                    Standard Contributor Account
+                  </h3>
                   <p className="text-xs text-muted-foreground mt-1 max-w-xl leading-relaxed">
-                    Unlock priority reviews, publish multiple articles without individual submission fees, and acquire your official Author Certificate by subscribing to our annual or lifetime plan.
+                    Unlock priority reviews, publish multiple articles without individual submission
+                    fees, and acquire your official Author Certificate by subscribing to our annual
+                    or lifetime plan.
                   </p>
                 </div>
               </div>
@@ -389,7 +424,9 @@ function Dashboard() {
                       <span>·</span>
                       <span>{new Date(s.created_at).toLocaleDateString()}</span>
                       <span>·</span>
-                      <span className="uppercase text-[10px] bg-secondary/80 text-foreground px-1.5 py-0.5 rounded-sm font-semibold">{s.plan}</span>
+                      <span className="uppercase text-xs bg-secondary/80 text-foreground px-1.5 py-0.5 rounded-sm font-semibold">
+                        {s.plan}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
@@ -399,7 +436,7 @@ function Dashboard() {
                         to="/article/certificate/$submissionId"
                         params={{ submissionId: s.id }}
                         target="_blank"
-                        className="bg-primary/10 hover:bg-primary/20 text-primary text-[10px] uppercase font-sans font-bold px-3 py-1.5 rounded-sm transition inline-flex items-center gap-1 cursor-pointer"
+                        className="bg-primary/10 hover:bg-primary/20 text-primary text-xs uppercase font-sans font-bold px-3 py-1.5 rounded-sm transition inline-flex items-center gap-1 cursor-pointer"
                       >
                         <Award className="h-3.5 w-3.5" /> Certificate
                       </Link>
@@ -419,19 +456,23 @@ function Dashboard() {
             <div className="mt-6 border border-rule rounded overflow-hidden">
               <ul className="divide-y divide-rule bg-paper">
                 {payments.map((pay) => (
-                  <li key={pay.id} className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-sm">
+                  <li
+                    key={pay.id}
+                    className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-sm"
+                  >
                     <div>
                       <div className="font-display text-ink font-bold flex items-center gap-2">
                         {getPlanName(pay.plan)} · ₹{pay.amount.toLocaleString()}
-                        <span className="text-[10px] text-muted-foreground font-mono font-normal">
+                        <span className="text-xs text-muted-foreground font-mono font-normal">
                           (Ref: {pay.transaction_ref})
                         </span>
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Settle claim filed on: {new Date(pay.created_at).toLocaleString()} via <span className="uppercase">{pay.payment_method}</span>
+                        Settle claim filed on: {new Date(pay.created_at).toLocaleString()} via{" "}
+                        <span className="uppercase">{pay.payment_method}</span>
                       </div>
                       {pay.notes && (
-                        <div className="text-[11px] bg-muted/50 border border-rule/50 px-3 py-1.5 mt-2 rounded text-foreground/80">
+                        <div className="text-xs bg-muted/50 border border-rule/50 px-3 py-1.5 mt-2 rounded text-foreground/80">
                           <strong>Admin Notes:</strong> {pay.notes}
                         </div>
                       )}
@@ -499,7 +540,7 @@ function StatusBadge({ status }: { status: string }) {
   };
   return (
     <span
-      className={`text-[0.65rem] uppercase tracking-widest px-3 py-1.5 rounded-sm shrink-0 ${map[status] || "bg-muted"}`}
+      className={`text-xs uppercase tracking-widest px-3 py-1.5 rounded-sm shrink-0 ${map[status] || "bg-muted"}`}
     >
       {status.replace("_", " ")}
     </span>

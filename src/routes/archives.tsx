@@ -1,21 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { fetchIssues, fetchPublishedArticles, articlePdf, type IssueRow, type DBArticle } from "@/lib/data";
+import {
+  fetchIssues,
+  fetchPublishedArticles,
+  articlePdf,
+  type IssueRow,
+  type DBArticle,
+} from "@/lib/data";
 import { useMemo, useState, useEffect } from "react";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 import { Download, ChevronDown, ChevronUp, FileText } from "lucide-react";
-
 
 const escapeJsonLd = (json: string) => json.replace(/<\/script/gi, "<\\/script");
 
 export const Route = createFileRoute("/archives")({
   component: Archives,
   loader: async () => {
-    const [seo, issues] = await Promise.all([
-      fetchSeoMetadata("archives"),
-      fetchIssues(),
-    ]);
+    const [seo, issues] = await Promise.all([fetchSeoMetadata("archives"), fetchIssues()]);
     return { seo, issues };
   },
   head: ({ loaderData }) => ({
@@ -32,7 +34,10 @@ export const Route = createFileRoute("/archives")({
 });
 
 function Archives() {
-  const { issues } = Route.useLoaderData() as { seo: { title: string; description: string }; issues: IssueRow[] };
+  const { issues } = Route.useLoaderData() as {
+    seo: { title: string; description: string };
+    issues: IssueRow[];
+  };
   const [year, setYear] = useState<string>("all");
   const [month, setMonth] = useState<string>("all");
   const { get } = useSiteContent("archives");
@@ -57,8 +62,18 @@ function Archives() {
       }
     });
     const monthOrder = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
     const list = Array.from(set).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
     return ["all", ...list];
@@ -88,19 +103,23 @@ function Archives() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(collectionSchema) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: escapeJsonLd(collectionSchema) }}
+      />
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-16">
+      <main id="main-content" className="container-editorial py-16">
         <div className="eyebrow">Archives</div>
-        <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink">{get("hero", "headline")}</h1>
-        <p className="mt-5 max-w-2xl text-foreground/70">
-          {get("hero", "subtitle")}
-        </p>
+        <h1 className="font-display text-2xl md:text-3xl mt-3 text-ink">
+          {get("hero", "headline")}
+        </h1>
+        <p className="mt-5 max-w-2xl text-foreground/70">{get("hero", "subtitle")}</p>
 
         <div className="mt-10 space-y-6">
           <div>
-            <span className="text-xs uppercase tracking-wider text-foreground/50 font-bold block mb-2 font-sans">Filter by Year</span>
+            <span className="text-xs uppercase tracking-wider text-foreground/50 font-bold block mb-2 font-sans">
+              Filter by Year
+            </span>
             <div className="flex gap-2 flex-wrap">
               {years.map((y) => (
                 <button
@@ -119,7 +138,9 @@ function Archives() {
 
           {months.length > 1 && (
             <div>
-              <span className="text-xs uppercase tracking-wider text-foreground/50 font-bold block mb-2 font-sans">Filter by Month</span>
+              <span className="text-xs uppercase tracking-wider text-foreground/50 font-bold block mb-2 font-sans">
+                Filter by Month
+              </span>
               <div className="flex gap-2 flex-wrap">
                 {months.map((m) => (
                   <button
@@ -145,7 +166,6 @@ function Archives() {
           ))}
         </div>
       </main>
-      </main>
       <SiteFooter />
     </>
   );
@@ -166,7 +186,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
         // Fetch articles that belong to this issue's volume/number
         const all = await fetchPublishedArticles();
         const filtered = all.filter(
-          (a) => a.volume === issue.volume && a.issueNumber === issue.number
+          (a) => a.volume === issue.volume && a.issueNumber === issue.number,
         );
         setArticles(filtered);
       } catch {
@@ -179,7 +199,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
   };
 
   return (
-    <div className="border border-rule bg-white">
+    <div className="border border-rule bg-background">
       {/* Issue header row */}
       <div className="grid sm:grid-cols-[auto_1fr] gap-6 p-6">
         <div className="bg-paper border border-rule w-28 sm:w-36 aspect-[3/4] overflow-hidden flex items-center justify-center shrink-0">
@@ -199,7 +219,9 @@ function IssueCard({ issue }: { issue: IssueRow }) {
               Vol {issue.volume} · Issue {issue.number} · {issue.date}
             </div>
             <h2 className="font-display text-2xl md:text-3xl leading-tight mt-2">{issue.title}</h2>
-            <p className="text-[14px] text-muted-foreground mt-2 leading-relaxed line-clamp-2">{issue.desc}</p>
+            <p className="text-[14px] text-muted-foreground mt-2 leading-relaxed line-clamp-2">
+              {issue.desc}
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {issue.pdfUrl && (
@@ -216,7 +238,11 @@ function IssueCard({ issue }: { issue: IssueRow }) {
               onClick={handleToggle}
               className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-primary border border-primary/25 px-3 py-1.5 hover:bg-primary/5 transition-colors"
             >
-              {open ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              {open ? (
+                <ChevronUp className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5" />
+              )}
               {open ? "Hide" : "View"} Table of Contents
             </button>
           </div>
@@ -226,7 +252,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
       {/* Expandable Table of Contents */}
       {open && (
         <div className="border-t border-rule bg-paper px-6 py-5">
-          <div className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[oklch(var(--orange))] mb-4">
+          <div className="text-xs uppercase tracking-[0.2em] font-semibold text-[oklch(var(--orange))] mb-4">
             Table of Contents — Vol {issue.volume}, Issue {issue.number}
           </div>
           {loading ? (
@@ -256,7 +282,9 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                       {String(idx + 1).padStart(2, "0")}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[10px] uppercase tracking-wider text-foreground/50 font-semibold">{a.category}</div>
+                      <div className="text-xs uppercase tracking-wider text-foreground/50 font-semibold">
+                        {a.category}
+                      </div>
                       <Link
                         to="/articles/$slug"
                         params={{ slug: a.slug }}
@@ -271,7 +299,8 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                           Vol. {issue.volume} · Issue {issue.number}
                           {(a.pageStart || a.pageEnd) && (
                             <span className="ml-1 text-foreground/40">
-                              · pp. {a.pageStart ?? "—"}{a.pageEnd ? `–${a.pageEnd}` : ""}
+                              · pp. {a.pageStart ?? "—"}
+                              {a.pageEnd ? `–${a.pageEnd}` : ""}
                             </span>
                           )}
                         </div>
@@ -281,7 +310,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                       <Link
                         to="/articles/$slug"
                         params={{ slug: a.slug }}
-                        className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold text-[oklch(var(--navy))]/60 hover:text-[oklch(var(--navy))] transition-colors"
+                        className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[oklch(var(--navy))]/60 hover:text-[oklch(var(--navy))] transition-colors"
                       >
                         <FileText className="h-3 w-3" /> Read
                       </Link>
@@ -290,12 +319,12 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                           href={pdf}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold text-[oklch(var(--orange))] hover:text-[oklch(var(--orange))]/80 transition-colors"
+                          className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[oklch(var(--orange))] hover:text-[oklch(var(--orange))]/80 transition-colors"
                         >
                           <Download className="h-3 w-3" /> PDF
                         </a>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-semibold text-foreground/25 cursor-not-allowed">
+                        <span className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-foreground/25 cursor-not-allowed">
                           <Download className="h-3 w-3" /> PDF
                         </span>
                       )}

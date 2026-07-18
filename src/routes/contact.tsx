@@ -7,6 +7,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
+import { friendlyZodError } from "@/lib/form-errors";
 
 export const Route = createFileRoute("/contact")({
   component: Contact,
@@ -41,7 +42,7 @@ function Contact() {
     const data = Object.fromEntries(new FormData(form));
     const r = schema.safeParse(data);
     if (!r.success) {
-      toast.error(r.error.issues[0].message);
+      toast.error(friendlyZodError(r.error));
       return;
     }
     setSending(true);
@@ -63,16 +64,16 @@ function Contact() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-16">
+      <main id="main-content" className="container-editorial py-16">
         <div className="grid md:grid-cols-12 gap-12">
           <div className="md:col-span-5">
             <div className="eyebrow">Contact</div>
-            <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink leading-[1.05]">
+            <h1 className="font-display text-2xl md:text-3xl mt-3 text-ink leading-[1.05]">
               Editorial Office
             </h1>
             <p className="mt-6 text-foreground/75 leading-relaxed max-w-md">
-              For author queries, membership, advertising and general correspondence. {get("office", "turnaround")}
+              For author queries, membership, advertising and general correspondence.{" "}
+              {get("office", "turnaround")}
             </p>
 
             <div className="mt-10">
@@ -124,7 +125,7 @@ function Contact() {
             </div>
             <button
               disabled={sending}
-              className="bg-primary text-primary-foreground h-12 px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60 flex items-center justify-center w-max"
+              className="bg-primary text-primary-foreground h-10 px-6 rounded-sm text-sm font-medium hover:bg-primary/90 disabled:opacity-60 flex items-center justify-center w-max"
             >
               {sending ? "Sending…" : "Send message"}
             </button>
@@ -137,13 +138,12 @@ function Contact() {
               <Building2 className="h-5 w-5 text-primary" />
               <div className="eyebrow">Publisher</div>
             </div>
-            <h3 className="font-display text-2xl mt-3 leading-tight">
-              {get("publisher", "name")}
-            </h3>
+            <h3 className="font-display text-2xl mt-3 leading-tight">{get("publisher", "name")}</h3>
             <p className="text-sm text-foreground/70 mt-3 leading-relaxed">(R.A.D.F.)</p>
             <ul className="mt-4 space-y-2 text-sm">
               <li className="flex gap-3">
-                <MapPin className="h-4 w-4 mt-1 text-primary shrink-0" /> {get("publisher", "address")}
+                <MapPin className="h-4 w-4 mt-1 text-primary shrink-0" />{" "}
+                {get("publisher", "address")}
               </li>
               <li className="flex gap-3">
                 <Phone className="h-4 w-4 mt-1 text-primary shrink-0" /> {get("office", "phone")}
@@ -176,7 +176,6 @@ function Contact() {
           </div>
         </div>
       </main>
-      </main>
       <SiteFooter />
     </>
   );
@@ -190,7 +189,7 @@ function Field({ name, label, type = "text" }: { name: string; label: string; ty
         name={name}
         type={type}
         required
-        className="w-full h-12 bg-background border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
+        className="w-full h-10 bg-background border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
       />
     </div>
   );

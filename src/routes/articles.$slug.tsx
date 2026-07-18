@@ -15,13 +15,11 @@ export const Route = createFileRoute("/articles/$slug")({
   notFoundComponent: () => (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-32 text-center">
+      <main id="main-content" className="container-editorial py-32 text-center">
         <h1 className="font-display text-4xl">Article not found</h1>
         <Link to="/archives" className="text-primary mt-4 inline-block">
           Browse archives →
         </Link>
-      </main>
       </main>
       <SiteFooter />
     </>
@@ -58,24 +56,31 @@ function Article() {
         const sessionKey = "tapam_viewed_articles";
         const raw = sessionStorage.getItem(sessionKey);
         const viewedIds: string[] = raw ? JSON.parse(raw) : [];
-        
+
         if (!viewedIds.includes(a.id)) {
           viewedIds.push(a.id);
           sessionStorage.setItem(sessionKey, JSON.stringify(viewedIds));
-          
-          (supabase as any).rpc("increment_article_views", { article_id: a.id }).then(({ error }: { error: any }) => {
-            if (error) console.error("Error incrementing views:", error);
-          });
+
+          (supabase as any)
+            .rpc("increment_article_views", { article_id: a.id })
+            .then(({ error }: { error: any }) => {
+              if (error) console.error("Error incrementing views:", error);
+            });
         }
       } catch (err) {
-        (supabase as any).rpc("increment_article_views", { article_id: a.id }).then(({ error }: { error: any }) => {
-          if (error) console.error("Error incrementing views:", error);
-        });
+        (supabase as any)
+          .rpc("increment_article_views", { article_id: a.id })
+          .then(({ error }: { error: any }) => {
+            if (error) console.error("Error incrementing views:", error);
+          });
       }
     }
   }, [a?.id]);
 
-  const siteTitle = (getHeader("branding", "title_line1") || "The Agriculture") + " " + (getHeader("branding", "title_line2") || "Popular Article Magazine");
+  const siteTitle =
+    (getHeader("branding", "title_line1") || "The Agriculture") +
+    " " +
+    (getHeader("branding", "title_line2") || "Popular Article Magazine");
   const pdfHref = articlePdf(a.pdfPath);
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const onShare = async () => {
@@ -99,7 +104,9 @@ function Article() {
         author: {
           "@type": "Person",
           name: a.author,
-          ...(a.affiliation ? { affiliation: { "@type": "Organization", name: a.affiliation } } : {}),
+          ...(a.affiliation
+            ? { affiliation: { "@type": "Organization", name: a.affiliation } }
+            : {}),
         },
         datePublished: a.publishedAt,
         publisher: {
@@ -118,15 +125,17 @@ function Article() {
   return (
     <>
       {articleSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: escapeJsonLd(articleSchema) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: escapeJsonLd(articleSchema) }}
+        />
       )}
       <SiteHeader />
       <main id="main-content">
-      <main>
         <header className="container-editorial pt-16 pb-12">
           <div className="max-w-3xl mx-auto text-center">
             <div className="eyebrow">{a.category}</div>
-            <h1 className="font-display text-4xl md:text-6xl mt-5 text-ink leading-[1.05]">
+            <h1 className="font-display text-2xl md:text-3xl mt-5 text-ink leading-[1.05]">
               {a.title}
             </h1>
             <div className="mt-7 text-sm text-muted-foreground flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
@@ -144,7 +153,7 @@ function Article() {
             </div>
 
             {/* ISSN-required bibliographic strip */}
-            <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-primary/5 border border-primary/15 rounded-sm px-5 py-2.5 text-[11px] uppercase tracking-[0.15em] font-semibold text-muted-foreground font-sans">
+            <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-primary/5 border border-primary/15 rounded-sm px-5 py-2.5 text-xs uppercase tracking-[0.15em] font-semibold text-muted-foreground font-sans">
               <span className="text-primary font-bold">{siteTitle}</span>
               {(a.volume || a.issueNumber) && (
                 <>
@@ -166,8 +175,7 @@ function Article() {
                 <>
                   <span className="text-foreground/30">·</span>
                   <span>
-                    pp.{" "}
-                    {a.pageStart ?? "—"}
+                    pp. {a.pageStart ?? "—"}
                     {a.pageEnd ? `–${a.pageEnd}` : ""}
                   </span>
                 </>
@@ -187,13 +195,12 @@ function Article() {
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = "/placeholder.svg";
             }}
-            className="w-full aspect-[4/5] sm:aspect-[16/9] object-cover border border-rule rounded-sm bg-paper"
+            className="w-full max-h-[500px] aspect-[4/5] sm:aspect-[16/9] object-cover border border-rule rounded-sm bg-paper"
           />
-
         </div>
 
         <div className="container-editorial grid md:grid-cols-12 gap-12 mt-14">
-          <aside className="md:col-span-1 md:sticky md:top-28 self-start hidden md:flex flex-col gap-3 text-muted-foreground">
+          <aside className="md:col-span-1 md:sticky md:top-36 self-start flex flex-col gap-3 text-muted-foreground">
             <button
               onClick={onShare}
               className="p-2 hover:text-primary"
@@ -218,9 +225,7 @@ function Article() {
             )}
             <button
               onClick={() =>
-                navigator.clipboard?.writeText(
-                  `${a.author} (${a.date}). ${a.title}. ${siteTitle}.`,
-                )
+                navigator.clipboard?.writeText(`${a.author} (${a.date}). ${a.title}. ${siteTitle}.`)
               }
               className="p-2 hover:text-primary"
               aria-label="Copy citation"
@@ -237,14 +242,12 @@ function Article() {
           </aside>
           <article className="md:col-span-7 max-w-2xl mx-auto">
             {a.content ? (
-              <div 
-                className="article-content prose prose-stone max-w-none prose-p:text-foreground/85 prose-p:leading-[1.75] prose-headings:font-display prose-headings:text-ink prose-a:text-primary hover:prose-a:text-orange"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(a.content) }} 
+              <div
+                className="article-content prose prose-stone max-w-none prose-p:text-foreground/85 prose-p:leading-[1.65] prose-headings:font-display prose-headings:text-ink prose-a:text-primary hover:prose-a:text-orange"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(a.content) }}
               />
             ) : (
-              <p className="drop-cap text-lg leading-[1.75] text-foreground/85">
-                {a.abstract}
-              </p>
+              <p className="drop-cap text-lg leading-[1.65] text-foreground/85">{a.abstract}</p>
             )}
 
             <div className="rule-thin mt-16 pt-8">
@@ -268,7 +271,7 @@ function Article() {
             </div>
           </article>
           <aside className="md:col-span-4">
-            <div className="md:sticky md:top-28">
+            <div className="md:sticky md:top-36">
               <h2 className="eyebrow">Related</h2>
               <div className="rule-thick mt-3" />
               <ul className="mt-5 space-y-7">
@@ -287,7 +290,6 @@ function Article() {
             </div>
           </aside>
         </div>
-      </main>
       </main>
       <SiteFooter />
     </>

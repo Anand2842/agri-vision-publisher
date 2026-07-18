@@ -83,7 +83,7 @@ function AdminIssues() {
         >
           <div className="sm:col-span-2 flex justify-between">
             <div className="eyebrow">{editing.id ? "Edit issue" : "New issue"}</div>
-            <button type="button" onClick={() => setEditing(null)}>
+            <button type="button" onClick={() => setEditing(null)} aria-label="Close">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -133,35 +133,37 @@ function AdminIssues() {
         ) : rows.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No issues yet.</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-secondary/40 text-left">
-              <tr>
-                <Th>Vol/Issue</Th>
-                <Th>Title</Th>
-                <Th>Published</Th>
-                <Th></Th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-t border-rule">
-                  <Td>
-                    V{r.volume} · I{r.issue_number}
-                  </Td>
-                  <Td className="font-display text-ink">{r.title}</Td>
-                  <Td>{r.published_at ? new Date(r.published_at).toLocaleDateString() : "—"}</Td>
-                  <Td className="text-right whitespace-nowrap">
-                    <IconBtn onClick={() => setEditing(r)}>
-                      <Pencil className="h-4 w-4" />
-                    </IconBtn>
-                    <IconBtn onClick={() => remove(r.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </IconBtn>
-                  </Td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-secondary/40 text-left">
+                <tr>
+                  <Th>Vol/Issue</Th>
+                  <Th>Title</Th>
+                  <Th>Published</Th>
+                  <Th></Th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.id} className="border-t border-rule">
+                    <Td>
+                      V{r.volume} · I{r.issue_number}
+                    </Td>
+                    <Td className="font-display text-ink">{r.title}</Td>
+                    <Td>{r.published_at ? new Date(r.published_at).toLocaleDateString() : "—"}</Td>
+                    <Td className="text-right whitespace-nowrap">
+                      <IconBtn onClick={() => setEditing(r)}>
+                        <Pencil className="h-4 w-4" />
+                      </IconBtn>
+                      <IconBtn onClick={() => remove(r.id)}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </IconBtn>
+                    </Td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

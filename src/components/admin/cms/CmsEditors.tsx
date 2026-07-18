@@ -46,7 +46,7 @@ export function CmsSaveButton({
         value,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "page,section,key" }
+      { onConflict: "page,section,key" },
     );
 
     setSaving(false);
@@ -60,7 +60,11 @@ export function CmsSaveButton({
 
   return (
     <Button size="sm" onClick={handleSave} disabled={!hasChanged || saving}>
-      {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+      {saving ? (
+        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+      ) : (
+        <Save className="h-4 w-4 mr-2" />
+      )}
       Save
     </Button>
   );
@@ -84,7 +88,13 @@ export function TextFieldEditor({
     <div className="space-y-2 border p-4 rounded-md bg-muted/20">
       <div className="flex items-center justify-between">
         <Label>{label}</Label>
-        <CmsSaveButton page={page} section={section} contentKey={contentKey} value={value} originalValue={initialValue} />
+        <CmsSaveButton
+          page={page}
+          section={section}
+          contentKey={contentKey}
+          value={value}
+          originalValue={initialValue}
+        />
       </div>
       <Input value={value} onChange={(e) => setValue(e.target.value)} />
     </div>
@@ -109,7 +119,13 @@ export function TextareaEditor({
     <div className="space-y-2 border p-4 rounded-md bg-muted/20">
       <div className="flex items-center justify-between">
         <Label>{label}</Label>
-        <CmsSaveButton page={page} section={section} contentKey={contentKey} value={value} originalValue={initialValue} />
+        <CmsSaveButton
+          page={page}
+          section={section}
+          contentKey={contentKey}
+          value={value}
+          originalValue={initialValue}
+        />
       </div>
       <Textarea rows={5} value={value} onChange={(e) => setValue(e.target.value)} />
     </div>
@@ -151,7 +167,13 @@ export function JsonArrayEditor({
     <div className="space-y-2 border p-4 rounded-md bg-muted/20">
       <div className="flex items-center justify-between">
         <Label>{label}</Label>
-        <CmsSaveButton page={page} section={section} contentKey={contentKey} value={valueStr} originalValue={initialValue} />
+        <CmsSaveButton
+          page={page}
+          section={section}
+          contentKey={contentKey}
+          value={valueStr}
+          originalValue={initialValue}
+        />
       </div>
       <div className="space-y-2">
         {items.map((item, i) => (
@@ -249,7 +271,7 @@ function InlineImageUploader({
       ) : (
         <div className="h-14 w-20 bg-muted rounded flex flex-col items-center justify-center border border-dashed text-muted-foreground p-1 text-center">
           <ImageIcon className="h-5 w-5 stroke-[1.5] mb-0.5 text-muted-foreground/60" />
-          <span className="text-[9px] leading-none">No image</span>
+          <span className="text-xs leading-none">No image</span>
         </div>
       )}
       <div className="flex flex-col space-y-1">
@@ -273,7 +295,13 @@ function InlineImageUploader({
                 disabled={uploading}
                 className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
               />
-              <Button type="button" variant="outline" size="sm" disabled={uploading} className="h-7 text-xs">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={uploading}
+                className="h-7 text-xs"
+              >
                 Replace
               </Button>
             </div>
@@ -287,8 +315,18 @@ function InlineImageUploader({
               disabled={uploading}
               className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
             />
-            <Button type="button" variant="outline" size="sm" disabled={uploading} className="h-7 text-xs">
-              {uploading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Upload className="h-3 w-3 mr-1" />}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={uploading}
+              className="h-7 text-xs"
+            >
+              {uploading ? (
+                <Loader2 className="h-3 w-3 animate-spin mr-1" />
+              ) : (
+                <Upload className="h-3 w-3 mr-1" />
+              )}
               Upload
             </Button>
           </div>
@@ -311,7 +349,11 @@ export function JsonObjectArrayEditor({
   section: string;
   contentKey: string;
   initialValue: string;
-  fields: { key: string; label: string; type?: "text" | "textarea" | "number" | "boolean" | "array" | "image" }[];
+  fields: {
+    key: string;
+    label: string;
+    type?: "text" | "textarea" | "number" | "boolean" | "array" | "image";
+  }[];
 }) {
   const [items, setItems] = useState<any[]>(() => {
     try {
@@ -325,7 +367,9 @@ export function JsonObjectArrayEditor({
 
   const addItem = () => {
     const newItem: any = {};
-    fields.forEach((f) => (newItem[f.key] = f.type === "array" ? [] : f.type === "boolean" ? false : ""));
+    fields.forEach(
+      (f) => (newItem[f.key] = f.type === "array" ? [] : f.type === "boolean" ? false : ""),
+    );
     setItems([...items, newItem]);
   };
 
@@ -340,19 +384,33 @@ export function JsonObjectArrayEditor({
     <div className="space-y-2 border p-4 rounded-md bg-muted/20">
       <div className="flex items-center justify-between mb-4">
         <Label className="text-lg font-semibold">{label}</Label>
-        <CmsSaveButton page={page} section={section} contentKey={contentKey} value={valueStr} originalValue={initialValue} />
+        <CmsSaveButton
+          page={page}
+          section={section}
+          contentKey={contentKey}
+          value={valueStr}
+          originalValue={initialValue}
+        />
       </div>
       <div className="space-y-6">
         {items.map((item, i) => (
           <div key={i} className="space-y-3 p-4 border bg-background rounded-md relative">
-            <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={() => removeItem(i)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2"
+              onClick={() => removeItem(i)}
+            >
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
             {fields.map((field) => (
               <div key={field.key} className="space-y-1">
                 <Label className="text-xs text-muted-foreground">{field.label}</Label>
                 {field.type === "textarea" ? (
-                  <Textarea value={item[field.key] || ""} onChange={(e) => updateItem(i, field.key, e.target.value)} />
+                  <Textarea
+                    value={item[field.key] || ""}
+                    onChange={(e) => updateItem(i, field.key, e.target.value)}
+                  />
                 ) : field.type === "array" ? (
                   <Input
                     value={Array.isArray(item[field.key]) ? item[field.key].join(", ") : ""}
@@ -360,7 +418,7 @@ export function JsonObjectArrayEditor({
                       updateItem(
                         i,
                         field.key,
-                        e.target.value.split(",").map((s) => s.trim())
+                        e.target.value.split(",").map((s) => s.trim()),
                       )
                     }
                     placeholder="Comma separated values"
@@ -387,7 +445,11 @@ export function JsonObjectArrayEditor({
                     type={field.type === "number" ? "number" : "text"}
                     value={item[field.key] || ""}
                     onChange={(e) =>
-                      updateItem(i, field.key, field.type === "number" ? Number(e.target.value) : e.target.value)
+                      updateItem(
+                        i,
+                        field.key,
+                        field.type === "number" ? Number(e.target.value) : e.target.value,
+                      )
                     }
                   />
                 )}
@@ -438,13 +500,29 @@ export function KeyValueTableEditor({
     <div className="space-y-2 border p-4 rounded-md bg-muted/20">
       <div className="flex items-center justify-between">
         <Label>{label}</Label>
-        <CmsSaveButton page={page} section={section} contentKey={contentKey} value={valueStr} originalValue={initialValue} />
+        <CmsSaveButton
+          page={page}
+          section={section}
+          contentKey={contentKey}
+          value={valueStr}
+          originalValue={initialValue}
+        />
       </div>
       <div className="space-y-2">
         {items.map((item, i) => (
           <div key={i} className="flex items-center space-x-2">
-            <Input placeholder="Key" value={item[0]} onChange={(e) => updateItem(i, [e.target.value, item[1]])} className="w-1/3" />
-            <Input placeholder="Value" value={item[1]} onChange={(e) => updateItem(i, [item[0], e.target.value])} className="w-2/3" />
+            <Input
+              placeholder="Key"
+              value={item[0]}
+              onChange={(e) => updateItem(i, [e.target.value, item[1]])}
+              className="w-1/3"
+            />
+            <Input
+              placeholder="Value"
+              value={item[1]}
+              onChange={(e) => updateItem(i, [item[0], e.target.value])}
+              className="w-2/3"
+            />
             <Button variant="outline" size="icon" onClick={() => removeItem(i)}>
               <Trash2 className="h-4 w-4" />
             </Button>

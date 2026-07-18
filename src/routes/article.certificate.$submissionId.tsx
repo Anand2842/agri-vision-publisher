@@ -3,6 +3,20 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Printer, ArrowLeft, Loader2, Award, ShieldCheck } from "lucide-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import logo from "@/assets/logo.png";
+
+const MOCK_ARTICLE_CERT = {
+  submission: {
+    id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    title: "Impact of Organic Farming Practices on Soil Microbial Diversity in Semi-Arid Regions of Rajasthan",
+    status: "published" as const,
+    created_at: "2026-06-15T10:30:00Z",
+    updated_at: "2026-07-10T14:22:00Z",
+  },
+  authorName: "Dr. Priya Sharma",
+  institution: "ICAR - Central Arid Zone Research Institute (CAZRI)",
+  country: "India",
+};
 
 export const Route = createFileRoute("/article/certificate/$submissionId")({
   component: PublicationCertificate,
@@ -39,6 +53,14 @@ function PublicationCertificate() {
     const loadCertificateData = async () => {
       setLoading(true);
       setError(null);
+
+      // Preview mode: show mock data without database
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("preview") === "true") {
+        setData(MOCK_ARTICLE_CERT);
+        setLoading(false);
+        return;
+      }
 
       try {
         // Require authentication
@@ -180,10 +202,11 @@ function PublicationCertificate() {
           
           {/* Header */}
           <div className="space-y-1.5">
-            <div className="text-[11px] font-sans font-semibold text-primary uppercase tracking-[0.3em] font-semibold">
+            <img src={logo} alt="TAPAM Logo" className="h-14 mx-auto mb-2" />
+            <div className="text-xs font-sans font-semibold text-primary uppercase tracking-[0.3em] font-semibold">
               {getCert("branding", "magazine_name")}
             </div>
-            <div className="text-[9px] font-sans font-bold text-muted-foreground uppercase tracking-widest">
+            <div className="text-xs font-sans font-bold text-muted-foreground uppercase tracking-widest">
               Published by: {getCert("branding", "publisher")}
             </div>
             <div className="w-40 h-px bg-gradient-to-r from-transparent via-[#8C6D3E]/40 to-transparent mx-auto mt-2" />
@@ -191,7 +214,7 @@ function PublicationCertificate() {
 
           {/* Title */}
           <div>
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-[#8C6D3E] uppercase tracking-[0.15em] leading-none drop-shadow-sm">
+            <h1 className="font-display text-xl md:text-2xl font-bold text-[#8C6D3E] uppercase tracking-[0.15em] leading-none drop-shadow-sm">
               Certificate of Publication
             </h1>
             <p className="font-serif italic text-sm text-foreground/75 mt-2.5">
@@ -204,7 +227,7 @@ function PublicationCertificate() {
             <div className="font-serif italic text-3xl md:text-4xl font-bold text-navy px-12 border-b border-[#8C6D3E]/30 pb-1.5 inline-block min-w-[340px] max-w-[650px] break-words leading-tight drop-shadow-[0_1.5px_1.5px_rgba(255,255,255,1)]">
               {authorName}
             </div>
-            <div className="text-[10px] font-sans font-semibold text-muted-foreground uppercase tracking-widest mt-1.5 max-w-[600px] break-words leading-normal mx-auto">
+            <div className="text-xs font-sans font-semibold text-muted-foreground uppercase tracking-widest mt-1.5 max-w-[600px] break-words leading-normal mx-auto">
               {institution ? `${institution}, ${country}` : "Registered Agricultural Researcher"}
             </div>
           </div>
@@ -234,7 +257,7 @@ function PublicationCertificate() {
                 {getCert("branding", "chief_editor_signature")}
               </div>
               <div className="w-36 h-px bg-foreground/30 mb-2" />
-              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
+              <div className="text-xs font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
                 {getCert("branding", "chief_editor")}
               </div>
               <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest max-w-[220px] break-words leading-tight mt-0.5">
@@ -264,7 +287,7 @@ function PublicationCertificate() {
                 {getCert("branding", "publisher_signature")}
               </div>
               <div className="w-36 h-px bg-foreground/30 mb-2" />
-              <div className="text-[10px] font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
+              <div className="text-xs font-sans font-bold text-ink uppercase tracking-wider max-w-[220px] break-words leading-tight">
                 {getCert("branding", "publisher_title")}
               </div>
               <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest max-w-[220px] break-words leading-tight mt-0.5">

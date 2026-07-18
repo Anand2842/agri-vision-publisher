@@ -6,10 +6,12 @@ import { z } from "zod";
 
 const FooterNavColumnSchema = z.object({
   title: z.string(),
-  links: z.array(z.object({
-    label: z.string(),
-    href: z.string()
-  }))
+  links: z.array(
+    z.object({
+      label: z.string(),
+      href: z.string(),
+    }),
+  ),
 });
 
 const FooterNavSchema = z.array(FooterNavColumnSchema);
@@ -30,7 +32,7 @@ export function SiteFooter() {
         { label: "Editorial Board", href: "/editorial-board" },
         { label: "Advertise", href: "/advertise" },
         { label: "About", href: "/about" },
-      ]
+      ],
     },
     {
       title: "Authors",
@@ -50,7 +52,7 @@ export function SiteFooter() {
         { label: "Terms & Conditions", href: "/terms" },
         { label: "Privacy Policy", href: "/privacy" },
       ],
-    }
+    },
   ];
 
   const columns = cmsColumns ?? defaultColumns;
@@ -61,7 +63,7 @@ export function SiteFooter() {
           <div className="flex items-center gap-3">
             <img
               src={getHeader("branding", "logo_url") || logo}
-              alt=""
+              alt="The Agriculture Popular Article Magazine"
               width={56}
               height={56}
               className="h-14 w-14 shrink-0"
@@ -74,10 +76,18 @@ export function SiteFooter() {
             </div>
           </div>
           <p className="text-sm text-white/70 mt-4 max-w-xs leading-relaxed">
-            {getFooter("branding", "description")}
+            {getFooter("branding", "description") ||
+              "A peer-reviewed, open-access monthly magazine advancing agriculture through knowledge, innovation, sustainability and community."}
           </p>
-          <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-[10px] uppercase tracking-[0.18em] text-orange font-semibold">
-            {getFooterJson<"branding", "tagwords", string[]>("branding", "tagwords").map((w, i, arr) => (
+          <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-xs uppercase tracking-[0.18em] text-orange font-semibold">
+            {(
+              getFooterJson<"branding", "tagwords", string[]>("branding", "tagwords") || [
+                "Knowledge",
+                "Innovation",
+                "Sustainability",
+                "Community",
+              ]
+            ).map((w, i, arr) => (
               <React.Fragment key={w}>
                 <span>{w}</span>
                 {i < arr.length - 1 && <span>·</span>}
@@ -95,16 +105,24 @@ export function SiteFooter() {
         <div>
           <div className="eyebrow mb-4 text-white/50">Editorial Office</div>
           <ul className="space-y-2 text-sm text-white/80">
-            <li>{getFooter("contact", "name")}</li>
-            <li className="text-white/60">{getFooter("contact", "address")}</li>
+            <li>{getFooter("contact", "name") || "Dr. Dileep Kumar"}</li>
+            <li className="text-white/60">
+              {getFooter("contact", "address") || "ICAR–RRS–CAZRI, Jaisalmer 345001"}
+            </li>
             <li>
-              <a href={`tel:${getFooter("contact", "phone")}`} className="hover:text-orange">
-                {getFooter("contact", "phone")}
+              <a
+                href={`tel:${getFooter("contact", "phone") || "+91 9509164410"}`}
+                className="hover:text-orange transition-colors"
+              >
+                {getFooter("contact", "phone") || "+91 9509164410"}
               </a>
             </li>
             <li>
-              <a href={`mailto:${getFooter("contact", "email")}`} className="hover:text-orange break-all">
-                {getFooter("contact", "email")}
+              <a
+                href={`mailto:${getFooter("contact", "email") || "dkdkdangi@gmail.com"}`}
+                className="hover:text-orange transition-colors break-all"
+              >
+                {getFooter("contact", "email") || "dkdkdangi@gmail.com"}
               </a>
             </li>
           </ul>
@@ -129,15 +147,17 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="container-editorial py-6 flex flex-col md:flex-row justify-between text-xs text-white/60 gap-2">
           <div>
-            © {new Date().getFullYear()}{" "}
-            {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
-            {getHeader("branding", "title_line2") || "Popular Article Magazine"}. Published by {getFooter("legal", "publisher_name")}.
+            © {new Date().getFullYear()} {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
+            {getHeader("branding", "title_line2") || "Popular Article Magazine"}. Published by{" "}
+            {getFooter("legal", "publisher_name") ||
+              "Ram Mangalam Agri – Rural Development Foundation"}
+            .
           </div>
           <div>Published monthly · Peer reviewed · Open access</div>
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="container-editorial py-3 text-center text-[11px] text-white/40">
+        <div className="container-editorial py-3 text-center text-xs text-white/60">
           Designed &amp; developed by{" "}
           <a
             href="https://anandbuild.dev/"
@@ -160,7 +180,7 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
       <ul className="space-y-2">
         {links.map(([label, to]) => (
           <li key={label}>
-            <Link to={to} className="text-sm text-white/80 hover:text-orange">
+            <Link to={to} className="text-sm text-white/80 hover:text-orange transition-colors">
               {label}
             </Link>
           </li>

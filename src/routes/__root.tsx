@@ -10,12 +10,13 @@ import {
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import ScrollToTop from "@/components/site/ScrollToTop";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
+        <h1 className="text-5xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist or has been moved.
@@ -88,17 +89,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@AgricMagazine" },
       { name: "twitter:title", content: "The Agriculture Popular Article Magazine" },
       {
         name: "twitter:description",
         content:
           "A peer-reviewed, open-access monthly magazine for agriculture and allied sciences.",
       },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp" },
+      { property: "og:image", content: "https://agriculturemagazine.in/og-default.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "theme-color", content: "#356B3A" },
+      { name: "twitter:image", content: "https://agriculturemagazine.in/og-default.jpg" },
     ],
     links: [
+      { rel: "canonical", href: "https://agriculturemagazine.in" },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -141,7 +146,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         }),
       },
     ],
-
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -151,7 +155,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ scrollPaddingTop: "140px" }}>
       <head>
         <HeadContent />
       </head>
@@ -170,6 +174,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <Outlet />
       <Toaster />
+      <ScrollToTop />
     </QueryClientProvider>
   );
 }

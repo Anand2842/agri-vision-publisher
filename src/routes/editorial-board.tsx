@@ -65,18 +65,25 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
   return (
     <article className="group">
       <div
-        className={`aspect-[4/5] bg-muted rounded-sm flex items-center justify-center font-display ${
-          large ? "text-7xl" : "text-4xl"
-        } text-[oklch(var(--navy))]/30 border border-rule overflow-hidden`}
+        className={`aspect-square bg-muted rounded-full flex items-center justify-center font-display ${
+          large ? "text-4xl" : "text-2xl"
+        } text-[oklch(var(--navy))]/30 border border-rule overflow-hidden max-w-[120px] mx-auto`}
       >
         {m.photo_url ? (
-          <img src={m.photo_url} alt={m.name} width={480} height={600} className="h-full w-full object-cover object-top" loading="lazy" />
+          <img
+            src={m.photo_url}
+            alt={m.name}
+            width={480}
+            height={600}
+            className="h-full w-full object-cover object-top"
+            loading="lazy"
+          />
         ) : (
           <span className="tracking-wider">{initials(m.name)}</span>
         )}
       </div>
       <h4
-        className={`font-display ${large ? "text-2xl" : "text-lg"} mt-4 text-[oklch(var(--navy))] leading-tight`}
+        className={`font-display ${large ? "text-lg" : "text-lg"} mt-4 text-[oklch(var(--navy))] leading-tight`}
       >
         {nameNode}
       </h4>
@@ -112,11 +119,11 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
 
 function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
-    <header className="mt-20 mb-10">
+    <header className="mt-12 mb-6">
       <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
         {eyebrow}
       </div>
-      <h2 className="font-display text-3xl md:text-4xl mt-2 text-[oklch(var(--navy))]">{title}</h2>
+      <h2 className="font-display text-xl md:text-2xl mt-2 text-[oklch(var(--navy))]">{title}</h2>
       <div className="h-px bg-[oklch(var(--navy))]/20 mt-4" />
     </header>
   );
@@ -126,7 +133,10 @@ function Board() {
   const { get, getJson } = useSiteContent("editorial_board");
   const editorialBoard = getJson<"editors", "items", BoardMember[]>("editors", "items");
   const advisoryCommittee = getJson<"advisory", "items", BoardMember[]>("advisory", "items");
-  const reviewers = getJson<"reviewers", "items", (BoardMember & { dept?: string })[]>("reviewers", "items");
+  const reviewers = getJson<"reviewers", "items", (BoardMember & { dept?: string })[]>(
+    "reviewers",
+    "items",
+  );
 
   const groupBy = (role: string) => editorialBoard.filter((m) => m.role === role);
   const eic = groupBy("Editor-in-Chief")[0];
@@ -136,13 +146,12 @@ function Board() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-16">
+      <main id="main-content" className="container-editorial py-16">
         <div className="border-b border-[oklch(var(--navy))]/15 pb-12">
           <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
             {get("hero", "eyebrow")}
           </div>
-          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl mt-4 text-[oklch(var(--navy))] leading-[1.05] max-w-4xl">
+          <h1 className="font-display text-xl md:text-2xl mt-4 text-[oklch(var(--navy))] leading-[1.05] max-w-4xl">
             {get("hero", "tagline")}
           </h1>
           <p className="mt-6 text-lg text-foreground/75 max-w-2xl leading-relaxed">
@@ -151,17 +160,17 @@ function Board() {
         </div>
 
         <SectionHeader eyebrow="Leadership" title="Editor-in-Chief" />
-        <div className="grid md:grid-cols-3 gap-10">{eic && <PersonCard m={eic} large />}</div>
+        <div className="grid md:grid-cols-1 max-w-xs">{eic && <PersonCard m={eic} large />}</div>
 
         <SectionHeader eyebrow={`${international.length} Editors`} title="International Editors" />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
           {international.map((m) => (
             <PersonCard key={m.name} m={m} />
           ))}
         </div>
 
         <SectionHeader eyebrow={`${associate.length} Editors`} title="Associate Editors" />
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
           {associate.map((m) => (
             <PersonCard key={m.name} m={m} />
           ))}
@@ -171,9 +180,7 @@ function Board() {
           eyebrow={`${advisoryCommittee.length} Members`}
           title="International Advisory Committee"
         />
-        <p className="-mt-6 mb-10 text-foreground/70 max-w-2xl">
-          {get("advisory", "description")}
-        </p>
+        <p className="-mt-6 mb-10 text-foreground/70 max-w-2xl">{get("advisory", "description")}</p>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-[oklch(var(--navy))]/15">
           {advisoryCommittee.map((m) => (
             <div
@@ -181,11 +188,13 @@ function Board() {
               className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-start gap-4"
             >
               <div className="flex-1 min-w-0">
-                <div className="font-display text-lg text-[oklch(var(--navy))] leading-snug">{m.name}</div>
+                <div className="font-display text-lg text-[oklch(var(--navy))] leading-snug">
+                  {m.name}
+                </div>
                 {m.email && (
                   <a
                     href={`mailto:${m.email}`}
-                    className="inline-flex items-center gap-1 mt-1 text-[11px] text-[oklch(var(--navy))]/55 hover:text-[oklch(var(--orange))] transition-colors break-all"
+                    className="inline-flex items-center gap-1 mt-1 text-xs text-[oklch(var(--navy))]/55 hover:text-[oklch(var(--orange))] transition-colors break-all"
                   >
                     <Mail className="h-3 w-3 shrink-0" />
                     {m.email}
@@ -211,11 +220,13 @@ function Board() {
               className="py-5 border-b border-[oklch(var(--navy))]/10 flex items-start gap-4"
             >
               <div className="flex-1 min-w-0">
-                <div className="font-display text-lg text-[oklch(var(--navy))] leading-snug">{r.name}</div>
+                <div className="font-display text-lg text-[oklch(var(--navy))] leading-snug">
+                  {r.name}
+                </div>
                 {r.email && (
                   <a
                     href={`mailto:${r.email}`}
-                    className="inline-flex items-center gap-1 mt-1 text-[11px] text-[oklch(var(--navy))]/55 hover:text-[oklch(var(--orange))] transition-colors break-all"
+                    className="inline-flex items-center gap-1 mt-1 text-xs text-[oklch(var(--navy))]/55 hover:text-[oklch(var(--orange))] transition-colors break-all"
                   >
                     <Mail className="h-3 w-3 shrink-0" />
                     {r.email}
@@ -231,7 +242,6 @@ function Board() {
             </div>
           ))}
         </div>
-      </main>
       </main>
       <SiteFooter />
     </>

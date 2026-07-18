@@ -15,7 +15,12 @@ export const Route = createFileRoute("/publication-ethics")({
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },
         ]
-      : [{ title: "Publication Ethics & Plagiarism Policy — The Agriculture Popular Article Magazine" }],
+      : [
+          {
+            title:
+              "Publication Ethics & Plagiarism Policy — The Agriculture Popular Article Magazine",
+          },
+        ],
     links: [{ rel: "canonical", href: "https://agriculturemagazine.in/publication-ethics" }],
   }),
 });
@@ -27,15 +32,12 @@ function PublicationEthics() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content">
-      <main className="container-editorial py-16">
+      <main id="main-content" className="container-editorial py-16">
         <div className="eyebrow">{get("hero", "eyebrow")}</div>
-        <h1 className="font-display text-5xl md:text-6xl mt-3 text-ink max-w-3xl leading-[1.05]">
+        <h1 className="font-display text-2xl md:text-3xl mt-3 text-ink max-w-3xl leading-[1.05]">
           {get("hero", "title")}
         </h1>
-        <p className="mt-6 max-w-2xl text-foreground/75 leading-relaxed">
-          {get("hero", "body")}
-        </p>
+        <p className="mt-6 max-w-2xl text-foreground/75 leading-relaxed">{get("hero", "body")}</p>
 
         <Section title={get("originality", "title")}>
           <p>{get("originality", "body")}</p>
@@ -72,7 +74,6 @@ function PublicationEthics() {
           <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(get("reporting", "body")) }} />
         </Section>
       </main>
-      </main>
       <SiteFooter />
     </>
   );
@@ -92,4 +93,3 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     </section>
   );
 }
-

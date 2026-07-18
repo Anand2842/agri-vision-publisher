@@ -378,7 +378,7 @@ function AdminSubmissions() {
                           <div className="text-muted-foreground">
                             {formatDistanceToNow(new Date(s.created_at), { addSuffix: true })}
                           </div>
-                          <span className="mt-1 inline-block text-[0.65rem] uppercase tracking-widest px-2 py-0.5 bg-muted rounded-sm">
+                          <span className="mt-1 inline-block text-xs uppercase tracking-widest px-2 py-0.5 bg-muted rounded-sm">
                             {s.status.replace(/_/g, " ")}
                           </span>
                         </div>
@@ -553,7 +553,7 @@ function StatChip({
 function MemberBadge({ status, plan }: { status?: string; plan?: string }) {
   if (!status) {
     return (
-      <span className="inline-block px-2 py-1 rounded-sm bg-muted text-muted-foreground text-[0.65rem] uppercase tracking-widest">
+      <span className="inline-block px-2 py-1 rounded-sm bg-muted text-muted-foreground text-xs uppercase tracking-widest">
         No payment
       </span>
     );
@@ -565,7 +565,7 @@ function MemberBadge({ status, plan }: { status?: string; plan?: string }) {
       ? "bg-amber-100 text-amber-800 border-amber-300"
       : "bg-rose-100 text-rose-800 border-rose-300";
   return (
-    <span className={`inline-block px-2 py-1 rounded-sm border text-[0.65rem] uppercase tracking-widest ${cls}`}>
+    <span className={`inline-block px-2 py-1 rounded-sm border text-xs uppercase tracking-widest ${cls}`}>
       {status === "approved" ? `Paid · ${plan ?? ""}` : status}
     </span>
   );

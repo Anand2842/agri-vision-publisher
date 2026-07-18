@@ -4,12 +4,19 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyZodError } from "@/lib/form-errors";
 import { z } from "zod";
 import { FileText, Upload } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/submit")({
   component: Submit,
-  head: () => ({ meta: [{ title: "Submit Article — The Agriculture Popular Article Magazine" }, { name: "robots", content: "noindex" }], links: [{ rel: "canonical", href: "https://agriculturemagazine.in/submit" }] }),
+  head: () => ({
+    meta: [
+      { title: "Submit Article — The Agriculture Popular Article Magazine" },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [{ rel: "canonical", href: "https://agriculturemagazine.in/submit" }],
+  }),
 });
 
 const schema = z.object({
@@ -70,7 +77,7 @@ function Submit() {
     };
     const r = schema.safeParse(data);
     if (!r.success) {
-      toast.error(r.error.issues[0].message);
+      toast.error(friendlyZodError(r.error));
       return;
     }
     if (!file) {
@@ -115,14 +122,12 @@ function Submit() {
     nav({ to: "/dashboard" });
   };
 
-
-
   return (
     <>
       <SiteHeader />
-      <main className="container-editorial py-16 max-w-3xl">
+      <main id="main-content" className="container-editorial py-16 max-w-3xl">
         <div className="eyebrow">Authors</div>
-        <h1 className="font-display text-5xl mt-3 text-ink">Submit Your Article</h1>
+        <h1 className="font-display text-2xl mt-3 text-ink">Submit Your Article</h1>
         <p className="mt-4 text-foreground/70">
           Manuscripts in Microsoft Word (.doc / .docx) format only · 2–4 pages · reviewed within 21
           days.
@@ -167,7 +172,9 @@ function Submit() {
                 <>
                   <FileText className="h-5 w-5 text-primary" />
                   <span className="font-display">{file.name}</span>
-                  <span className="text-muted-foreground">({(file.size / 1024).toFixed(0)} KB)</span>
+                  <span className="text-muted-foreground">
+                    ({(file.size / 1024).toFixed(0)} KB)
+                  </span>
                 </>
               ) : (
                 <>
@@ -208,8 +215,13 @@ function Submit() {
               required
               className="mt-1 h-4 w-4 text-primary border-rule focus:ring-primary shrink-0"
             />
-            <label htmlFor="copyright_transfer" className="text-sm text-foreground/80 leading-normal font-sans select-none">
-              I confirm this is original, unpublished work and I agree to transfer the copyright of the accepted article to the publisher (Ram Mangalam Agri–Rural Development Foundation) upon acceptance.
+            <label
+              htmlFor="copyright_transfer"
+              className="text-sm text-foreground/80 leading-normal font-sans select-none"
+            >
+              I confirm this is original, unpublished work and I agree to transfer the copyright of
+              the accepted article to the publisher (Ram Mangalam Agri–Rural Development Foundation)
+              upon acceptance.
             </label>
           </div>
 

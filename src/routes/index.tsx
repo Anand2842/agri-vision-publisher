@@ -1,11 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play, Quote } from "lucide-react";
 import { fetchPublishedArticles, type DBArticle } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { useSiteContent, fetchSeoMetadata } from "@/hooks/useSiteContent";
 import { ArticleGridSkeleton } from "@/components/site/Skeletons";
+import heroPaddyWebp from "@/assets/hero-paddy.webp";
+import heroTractorWebp from "@/assets/hero-tractor.webp";
+import heroWheatWebp from "@/assets/hero-wheat.webp";
+import heroFieldsWebp from "@/assets/hero-fields.webp";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -37,8 +41,18 @@ function getDeadlineText() {
   }
 
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   return `25th ${monthNames[monthIndex]}, ${year}`;
 }
@@ -51,14 +65,14 @@ function Home() {
   return (
     <>
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <HeroSlider />
-        
+
         {/* Submission Deadline Banner */}
         <section className="bg-primary/5 border-b border-rule py-4">
           <div className="container-editorial flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             <div className="flex flex-col sm:flex-row items-center gap-3">
-              <span className="inline-flex items-center justify-center bg-orange text-white text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-sm font-sans shrink-0">
+              <span className="inline-flex items-center justify-center bg-orange text-navy text-xs uppercase tracking-wider font-semibold px-2 py-0.5 rounded-sm font-sans shrink-0">
                 Next Deadline
               </span>
               <p className="text-sm font-sans text-foreground/80 leading-normal">
@@ -67,11 +81,17 @@ function Home() {
               </p>
             </div>
             <div className="flex gap-4 items-center shrink-0">
-              <Link to="/submit" className="text-xs uppercase tracking-wider font-semibold text-primary hover:text-orange transition-colors font-sans">
+              <Link
+                to="/submit"
+                className="text-xs uppercase tracking-wider font-semibold text-primary hover:text-orange transition-colors font-sans"
+              >
                 Submit Online →
               </Link>
               <span className="h-3 w-px bg-rule hidden sm:inline" />
-              <Link to="/submission-guidelines" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground hover:text-ink transition-colors font-sans">
+              <Link
+                to="/submission-guidelines"
+                className="text-xs uppercase tracking-wider font-semibold text-muted-foreground hover:text-ink transition-colors font-sans"
+              >
                 Author Guidelines
               </Link>
             </div>
@@ -92,22 +112,35 @@ function Home() {
 
 function HeroSlider() {
   const { get, getJson } = useSiteContent("home");
-  const slides = getJson<"hero", "slide_images", { img: string; alt: string }[]>("hero", "slide_images");
+  const slides = getJson<"hero", "slide_images", { img: string; alt: string }[]>(
+    "hero",
+    "slide_images",
+  );
+  const webpMap: Record<string, string> = {
+    ["/hero-tractor"]: heroTractorWebp,
+    ["/hero-paddy"]: heroPaddyWebp,
+    ["/hero-wheat"]: heroWheatWebp,
+    ["/hero-fields"]: heroFieldsWebp,
+  };
   const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const prefersReducedMotion =
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
-    if (slides.length === 0) return;
+    if (slides.length === 0 || paused || prefersReducedMotion) return;
     const t = setInterval(() => setI((p) => (p + 1) % slides.length), 5500);
     return () => clearInterval(t);
-  }, [slides.length]);
+  }, [slides.length, paused, prefersReducedMotion]);
 
   if (slides.length === 0) {
     return (
       <section className="relative w-full overflow-hidden bg-navy aspect-[4/5] sm:aspect-[16/9]">
-
         <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-primary/30 animate-pulse" />
         <div className="absolute inset-0 grid place-items-center">
-          <div className="text-white/60 font-display text-sm uppercase tracking-widest">Loading featured stories…</div>
+          <div className="text-white/60 font-display text-sm uppercase tracking-widest">
+            Loading featured stories…
+          </div>
         </div>
       </section>
     );
@@ -115,22 +148,33 @@ function HeroSlider() {
 
   return (
     <section className="relative w-full overflow-hidden bg-navy aspect-[4/5] sm:aspect-[16/9]">
-      {slides.map((s, idx) => (
-        <img
-          key={idx}
-          src={s.img}
-          alt={s.alt}
-          width={1920}
-          height={1080}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1400ms] ${idx === i ? "opacity-100" : "opacity-0"}`}
-          loading={idx === 0 ? "eager" : "lazy"}
-          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-        />
-      ))}
+      {slides.map((s, idx) => {
+        const isCurrent = idx === i;
+        const isAdjacent =
+          idx === (i - 1 + slides.length) % slides.length || idx === (i + 1) % slides.length;
+        if (!isCurrent && !isAdjacent) return null;
+        const webpSrc = Object.entries(webpMap).find(([key]) => s.img.includes(key))?.[1];
+        return (
+          <picture key={idx}>
+            {webpSrc && <source srcSet={webpSrc} type="image/webp" />}
+            <img
+              src={s.img}
+              alt={s.alt}
+              width={1920}
+              height={1080}
+              loading={isCurrent ? "eager" : "lazy"}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1400ms] ${isCurrent ? "opacity-100" : "opacity-0"}`}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+          </picture>
+        );
+      })}
       <div className="absolute inset-0 bg-black/10" />
       <div className="absolute inset-x-0 bottom-12 md:bottom-16 flex flex-col items-center justify-end px-4">
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-        <h1 className="relative font-display text-white text-xl sm:text-2xl md:text-4xl text-center leading-tight drop-shadow-lg">
+        <h1 className="relative font-display text-white text-lg sm:text-xl md:text-2xl text-center leading-tight drop-shadow-lg">
           The Agriculture Popular Article Magazine
         </h1>
         <p className="relative mt-2 text-white/80 text-xs sm:text-sm md:text-base text-center font-sans max-w-2xl drop-shadow">
@@ -140,21 +184,28 @@ function HeroSlider() {
       <button
         onClick={() => setI((p) => (p - 1 + slides.length) % slides.length)}
         aria-label="Previous slide"
-        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 h-10 w-10 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur"
+        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 h-11 w-11 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur"
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
       <button
         onClick={() => setI((p) => (p + 1) % slides.length)}
         aria-label="Next slide"
-        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 h-10 w-10 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur"
+        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 h-11 w-11 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur"
       >
         <ChevronRight className="h-5 w-5" />
+      </button>
+      <button
+        onClick={() => setPaused(!paused)}
+        className="absolute bottom-4 right-4 z-20 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors"
+        aria-label={paused ? "Resume slideshow" : "Pause slideshow"}
+      >
+        {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
       </button>
       <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
         {slides.map((_, idx) => (
           // dot button — tap-target expanded, inner pill is the visible indicator
-          
+
           <button
             key={idx}
             onClick={() => setI(idx)}
@@ -162,9 +213,10 @@ function HeroSlider() {
             aria-current={idx === i ? "true" : undefined}
             className={`min-h-11 min-w-11 grid place-items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange rounded-full`}
           >
-            <span className={`block h-2 rounded-full transition-all ${idx === i ? "w-8 bg-white" : "w-2 bg-white/50"}`} />
+            <span
+              className={`block h-2 rounded-full transition-all ${idx === i ? "w-8 bg-white" : "w-2 bg-white/50"}`}
+            />
           </button>
-
         ))}
       </div>
     </section>
@@ -176,11 +228,9 @@ function Intro() {
   return (
     <section className="container-editorial py-16 md:py-24">
       <div className="hr-divider mb-8">
-        <h2 className="section-title text-2xl md:text-4xl text-center">
-          {get("intro", "heading")}
-        </h2>
+        <h2 className="section-title text-xl md:text-2xl text-center">{get("intro", "heading")}</h2>
       </div>
-      <p className="max-w-4xl mx-auto text-center text-foreground/75 leading-[1.9] text-[0.97rem]">
+      <p className="max-w-4xl mx-auto text-center text-foreground/75 leading-relaxed text-base">
         {get("intro", "body")}
       </p>
 
@@ -196,7 +246,9 @@ function Intro() {
             <tbody className="divide-y divide-rule/50">
               <tr className="hover:bg-primary/5 transition-colors">
                 <th className="py-3 px-6 font-semibold text-ink w-1/3">Title</th>
-                <td className="py-3 px-6 text-foreground/80">The Agriculture Popular Article Magazine</td>
+                <td className="py-3 px-6 text-foreground/80">
+                  The Agriculture Popular Article Magazine
+                </td>
               </tr>
               <tr className="hover:bg-primary/5 transition-colors">
                 <th className="py-3 px-6 font-semibold text-ink">Frequency</th>
@@ -208,11 +260,15 @@ function Intro() {
               </tr>
               <tr className="hover:bg-primary/5 transition-colors">
                 <th className="py-3 px-6 font-semibold text-ink">Publisher name</th>
-                <td className="py-3 px-6 text-foreground/80">Ram Mangalam Agri – Rural Development Foundation</td>
+                <td className="py-3 px-6 text-foreground/80">
+                  Ram Mangalam Agri – Rural Development Foundation
+                </td>
               </tr>
               <tr className="hover:bg-primary/5 transition-colors">
                 <th className="py-3 px-6 font-semibold text-ink">Publisher address</th>
-                <td className="py-3 px-6 text-foreground/80">ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India</td>
+                <td className="py-3 px-6 text-foreground/80">
+                  ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India
+                </td>
               </tr>
               <tr className="hover:bg-primary/5 transition-colors">
                 <th className="py-3 px-6 font-semibold text-ink">Starting Year</th>
@@ -280,7 +336,7 @@ function RecentBlogs() {
     <section className="bg-paper border-y border-rule py-16 md:py-24">
       <div className="container-editorial">
         <div className="hr-divider mb-12">
-          <h2 className="section-title text-2xl md:text-4xl text-center">Recent Blogs</h2>
+          <h2 className="section-title text-xl md:text-2xl text-center">Recent Blogs</h2>
         </div>
 
         {loading ? (
@@ -296,7 +352,10 @@ function RecentBlogs() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-7">
             {articles.slice(0, 4).map((a) => (
-              <article key={a.slug} className="bg-white border border-rule hover-lift flex flex-col">
+              <article
+                key={a.slug}
+                className="bg-white border border-rule hover-lift flex flex-col"
+              >
                 <Link
                   to="/articles/$slug"
                   params={{ slug: a.slug }}
@@ -308,18 +367,18 @@ function RecentBlogs() {
                     width={800}
                     height={450}
                     className="w-full h-full object-cover border-b border-rule hover:scale-105 transition-transform duration-700"
-
                     loading="lazy"
                     onError={(e) => {
                       const t = e.currentTarget as HTMLImageElement;
                       if (!t.src.endsWith("/placeholder.svg")) t.src = "/placeholder.svg";
                     }}
                   />
-
                 </Link>
                 <div className="p-6 flex flex-col flex-1">
-                  <div className="text-xs text-orange font-semibold uppercase tracking-wider">{a.category}</div>
-                  <h3 className="font-display text-2xl md:text-[28px] mt-2 leading-tight text-navy">
+                  <div className="text-xs text-orange font-semibold uppercase tracking-wider">
+                    {a.category}
+                  </div>
+                  <h3 className="font-display text-lg md:text-xl mt-2 leading-tight text-navy">
                     <Link
                       to="/articles/$slug"
                       params={{ slug: a.slug }}
@@ -334,11 +393,14 @@ function RecentBlogs() {
                     <span className="inline-flex items-center gap-1 mt-0.5">
                       Vol. {a.volume} · Issue {a.issueNumber}
                       {(a.pageStart || a.pageEnd) && (
-                        <span>· pp. {a.pageStart ?? "—"}{a.pageEnd ? `–${a.pageEnd}` : ""}</span>
+                        <span>
+                          · pp. {a.pageStart ?? "—"}
+                          {a.pageEnd ? `–${a.pageEnd}` : ""}
+                        </span>
                       )}
                     </span>
                   </div>
-                  <p className="mt-3 text-[15px] text-foreground/70 leading-relaxed line-clamp-3 flex-1">
+                  <p className="mt-3 text-base text-foreground/70 leading-relaxed line-clamp-3 flex-1">
                     {a.abstract}
                   </p>
                   <Link
@@ -363,9 +425,11 @@ function VisionMission() {
   return (
     <section className="container-editorial py-16 md:py-24">
       <div className="hr-divider mb-10">
-        <h2 className="section-title text-2xl md:text-4xl text-center">{get("vision_mission", "heading")}</h2>
+        <h2 className="section-title text-xl md:text-2xl text-center">
+          {get("vision_mission", "heading")}
+        </h2>
       </div>
-      <p className="max-w-4xl mx-auto text-center text-foreground/75 leading-[1.9] text-[0.97rem]">
+      <p className="max-w-4xl mx-auto text-center text-foreground/75 leading-relaxed text-base">
         {get("vision_mission", "body")}
       </p>
     </section>
@@ -374,12 +438,16 @@ function VisionMission() {
 
 function Testimonials() {
   const { get, getJson } = useSiteContent("home");
-  const testimonials = getJson<"testimonials", "items", { quote: string; name: string; role: string }[]>("testimonials", "items");
+  const testimonials = getJson<
+    "testimonials",
+    "items",
+    { quote: string; name: string; role: string }[]
+  >("testimonials", "items");
   return (
     <section className="bg-navy text-white py-16 md:py-24">
       <div className="container-editorial">
         <div className="hr-divider mb-14">
-          <h2 className="section-title text-2xl md:text-4xl text-center text-white">
+          <h2 className="section-title text-xl md:text-2xl text-center text-white">
             {get("testimonials", "heading")}
           </h2>
         </div>
@@ -389,8 +457,8 @@ function Testimonials() {
               key={t.name}
               className="relative bg-white/[0.04] border border-white/10 p-8 md:p-10"
             >
-              <Quote className="absolute -top-4 left-6 h-10 w-10 text-orange bg-navy px-1.5" />
-              <p className="text-white/85 leading-relaxed text-[0.98rem] italic">"{t.quote}"</p>
+              <Quote className="absolute -top-4 left-6 h-11 w-11 text-orange bg-navy px-1.5" />
+              <p className="text-white/85 leading-relaxed text-base italic">"{t.quote}"</p>
               <div className="mt-6 flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-orange/30 grid place-items-center font-display text-orange">
                   {t.name
@@ -416,11 +484,16 @@ function Testimonials() {
 
 function Readership() {
   const { get, getJson } = useSiteContent("home");
-  const readership = getJson<"readership", "items", { label: string; value: number }[]>("readership", "items");
+  const readership = getJson<"readership", "items", { label: string; value: number }[]>(
+    "readership",
+    "items",
+  );
   return (
     <section className="container-editorial py-16 md:py-24">
       <div className="hr-divider mb-14">
-        <h2 className="section-title text-2xl md:text-4xl text-center">{get("readership", "heading")}</h2>
+        <h2 className="section-title text-xl md:text-2xl text-center">
+          {get("readership", "heading")}
+        </h2>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
         {readership.map((s) => (
@@ -445,7 +518,7 @@ function Counter({ value, label }: { value: number; label: string }) {
   }, [value]);
   return (
     <div>
-      <div className="font-display font-bold text-4xl md:text-5xl text-orange tabular-nums">
+      <div className="font-display font-bold text-2xl md:text-3xl text-orange tabular-nums">
         {n.toLocaleString()}+
       </div>
       <div className="mt-2 text-xs uppercase tracking-widest font-condensed text-navy">{label}</div>
@@ -455,12 +528,17 @@ function Counter({ value, label }: { value: number; label: string }) {
 
 function Partners() {
   const { get, getJson } = useSiteContent("home");
-  const partners = getJson<"partners", "items", { name: string; logo_url?: string }[]>("partners", "items");
+  const partners = getJson<"partners", "items", { name: string; logo_url?: string }[]>(
+    "partners",
+    "items",
+  );
   return (
     <section className="bg-paper border-t border-rule py-16">
       <div className="container-editorial">
         <div className="hr-divider mb-12">
-          <h2 className="section-title text-xl md:text-3xl text-center">{get("partners", "heading")}</h2>
+          <h2 className="section-title text-xl md:text-2xl text-center">
+            {get("partners", "heading")}
+          </h2>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-6 items-center">
           {partners.map((p, idx) => (
@@ -469,10 +547,18 @@ function Partners() {
               className="aspect-[3/2] bg-white border border-rule grid place-items-center text-center p-3 hover-lift overflow-hidden"
             >
               {p.logo_url ? (
-                <img src={p.logo_url} alt={p.name} width={240} height={160} loading="lazy" className="max-h-full max-w-full object-contain" />
-
+                <img
+                  src={p.logo_url}
+                  alt={p.name}
+                  width={240}
+                  height={160}
+                  loading="lazy"
+                  className="max-h-full max-w-full object-contain"
+                />
               ) : (
-                <span className="font-display text-navy text-sm md:text-base leading-tight font-semibold">{p.name}</span>
+                <span className="font-display text-navy text-sm md:text-base leading-tight font-semibold">
+                  {p.name}
+                </span>
               )}
             </div>
           ))}
