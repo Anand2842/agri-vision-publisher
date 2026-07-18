@@ -148,7 +148,9 @@ export function SiteHeader() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  return (
     <header className="sticky top-0 z-40 bg-background border-b border-rule">
+
       {/* Skip-to-content — visible on keyboard focus only */}
       <a
         href="#main-content"
