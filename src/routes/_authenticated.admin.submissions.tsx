@@ -24,7 +24,9 @@ type Sub = {
   keywords: string | null;
   status: string;
   plan: string;
-  user_id: string;
+  user_id: string | null;
+  guest_name: string | null;
+  guest_email: string | null;
   category_id: string | null;
   notes: string | null;
   content: string | null;
