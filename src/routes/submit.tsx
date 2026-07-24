@@ -161,7 +161,7 @@ function Submit() {
     }
 
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-    const folder = isGuest ? "guest" : userId;
+    const folder = guestNow ? "guest" : currentUid;
     const path = `${folder}/${row.id}${ext}`;
     const { error: upErr } = await supabase.storage.from("manuscripts").upload(path, file, {
       contentType: file.type || "application/octet-stream",
@@ -173,20 +173,20 @@ function Submit() {
       return;
     }
     // Guests can't update the row (RLS), signed-in users can.
-    if (!isGuest) {
+    if (!guestNow) {
       await supabase.from("submissions").update({ manuscript_path: path }).eq("id", row.id);
     }
 
     setLoading(false);
     toast.success(`Submitted! Ticket #${row.id.slice(0, 8).toUpperCase()}`);
-    if (isGuest) {
-      // Reset form for guests
-      (e.target as HTMLFormElement).reset();
+    if (guestNow) {
+      form.reset();
       setFile(null);
     } else {
       nav({ to: "/dashboard" });
     }
   };
+
 
   return (
     <>
