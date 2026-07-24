@@ -352,8 +352,9 @@ function AdminSubmissions() {
               </div>
               <ul className="divide-y divide-rule">
                 {items.map((s, idx) => {
-                  const profile = profiles[s.user_id];
-                  const payment = payments[s.user_id];
+                  const profile = s.user_id ? profiles[s.user_id] : undefined;
+                  const payment = s.user_id ? payments[s.user_id] : undefined;
+                  const isGuest = !s.user_id;
                   return (
                     <li key={s.id} role="row" className={`p-5 ${idx % 2 ? "bg-paper/50" : ""}`}>
                       <div className="grid md:grid-cols-[1.6fr_1fr_auto_auto] gap-4 items-start">
@@ -366,11 +367,17 @@ function AdminSubmissions() {
                           </div>
                         </div>
                         <div className="text-sm">
-                          <div className="font-medium text-ink">
-                            {profile?.full_name || "Unknown author"}
+                          <div className="font-medium text-ink flex items-center gap-2">
+                            {profile?.full_name || s.guest_name || "Unknown author"}
+                            {isGuest && (
+                              <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-muted rounded-sm text-muted-foreground">Guest</span>
+                            )}
                           </div>
                           {profile?.institution && (
                             <div className="text-xs text-muted-foreground truncate">{profile.institution}</div>
+                          )}
+                          {isGuest && s.guest_email && (
+                            <a href={`mailto:${s.guest_email}`} className="text-xs text-muted-foreground truncate hover:text-primary">{s.guest_email}</a>
                           )}
                         </div>
                         <div className="text-xs">
