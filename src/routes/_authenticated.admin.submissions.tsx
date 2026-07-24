@@ -223,13 +223,14 @@ function AdminSubmissions() {
     return rows.filter((r) => {
       if (statusFilter && r.status !== statusFilter) return false;
       if (cutoff && new Date(r.created_at) < cutoff) return false;
-      const memberStatus = payments[r.user_id]?.status;
+      const memberStatus = r.user_id ? payments[r.user_id]?.status : undefined;
       if (memberFilter === "approved" && memberStatus !== "approved") return false;
       if (memberFilter === "pending" && memberStatus !== "pending") return false;
       if (memberFilter === "none" && memberStatus) return false;
       if (q) {
-        const name = profiles[r.user_id]?.full_name?.toLowerCase() || "";
-        if (!r.title.toLowerCase().includes(q) && !name.includes(q)) return false;
+        const name = (r.user_id ? profiles[r.user_id]?.full_name : r.guest_name)?.toLowerCase() || "";
+        const email = (r.guest_email || "").toLowerCase();
+        if (!r.title.toLowerCase().includes(q) && !name.includes(q) && !email.includes(q)) return false;
       }
       return true;
     });
