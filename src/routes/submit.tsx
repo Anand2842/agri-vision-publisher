@@ -61,7 +61,13 @@ function Submit() {
       setUserId(data.user?.id ?? null);
       setCheckedAuth(true);
     });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setUserId(s?.user?.id ?? null);
+      setCheckedAuth(true);
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
+
 
   const isGuest = checkedAuth && !userId;
 
