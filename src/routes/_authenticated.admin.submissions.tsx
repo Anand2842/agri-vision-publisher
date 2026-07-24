@@ -256,7 +256,7 @@ function AdminSubmissions() {
       total: list.length,
       week: list.filter((s) => new Date(s.created_at) >= weekAgo).length,
       pending: list.filter((s) => s.status === "submitted" || s.status === "under_review").length,
-      paid: list.filter((s) => payments[s.user_id]?.status === "approved").length,
+      paid: list.filter((s) => s.user_id && payments[s.user_id]?.status === "approved").length,
     };
   }, [rows, payments]);
 
