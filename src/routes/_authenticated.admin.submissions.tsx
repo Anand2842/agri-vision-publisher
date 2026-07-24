@@ -93,7 +93,7 @@ function AdminSubmissions() {
     setIssues((issueRes.data as Issue[]) || []);
     setCats((catRes.data as Cat[]) || []);
 
-    const userIds = Array.from(new Set(subs.map((s) => s.user_id)));
+    const userIds = Array.from(new Set(subs.map((s) => s.user_id).filter((v): v is string => !!v)));
     if (userIds.length) {
       const [profRes, payRes] = await Promise.all([
         supabase.from("profiles").select("id,full_name,institution").in("id", userIds),
