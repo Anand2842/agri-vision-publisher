@@ -372,6 +372,8 @@ export type Database = {
           category_id: string | null
           content: string | null
           created_at: string
+          guest_email: string | null
+          guest_name: string | null
           id: string
           keywords: string | null
           manuscript_path: string | null
@@ -380,13 +382,15 @@ export type Database = {
           status: Database["public"]["Enums"]["submission_status"]
           title: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           abstract: string
           category_id?: string | null
           content?: string | null
           created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
           id?: string
           keywords?: string | null
           manuscript_path?: string | null
@@ -395,13 +399,15 @@ export type Database = {
           status?: Database["public"]["Enums"]["submission_status"]
           title: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           abstract?: string
           category_id?: string | null
           content?: string | null
           created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
           id?: string
           keywords?: string | null
           manuscript_path?: string | null
@@ -410,7 +416,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["submission_status"]
           title?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {

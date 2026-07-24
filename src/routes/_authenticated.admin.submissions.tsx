@@ -24,7 +24,9 @@ type Sub = {
   keywords: string | null;
   status: string;
   plan: string;
-  user_id: string;
+  user_id: string | null;
+  guest_name: string | null;
+  guest_email: string | null;
   category_id: string | null;
   notes: string | null;
   content: string | null;
@@ -91,7 +93,7 @@ function AdminSubmissions() {
     setIssues((issueRes.data as Issue[]) || []);
     setCats((catRes.data as Cat[]) || []);
 
-    const userIds = Array.from(new Set(subs.map((s) => s.user_id)));
+    const userIds = Array.from(new Set(subs.map((s) => s.user_id).filter((v): v is string => !!v)));
     if (userIds.length) {
       const [profRes, payRes] = await Promise.all([
         supabase.from("profiles").select("id,full_name,institution").in("id", userIds),
@@ -221,13 +223,14 @@ function AdminSubmissions() {
     return rows.filter((r) => {
       if (statusFilter && r.status !== statusFilter) return false;
       if (cutoff && new Date(r.created_at) < cutoff) return false;
-      const memberStatus = payments[r.user_id]?.status;
+      const memberStatus = r.user_id ? payments[r.user_id]?.status : undefined;
       if (memberFilter === "approved" && memberStatus !== "approved") return false;
       if (memberFilter === "pending" && memberStatus !== "pending") return false;
       if (memberFilter === "none" && memberStatus) return false;
       if (q) {
-        const name = profiles[r.user_id]?.full_name?.toLowerCase() || "";
-        if (!r.title.toLowerCase().includes(q) && !name.includes(q)) return false;
+        const name = (r.user_id ? profiles[r.user_id]?.full_name : r.guest_name)?.toLowerCase() || "";
+        const email = (r.guest_email || "").toLowerCase();
+        if (!r.title.toLowerCase().includes(q) && !name.includes(q) && !email.includes(q)) return false;
       }
       return true;
     });
@@ -253,7 +256,7 @@ function AdminSubmissions() {
       total: list.length,
       week: list.filter((s) => new Date(s.created_at) >= weekAgo).length,
       pending: list.filter((s) => s.status === "submitted" || s.status === "under_review").length,
-      paid: list.filter((s) => payments[s.user_id]?.status === "approved").length,
+      paid: list.filter((s) => s.user_id && payments[s.user_id]?.status === "approved").length,
     };
   }, [rows, payments]);
 
@@ -349,8 +352,9 @@ function AdminSubmissions() {
               </div>
               <ul className="divide-y divide-rule">
                 {items.map((s, idx) => {
-                  const profile = profiles[s.user_id];
-                  const payment = payments[s.user_id];
+                  const profile = s.user_id ? profiles[s.user_id] : undefined;
+                  const payment = s.user_id ? payments[s.user_id] : undefined;
+                  const isGuest = !s.user_id;
                   return (
                     <li key={s.id} role="row" className={`p-5 ${idx % 2 ? "bg-paper/50" : ""}`}>
                       <div className="grid md:grid-cols-[1.6fr_1fr_auto_auto] gap-4 items-start">
@@ -363,11 +367,17 @@ function AdminSubmissions() {
                           </div>
                         </div>
                         <div className="text-sm">
-                          <div className="font-medium text-ink">
-                            {profile?.full_name || "Unknown author"}
+                          <div className="font-medium text-ink flex items-center gap-2">
+                            {profile?.full_name || s.guest_name || "Unknown author"}
+                            {isGuest && (
+                              <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-muted rounded-sm text-muted-foreground">Guest</span>
+                            )}
                           </div>
                           {profile?.institution && (
                             <div className="text-xs text-muted-foreground truncate">{profile.institution}</div>
+                          )}
+                          {isGuest && s.guest_email && (
+                            <a href={`mailto:${s.guest_email}`} className="text-xs text-muted-foreground truncate hover:text-primary">{s.guest_email}</a>
                           )}
                         </div>
                         <div className="text-xs">

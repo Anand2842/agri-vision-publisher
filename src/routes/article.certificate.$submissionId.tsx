@@ -84,12 +84,14 @@ function PublicationCertificate() {
           throw new Error("This submission has not been published yet.");
         }
 
-        // Fetch author profile
-        const { data: dbProfile } = await supabase
-          .from("profiles")
-          .select("full_name, institution, country")
-          .eq("id", dbSub.user_id)
-          .single();
+        // Fetch author profile (guest submissions have no user_id)
+        const { data: dbProfile } = dbSub.user_id
+          ? await supabase
+              .from("profiles")
+              .select("full_name, institution, country")
+              .eq("id", dbSub.user_id)
+              .single()
+          : { data: null as { full_name: string | null; institution: string | null; country: string | null } | null };
 
         setData({
           submission: {

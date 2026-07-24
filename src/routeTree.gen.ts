@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as SubmissionGuidelinesRouteImport } from './routes/submission-guidelines'
 import { Route as StartupSpotlightRouteImport } from './routes/startup-spotlight'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -29,7 +30,6 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MembershipCertClaimIdRouteImport } from './routes/membership-cert.$claimId'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
-import { Route as AuthenticatedSubmitRouteImport } from './routes/_authenticated.submit'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
@@ -46,6 +46,11 @@ import { Route as AuthenticatedAdminBackupsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminArticlesRouteImport } from './routes/_authenticated.admin.articles'
 import { Route as ApiPublicHooksBackupMirrorRouteImport } from './routes/api/public/hooks/backup-mirror'
 
+const SubmitRoute = SubmitRouteImport.update({
+  id: '/submit',
+  path: '/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubmissionGuidelinesRoute = SubmissionGuidelinesRouteImport.update({
   id: '/submission-guidelines',
   path: '/submission-guidelines',
@@ -144,11 +149,6 @@ const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
   id: '/articles/$slug',
   path: '/articles/$slug',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedSubmitRoute = AuthenticatedSubmitRouteImport.update({
-  id: '/submit',
-  path: '/submit',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -254,9 +254,9 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
+  '/submit': typeof SubmitRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/membership-cert/$claimId': typeof MembershipCertClaimIdRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
@@ -291,8 +291,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
+  '/submit': typeof SubmitRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/membership-cert/$claimId': typeof MembershipCertClaimIdRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
@@ -329,9 +329,9 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
+  '/submit': typeof SubmitRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/submit': typeof AuthenticatedSubmitRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/membership-cert/$claimId': typeof MembershipCertClaimIdRoute
   '/_authenticated/admin/articles': typeof AuthenticatedAdminArticlesRoute
@@ -368,9 +368,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/startup-spotlight'
     | '/submission-guidelines'
+    | '/submit'
     | '/admin'
     | '/dashboard'
-    | '/submit'
     | '/articles/$slug'
     | '/membership-cert/$claimId'
     | '/admin/articles'
@@ -405,8 +405,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/startup-spotlight'
     | '/submission-guidelines'
-    | '/dashboard'
     | '/submit'
+    | '/dashboard'
     | '/articles/$slug'
     | '/membership-cert/$claimId'
     | '/admin/articles'
@@ -442,9 +442,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/startup-spotlight'
     | '/submission-guidelines'
+    | '/submit'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
-    | '/_authenticated/submit'
     | '/articles/$slug'
     | '/membership-cert/$claimId'
     | '/_authenticated/admin/articles'
@@ -481,6 +481,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
+  SubmitRoute: typeof SubmitRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
   MembershipCertClaimIdRoute: typeof MembershipCertClaimIdRoute
   ArticleCertificateSubmissionIdRoute: typeof ArticleCertificateSubmissionIdRoute
@@ -489,6 +490,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/submit': {
+      id: '/submit'
+      path: '/submit'
+      fullPath: '/submit'
+      preLoaderRoute: typeof SubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/submission-guidelines': {
       id: '/submission-guidelines'
       path: '/submission-guidelines'
@@ -628,13 +636,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/articles/$slug'
       preLoaderRoute: typeof ArticlesSlugRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/submit': {
-      id: '/_authenticated/submit'
-      path: '/submit'
-      fullPath: '/submit'
-      preLoaderRoute: typeof AuthenticatedSubmitRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -778,13 +779,11 @@ const AuthenticatedAdminRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedSubmitRoute: typeof AuthenticatedSubmitRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedSubmitRoute: AuthenticatedSubmitRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -810,6 +809,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
+  SubmitRoute: SubmitRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
   MembershipCertClaimIdRoute: MembershipCertClaimIdRoute,
   ArticleCertificateSubmissionIdRoute: ArticleCertificateSubmissionIdRoute,

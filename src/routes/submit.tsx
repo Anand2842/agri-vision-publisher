@@ -8,27 +8,38 @@ import { friendlyZodError } from "@/lib/form-errors";
 import { z } from "zod";
 import { FileText, Upload } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/submit")({
+export const Route = createFileRoute("/submit")({
   component: Submit,
   head: () => ({
     meta: [
       { title: "Submit Article — The Agriculture Popular Article Magazine" },
-      { name: "robots", content: "noindex" },
+      {
+        name: "description",
+        content:
+          "Submit your agricultural article directly — no account required. Manuscripts reviewed within 21 days.",
+      },
     ],
     links: [{ rel: "canonical", href: "https://agriculturemagazine.in/submit" }],
   }),
 });
 
-const schema = z.object({
+const baseSchema = {
   title: z.string().trim().min(5).max(200),
   abstract: z.string().trim().min(50).max(3000),
   keywords: z.string().trim().max(300),
   content: z.string().trim().max(50000).optional(),
   category_id: z.string().uuid().optional().nullable(),
   plan: z.enum(["single", "annual", "lifetime", "institute"]),
+};
+
+const authedSchema = z.object(baseSchema);
+const guestSchema = z.object({
+  ...baseSchema,
+  guest_name: z.string().trim().min(2, "Please enter your full name").max(120),
+  guest_email: z.string().trim().email("Please enter a valid email"),
 });
 
-const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED_EXT = [".doc", ".docx"];
 
 function Submit() {
@@ -36,6 +47,8 @@ function Submit() {
   const [cats, setCats] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [checkedAuth, setCheckedAuth] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -44,7 +57,13 @@ function Submit() {
       .select("id,name")
       .order("name")
       .then(({ data }) => setCats(data || []));
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
+      setCheckedAuth(true);
+    });
   }, []);
+
+  const isGuest = checkedAuth && !userId;
 
   const onFile = (f: File | null) => {
     if (!f) {
@@ -67,7 +86,7 @@ function Submit() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const cat = String(fd.get("category_id") || "");
-    const data = {
+    const common = {
       title: String(fd.get("title")),
       abstract: String(fd.get("abstract")),
       keywords: String(fd.get("keywords") || ""),
@@ -75,27 +94,43 @@ function Submit() {
       category_id: cat || null,
       plan: String(fd.get("plan")) as "single" | "annual" | "lifetime" | "institute",
     };
-    const r = schema.safeParse(data);
-    if (!r.success) {
-      toast.error(friendlyZodError(r.error));
-      return;
+
+    let insertPayload: Record<string, unknown>;
+    if (isGuest) {
+      const parsed = guestSchema.safeParse({
+        ...common,
+        guest_name: String(fd.get("guest_name") || ""),
+        guest_email: String(fd.get("guest_email") || ""),
+      });
+      if (!parsed.success) {
+        toast.error(friendlyZodError(parsed.error));
+        return;
+      }
+      insertPayload = {
+        ...common,
+        user_id: null,
+        guest_name: parsed.data.guest_name,
+        guest_email: parsed.data.guest_email,
+        status: "submitted",
+      };
+    } else {
+      const parsed = authedSchema.safeParse(common);
+      if (!parsed.success) {
+        toast.error(friendlyZodError(parsed.error));
+        return;
+      }
+      insertPayload = { ...common, user_id: userId };
     }
+
     if (!file) {
       toast.error("Please attach your manuscript (.doc or .docx).");
       return;
     }
 
     setLoading(true);
-    const { data: sess } = await supabase.auth.getUser();
-    if (!sess.user) {
-      toast.error("Please sign in");
-      setLoading(false);
-      return;
-    }
-
     const { data: row, error } = await supabase
       .from("submissions")
-      .insert({ ...data, user_id: sess.user.id })
+      .insert(insertPayload as never)
       .select()
       .single();
     if (error || !row) {
@@ -105,7 +140,8 @@ function Submit() {
     }
 
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-    const path = `${sess.user.id}/${row.id}${ext}`;
+    const folder = isGuest ? "guest" : userId;
+    const path = `${folder}/${row.id}${ext}`;
     const { error: upErr } = await supabase.storage.from("manuscripts").upload(path, file, {
       contentType: file.type || "application/octet-stream",
       upsert: false,
@@ -115,11 +151,20 @@ function Submit() {
       toast.error(`Manuscript upload failed: ${upErr.message}`);
       return;
     }
-    await supabase.from("submissions").update({ manuscript_path: path }).eq("id", row.id);
+    // Guests can't update the row (RLS), signed-in users can.
+    if (!isGuest) {
+      await supabase.from("submissions").update({ manuscript_path: path }).eq("id", row.id);
+    }
 
     setLoading(false);
     toast.success(`Submitted! Ticket #${row.id.slice(0, 8).toUpperCase()}`);
-    nav({ to: "/dashboard" });
+    if (isGuest) {
+      // Reset form for guests
+      (e.target as HTMLFormElement).reset();
+      setFile(null);
+    } else {
+      nav({ to: "/dashboard" });
+    }
   };
 
   return (
@@ -130,10 +175,22 @@ function Submit() {
         <h1 className="font-display text-2xl mt-3 text-ink">Submit Your Article</h1>
         <p className="mt-4 text-foreground/70">
           Manuscripts in Microsoft Word (.doc / .docx) format only · 2–4 pages · reviewed within 21
-          days.
+          days. No account required — {" "}
+          <a href="/auth" className="underline hover:text-primary">
+            sign in
+          </a>{" "}
+          to track your submissions in a personal dashboard.
         </p>
 
         <form onSubmit={onSubmit} className="mt-12 space-y-6">
+          {isGuest && (
+            <div className="border border-rule bg-paper p-4 rounded-sm space-y-6">
+              <div className="eyebrow">Your details</div>
+              <Field label="Full name" name="guest_name" required />
+              <Field label="Email address" name="guest_email" type="email" required />
+            </div>
+          )}
+
           <Field label="Article title" name="title" required />
           <Field label="Abstract (50–3000 chars)" name="abstract" textarea rows={5} required />
           <Field label="Keywords (comma separated)" name="keywords" />
@@ -226,7 +283,7 @@ function Submit() {
           </div>
 
           <button
-            disabled={loading}
+            disabled={loading || !checkedAuth}
             className="w-full h-12 flex justify-center items-center bg-primary text-primary-foreground px-6 rounded-sm hover:bg-primary/90 disabled:opacity-60 font-sans font-semibold text-sm"
           >
             {loading ? "Submitting…" : "Submit for review"}
@@ -244,12 +301,14 @@ function Field({
   textarea,
   rows,
   required,
+  type,
 }: {
   label: string;
   name: string;
   textarea?: boolean;
   rows?: number;
   required?: boolean;
+  type?: string;
 }) {
   return (
     <div>
@@ -264,6 +323,7 @@ function Field({
       ) : (
         <input
           name={name}
+          type={type || "text"}
           required={required}
           className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
         />
