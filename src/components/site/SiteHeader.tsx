@@ -160,8 +160,40 @@ export function SiteHeader() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Smart header: hide on scroll down, show on scroll up (public pages only).
+  const [hidden, setHidden] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const isAdmin = pathname.startsWith("/admin");
+  useEffect(() => {
+    if (isAdmin || open) return;
+    let lastY = window.scrollY;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        setScrolled(y > 4);
+        const delta = y - lastY;
+        if (y < 80) setHidden(false);
+        else if (delta > 6) setHidden(true);
+        else if (delta < -6) setHidden(false);
+        lastY = y;
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isAdmin, open]);
+
   return (
-    <header className="sticky top-0 z-40 bg-background border-b border-rule">
+    <header
+      className={`sticky top-0 z-40 bg-background border-b border-rule transform-gpu will-change-transform transition-transform duration-300 motion-reduce:transition-none ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      } ${scrolled ? "shadow-[0_2px_8px_-4px_rgba(0,0,0,0.15)]" : ""}`}
+    >
+
       {/* Skip-to-content — visible on keyboard focus only */}
       <a
         href="#main-content"
