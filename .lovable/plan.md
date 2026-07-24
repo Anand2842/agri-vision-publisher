@@ -1,45 +1,50 @@
-## Root cause (verified)
+## What I found
 
-The Submit page UI no longer requires membership, but the database RLS policy on `public.submissions` still does. Current INSERT policy `"Users create own submissions"` (verified via `pg_policies`):
+### 1. Submit RLS error — root cause (verified)
 
-```
-auth.uid() = user_id
-AND status IN ('draft','submitted')
-AND (
-  EXISTS (SELECT 1 FROM membership_payments mp
-          WHERE mp.user_id = auth.uid() AND mp.status = 'approved')
-  OR has_role(auth.uid(),'admin')
-  OR has_role(auth.uid(),'moderator')
-)
-```
+The failed request in your network log went out with `user_id: null` + guest fields, but the Authorization header carried a signed-in admin bearer (dkdkdangi@gmail.com). PostgREST evaluated it as role `authenticated`, not `anon`, so the "Guests create submissions" policy (which is `TO anon` only) never applied — and the "Users create own submissions" policy failed because `auth.uid() ≠ null`.
 
-So any signed-in author without an *approved* membership payment gets an RLS error on submit — matching the user complaint that direct upload doesn't work and users end up emailing manuscripts instead. Admin/moderator accounts are unaffected by this policy, which is why the supervisor's inability to "sign in and upload" points to the same wall (they signed in fine but the upload failed silently / with a permission error), unless the supervisor's account simply isn't marked admin yet.
+Why the form sent `user_id: null` while signed in: `Submit()` calls `supabase.auth.getUser()` once on mount. If the session had expired / not rehydrated at that moment, `isGuest` became `true` and the form submitted as a guest — but the Supabase client still attached the bearer token to the request.
 
-## Fix
+### 2. Smart header
 
-1. **Migration** — drop the payment-gated INSERT policy and replace it with a simple "authenticated user can insert own submission" policy:
-  ```sql
-   DROP POLICY "Users create own submissions" ON public.submissions;
-   CREATE POLICY "Users create own submissions"
-     ON public.submissions FOR INSERT TO authenticated
-     WITH CHECK (
-       auth.uid() = user_id
-       AND status IN ('draft','submitted')
-     );
-  ```
-   Membership/payment status stays visible to admins in the submissions dashboard (already implemented) so they can see who paid vs. who hasn't — the gate just moves from "hard block" to "admin visibility".
-2. **Verify supervisor account** — I need one thing from you: **which email is the supervisor?** I'll confirm the account exists and has the `admin` role (grant it if missing). If it's `stufi339@gmail.com AND` [dkdkdangi@gmail.com](mailto:dkdkdangi@gmail.com) , BOTH ARE ADMIN HERE. 
-3. **Smoke test** — after the migration, drive a Playwright submit as a plain author account to confirm the insert + manuscript upload both succeed end-to-end, and check the row lands in `/admin/submissions` with the correct Membership badge.
+`SiteHeader` is a plain sticky header. No scroll listener, no hide-on-scroll-down / show-on-scroll-up behavior.
+
+### 3. "Audit everything"
+
+Too broad for one plan. I'll fix the two concrete items now and, in the same pass, run a quick sweep for the closely related risk (guest submit path end-to-end + header behavior on mobile). A full site-wide audit (perf, a11y, SEO, admin flows, RLS, storage) is a separate, bigger effort — happy to schedule it as its own plan after this ships.
+
+---
+
+## Fix plan
+
+### A. Submit — make the guest/auth split reliable
+
+1. **Policy safety net** (migration): recreate `Guests create submissions` with `TO anon, authenticated` so a signed-in user submitting a `user_id IS NULL` row is still allowed (guest-shaped rows are safe regardless of role). Keep the existing authenticated own-row policy untouched.
+2. **Client**: in `src/routes/submit.tsx`
+   - Re-check the session at submit time (not just on mount) via `supabase.auth.getUser()` inside `onSubmit`, and derive `isGuest` from that fresh value.
+   - When signed in, always set `user_id = <fresh uid>` and never send guest fields.
+   - Subscribe to `onAuthStateChange` so `isGuest` flips live if the user signs in/out while the page is open.
+   - Small UX: if signed in, hide the guest name/email block (already conditional — verify it stays hidden after the live check).
+3. **Verify**: submit twice against localhost — once signed out (guest row lands, manuscript uploads under `guest/`), once signed in as an author (row has `user_id`, manuscript under `<uid>/`). Confirm both appear in `/admin/submissions` with correct badges.
+
+### B. Smart header
+
+In `src/components/site/SiteHeader.tsx`:
+- Track `window.scrollY` with a throttled listener (rAF).
+- Hide the header (translate-y-full) when scrolling down past ~80px, show it when scrolling up, always show at top.
+- Add a subtle shadow/border once `scrollY > 0`.
+- Keep mobile menu behavior unchanged; ensure the hide doesn't apply while the mobile menu is open.
+- Respect `prefers-reduced-motion` (skip the transition).
+
+### C. Light sweep (bundled with the above, not a full audit)
+- Confirm `Submit` link in header + footer points to `/submit` (public).
+- Confirm `/submit` head/meta + canonical are correct.
+- Confirm `manuscripts` storage policies still allow `guest/` uploads (already migrated).
 
 ## Not changing
+- Admin submissions dashboard layout, membership flow, storage bucket structure, existing RLS on other tables.
+- No captcha in this pass (call it out again as a follow-up before public launch).
 
-- Submit UI, admin submissions dashboard, storage policies (manuscript upload path already works for any signed-in user under their own `auth.uid()` folder).
-- Membership payment flow — still available, just no longer blocking submission.
-
-## One question before I build
-
-Which email should I make sure has the admin role for the supervisor? (If it's already `stufi339@gmail.com AND` [dkdkdangi@gmail.com](mailto:dkdkdangi@gmail.com) , say so and I'll skip that step.)
-
-AND CHECK EVRYTHING WITH IT
-
-&nbsp;
+## One question
+Do you want the smart header on **all pages** (including admin), or **public pages only** (leave admin header static so scrolling long tables doesn't hide nav)? Default I'll ship: **public pages only**.

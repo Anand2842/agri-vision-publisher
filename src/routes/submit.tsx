@@ -61,7 +61,13 @@ function Submit() {
       setUserId(data.user?.id ?? null);
       setCheckedAuth(true);
     });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setUserId(s?.user?.id ?? null);
+      setCheckedAuth(true);
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
+
 
   const isGuest = checkedAuth && !userId;
 
@@ -84,7 +90,8 @@ function Submit() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const cat = String(fd.get("category_id") || "");
     const common = {
       title: String(fd.get("title")),
@@ -95,8 +102,15 @@ function Submit() {
       plan: String(fd.get("plan")) as "single" | "annual" | "lifetime" | "institute",
     };
 
+    // Re-check session at submit time — avoids stale isGuest if the token
+    // rehydrated after mount, which caused RLS 401s (authenticated bearer
+    // with user_id=null didn't match either policy).
+    const { data: freshUser } = await supabase.auth.getUser();
+    const currentUid = freshUser.user?.id ?? null;
+    const guestNow = !currentUid;
+
     let insertPayload: Record<string, unknown>;
-    if (isGuest) {
+    if (guestNow) {
       const parsed = guestSchema.safeParse({
         ...common,
         guest_name: String(fd.get("guest_name") || ""),
@@ -119,8 +133,15 @@ function Submit() {
         toast.error(friendlyZodError(parsed.error));
         return;
       }
-      insertPayload = { ...common, user_id: userId };
+      insertPayload = {
+        ...common,
+        user_id: currentUid,
+        guest_name: null,
+        guest_email: null,
+        status: "submitted",
+      };
     }
+
 
     if (!file) {
       toast.error("Please attach your manuscript (.doc or .docx).");
@@ -140,7 +161,7 @@ function Submit() {
     }
 
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-    const folder = isGuest ? "guest" : userId;
+    const folder = guestNow ? "guest" : currentUid;
     const path = `${folder}/${row.id}${ext}`;
     const { error: upErr } = await supabase.storage.from("manuscripts").upload(path, file, {
       contentType: file.type || "application/octet-stream",
@@ -152,20 +173,20 @@ function Submit() {
       return;
     }
     // Guests can't update the row (RLS), signed-in users can.
-    if (!isGuest) {
+    if (!guestNow) {
       await supabase.from("submissions").update({ manuscript_path: path }).eq("id", row.id);
     }
 
     setLoading(false);
     toast.success(`Submitted! Ticket #${row.id.slice(0, 8).toUpperCase()}`);
-    if (isGuest) {
-      // Reset form for guests
-      (e.target as HTMLFormElement).reset();
+    if (guestNow) {
+      form.reset();
       setFile(null);
     } else {
       nav({ to: "/dashboard" });
     }
   };
+
 
   return (
     <>
