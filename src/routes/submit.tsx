@@ -90,7 +90,8 @@ function Submit() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const cat = String(fd.get("category_id") || "");
     const common = {
       title: String(fd.get("title")),
@@ -101,8 +102,15 @@ function Submit() {
       plan: String(fd.get("plan")) as "single" | "annual" | "lifetime" | "institute",
     };
 
+    // Re-check session at submit time — avoids stale isGuest if the token
+    // rehydrated after mount, which caused RLS 401s (authenticated bearer
+    // with user_id=null didn't match either policy).
+    const { data: freshUser } = await supabase.auth.getUser();
+    const currentUid = freshUser.user?.id ?? null;
+    const guestNow = !currentUid;
+
     let insertPayload: Record<string, unknown>;
-    if (isGuest) {
+    if (guestNow) {
       const parsed = guestSchema.safeParse({
         ...common,
         guest_name: String(fd.get("guest_name") || ""),
@@ -125,8 +133,15 @@ function Submit() {
         toast.error(friendlyZodError(parsed.error));
         return;
       }
-      insertPayload = { ...common, user_id: userId };
+      insertPayload = {
+        ...common,
+        user_id: currentUid,
+        guest_name: null,
+        guest_email: null,
+        status: "submitted",
+      };
     }
+
 
     if (!file) {
       toast.error("Please attach your manuscript (.doc or .docx).");
