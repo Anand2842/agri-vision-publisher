@@ -380,9 +380,13 @@ function AdminSubmissions() {
                             <span className="font-medium">{s.plan}</span>
                           </div>
                         </div>
-                        <div className="text-sm">
+                        <div className="text-sm min-w-0">
                           <div className="font-medium text-ink flex items-center gap-2">
-                            {profile?.full_name || s.guest_name || "Unknown author"}
+                            <span className="truncate">
+                              {[s.salutation, s.author_name || profile?.full_name || s.guest_name || "Unknown author"]
+                                .filter(Boolean)
+                                .join(" ")}
+                            </span>
                             {isGuest && (
                               <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-muted rounded-sm text-muted-foreground">Guest</span>
                             )}
@@ -390,8 +394,26 @@ function AdminSubmissions() {
                           {profile?.institution && (
                             <div className="text-xs text-muted-foreground truncate">{profile.institution}</div>
                           )}
-                          {isGuest && s.guest_email && (
-                            <a href={`mailto:${s.guest_email}`} className="text-xs text-muted-foreground truncate hover:text-primary">{s.guest_email}</a>
+                          {(s.author_email || s.guest_email) && (
+                            <a
+                              href={`mailto:${s.author_email || s.guest_email}`}
+                              className="block text-xs text-muted-foreground truncate hover:text-primary"
+                            >
+                              {s.author_email || s.guest_email}
+                            </a>
+                          )}
+                          {s.contact_number && (
+                            <a
+                              href={`tel:${s.contact_number}`}
+                              className="block text-xs text-muted-foreground truncate hover:text-primary"
+                            >
+                              {s.contact_number}
+                            </a>
+                          )}
+                          {s.co_authors && (
+                            <div className="text-xs text-muted-foreground truncate">
+                              Co-authors: {s.co_authors}
+                            </div>
                           )}
                         </div>
                         <div className="text-xs">
