@@ -27,6 +27,11 @@ type Sub = {
   user_id: string | null;
   guest_name: string | null;
   guest_email: string | null;
+  salutation: string | null;
+  author_name: string | null;
+  author_email: string | null;
+  contact_number: string | null;
+  co_authors: string | null;
   category_id: string | null;
   notes: string | null;
   content: string | null;
