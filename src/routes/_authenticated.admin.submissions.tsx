@@ -233,9 +233,18 @@ function AdminSubmissions() {
       if (memberFilter === "pending" && memberStatus !== "pending") return false;
       if (memberFilter === "none" && memberStatus) return false;
       if (q) {
-        const name = (r.user_id ? profiles[r.user_id]?.full_name : r.guest_name)?.toLowerCase() || "";
-        const email = (r.guest_email || "").toLowerCase();
-        if (!r.title.toLowerCase().includes(q) && !name.includes(q) && !email.includes(q)) return false;
+        const name = (r.author_name || (r.user_id ? profiles[r.user_id]?.full_name : r.guest_name) || "").toLowerCase();
+        const email = (r.author_email || r.guest_email || "").toLowerCase();
+        const phone = (r.contact_number || "").toLowerCase();
+        const coauthors = (r.co_authors || "").toLowerCase();
+        if (
+          !r.title.toLowerCase().includes(q) &&
+          !name.includes(q) &&
+          !email.includes(q) &&
+          !phone.includes(q) &&
+          !coauthors.includes(q)
+        )
+          return false;
       }
       return true;
     });
