@@ -310,7 +310,7 @@ function AdminSubmissions() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by title or author…"
+              placeholder="Search title, author, email, phone, co-authors…"
               className="w-full h-9 pl-9 pr-3 bg-background border border-rule text-sm"
             />
           </div>
