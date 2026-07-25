@@ -27,6 +27,11 @@ type Sub = {
   user_id: string | null;
   guest_name: string | null;
   guest_email: string | null;
+  salutation: string | null;
+  author_name: string | null;
+  author_email: string | null;
+  contact_number: string | null;
+  co_authors: string | null;
   category_id: string | null;
   notes: string | null;
   content: string | null;
@@ -228,9 +233,18 @@ function AdminSubmissions() {
       if (memberFilter === "pending" && memberStatus !== "pending") return false;
       if (memberFilter === "none" && memberStatus) return false;
       if (q) {
-        const name = (r.user_id ? profiles[r.user_id]?.full_name : r.guest_name)?.toLowerCase() || "";
-        const email = (r.guest_email || "").toLowerCase();
-        if (!r.title.toLowerCase().includes(q) && !name.includes(q) && !email.includes(q)) return false;
+        const name = (r.author_name || (r.user_id ? profiles[r.user_id]?.full_name : r.guest_name) || "").toLowerCase();
+        const email = (r.author_email || r.guest_email || "").toLowerCase();
+        const phone = (r.contact_number || "").toLowerCase();
+        const coauthors = (r.co_authors || "").toLowerCase();
+        if (
+          !r.title.toLowerCase().includes(q) &&
+          !name.includes(q) &&
+          !email.includes(q) &&
+          !phone.includes(q) &&
+          !coauthors.includes(q)
+        )
+          return false;
       }
       return true;
     });
@@ -296,7 +310,7 @@ function AdminSubmissions() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by title or author…"
+              placeholder="Search title, author, email, phone, co-authors…"
               className="w-full h-9 pl-9 pr-3 bg-background border border-rule text-sm"
             />
           </div>
@@ -366,9 +380,13 @@ function AdminSubmissions() {
                             <span className="font-medium">{s.plan}</span>
                           </div>
                         </div>
-                        <div className="text-sm">
+                        <div className="text-sm min-w-0">
                           <div className="font-medium text-ink flex items-center gap-2">
-                            {profile?.full_name || s.guest_name || "Unknown author"}
+                            <span className="truncate">
+                              {[s.salutation, s.author_name || profile?.full_name || s.guest_name || "Unknown author"]
+                                .filter(Boolean)
+                                .join(" ")}
+                            </span>
                             {isGuest && (
                               <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 bg-muted rounded-sm text-muted-foreground">Guest</span>
                             )}
@@ -376,8 +394,26 @@ function AdminSubmissions() {
                           {profile?.institution && (
                             <div className="text-xs text-muted-foreground truncate">{profile.institution}</div>
                           )}
-                          {isGuest && s.guest_email && (
-                            <a href={`mailto:${s.guest_email}`} className="text-xs text-muted-foreground truncate hover:text-primary">{s.guest_email}</a>
+                          {(s.author_email || s.guest_email) && (
+                            <a
+                              href={`mailto:${s.author_email || s.guest_email}`}
+                              className="block text-xs text-muted-foreground truncate hover:text-primary"
+                            >
+                              {s.author_email || s.guest_email}
+                            </a>
+                          )}
+                          {s.contact_number && (
+                            <a
+                              href={`tel:${s.contact_number}`}
+                              className="block text-xs text-muted-foreground truncate hover:text-primary"
+                            >
+                              {s.contact_number}
+                            </a>
+                          )}
+                          {s.co_authors && (
+                            <div className="text-xs text-muted-foreground truncate">
+                              Co-authors: {s.co_authors}
+                            </div>
                           )}
                         </div>
                         <div className="text-xs">
