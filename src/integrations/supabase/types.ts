@@ -369,7 +369,11 @@ export type Database = {
       submissions: {
         Row: {
           abstract: string
+          author_email: string | null
+          author_name: string | null
           category_id: string | null
+          co_authors: string | null
+          contact_number: string | null
           content: string | null
           created_at: string
           guest_email: string | null
@@ -379,6 +383,7 @@ export type Database = {
           manuscript_path: string | null
           notes: string | null
           plan: Database["public"]["Enums"]["membership_plan"]
+          salutation: string | null
           status: Database["public"]["Enums"]["submission_status"]
           title: string
           updated_at: string
@@ -386,7 +391,11 @@ export type Database = {
         }
         Insert: {
           abstract: string
+          author_email?: string | null
+          author_name?: string | null
           category_id?: string | null
+          co_authors?: string | null
+          contact_number?: string | null
           content?: string | null
           created_at?: string
           guest_email?: string | null
@@ -396,6 +405,7 @@ export type Database = {
           manuscript_path?: string | null
           notes?: string | null
           plan?: Database["public"]["Enums"]["membership_plan"]
+          salutation?: string | null
           status?: Database["public"]["Enums"]["submission_status"]
           title: string
           updated_at?: string
@@ -403,7 +413,11 @@ export type Database = {
         }
         Update: {
           abstract?: string
+          author_email?: string | null
+          author_name?: string | null
           category_id?: string | null
+          co_authors?: string | null
+          contact_number?: string | null
           content?: string | null
           created_at?: string
           guest_email?: string | null
@@ -413,6 +427,7 @@ export type Database = {
           manuscript_path?: string | null
           notes?: string | null
           plan?: Database["public"]["Enums"]["membership_plan"]
+          salutation?: string | null
           status?: Database["public"]["Enums"]["submission_status"]
           title?: string
           updated_at?: string
