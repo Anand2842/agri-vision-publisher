@@ -23,20 +23,24 @@ export const Route = createFileRoute("/submit")({
   }),
 });
 
-const baseSchema = {
-  title: z.string().trim().min(5).max(200),
-  abstract: z.string().trim().min(50).max(3000),
-  keywords: z.string().trim().max(300),
+const SALUTATIONS = ["Mr.", "Ms.", "Mrs.", "Dr.", "Prof."] as const;
+const phoneRegex = /^[+\d][\d\s\-()]{7,19}$/;
+
+const submitSchema = z.object({
+  salutation: z.enum(SALUTATIONS, { message: "Please select a salutation" }),
+  author_name: z.string().trim().min(2, "Please enter your full name").max(120),
+  author_email: z.string().trim().email("Please enter a valid email").max(255),
+  contact_number: z
+    .string()
+    .trim()
+    .regex(phoneRegex, "Please enter a valid contact number"),
+  co_authors: z.string().trim().max(500).optional(),
+  title: z.string().trim().min(5, "Article title is too short").max(200),
+  abstract: z.string().trim().min(50, "Abstract must be at least 50 characters").max(3000),
+  keywords: z.string().trim().max(300).optional(),
   content: z.string().trim().max(50000).optional(),
   category_id: z.string().uuid().optional().nullable(),
   plan: z.enum(["single", "annual", "lifetime", "institute"]),
-};
-
-const authedSchema = z.object(baseSchema);
-const guestSchema = z.object({
-  ...baseSchema,
-  guest_name: z.string().trim().min(2, "Please enter your full name").max(120),
-  guest_email: z.string().trim().email("Please enter a valid email"),
 });
 
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -49,6 +53,7 @@ function Submit() {
   const [file, setFile] = useState<File | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [checkedAuth, setCheckedAuth] = useState(false);
+  const [prefill, setPrefill] = useState<{ name: string; email: string }>({ name: "", email: "" });
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -57,9 +62,18 @@ function Submit() {
       .select("id,name")
       .order("name")
       .then(({ data }) => setCats(data || []));
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id ?? null);
+    supabase.auth.getUser().then(async ({ data }) => {
+      const uid = data.user?.id ?? null;
+      setUserId(uid);
       setCheckedAuth(true);
+      if (uid) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", uid)
+          .maybeSingle();
+        setPrefill({ name: prof?.full_name || "", email: data.user?.email || "" });
+      }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setUserId(s?.user?.id ?? null);
@@ -67,9 +81,6 @@ function Submit() {
     });
     return () => sub.subscription.unsubscribe();
   }, []);
-
-
-  const isGuest = checkedAuth && !userId;
 
   const onFile = (f: File | null) => {
     if (!f) {
@@ -92,61 +103,64 @@ function Submit() {
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
-    const cat = String(fd.get("category_id") || "");
-    const common = {
-      title: String(fd.get("title")),
-      abstract: String(fd.get("abstract")),
+
+    const parsed = submitSchema.safeParse({
+      salutation: String(fd.get("salutation") || ""),
+      author_name: String(fd.get("author_name") || ""),
+      author_email: String(fd.get("author_email") || ""),
+      contact_number: String(fd.get("contact_number") || ""),
+      co_authors: String(fd.get("co_authors") || ""),
+      title: String(fd.get("title") || ""),
+      abstract: String(fd.get("abstract") || ""),
       keywords: String(fd.get("keywords") || ""),
       content: String(fd.get("content") || ""),
-      category_id: cat || null,
-      plan: String(fd.get("plan")) as "single" | "annual" | "lifetime" | "institute",
-    };
+      category_id: String(fd.get("category_id") || "") || null,
+      plan: String(fd.get("plan") || "single") as "single" | "annual" | "lifetime" | "institute",
+    });
 
-    // Re-check session at submit time — avoids stale isGuest if the token
-    // rehydrated after mount, which caused RLS 401s (authenticated bearer
-    // with user_id=null didn't match either policy).
-    const { data: freshUser } = await supabase.auth.getUser();
-    const currentUid = freshUser.user?.id ?? null;
-    const guestNow = !currentUid;
-
-    let insertPayload: Record<string, unknown>;
-    if (guestNow) {
-      const parsed = guestSchema.safeParse({
-        ...common,
-        guest_name: String(fd.get("guest_name") || ""),
-        guest_email: String(fd.get("guest_email") || ""),
-      });
-      if (!parsed.success) {
-        toast.error(friendlyZodError(parsed.error));
-        return;
-      }
-      insertPayload = {
-        ...common,
-        user_id: null,
-        guest_name: parsed.data.guest_name,
-        guest_email: parsed.data.guest_email,
-        status: "submitted",
-      };
-    } else {
-      const parsed = authedSchema.safeParse(common);
-      if (!parsed.success) {
-        toast.error(friendlyZodError(parsed.error));
-        return;
-      }
-      insertPayload = {
-        ...common,
-        user_id: currentUid,
-        guest_name: null,
-        guest_email: null,
-        status: "submitted",
-      };
+    if (!parsed.success) {
+      toast.error(friendlyZodError(parsed.error));
+      return;
     }
-
-
     if (!file) {
       toast.error("Please attach your manuscript (.doc or .docx).");
       return;
     }
+
+    // Re-check session at submit time
+    const { data: freshUser } = await supabase.auth.getUser();
+    const currentUid = freshUser.user?.id ?? null;
+    const guestNow = !currentUid;
+
+    const d = parsed.data;
+    const common = {
+      salutation: d.salutation,
+      author_name: d.author_name,
+      author_email: d.author_email,
+      contact_number: d.contact_number,
+      co_authors: d.co_authors || null,
+      title: d.title,
+      abstract: d.abstract,
+      keywords: d.keywords || null,
+      content: d.content || null,
+      category_id: d.category_id,
+      plan: d.plan,
+      status: "submitted" as const,
+    };
+
+    const insertPayload: Record<string, unknown> = guestNow
+      ? {
+          ...common,
+          user_id: null,
+          guest_name: d.author_name,
+          guest_email: d.author_email,
+        }
+      : {
+          ...common,
+          user_id: currentUid,
+          guest_name: null,
+          guest_email: null,
+        };
 
     setLoading(true);
     const { data: row, error } = await supabase
@@ -172,7 +186,6 @@ function Submit() {
       toast.error(`Manuscript upload failed: ${upErr.message}`);
       return;
     }
-    // Guests can't update the row (RLS), signed-in users can.
     if (!guestNow) {
       await supabase.from("submissions").update({ manuscript_path: path }).eq("id", row.id);
     }
@@ -186,7 +199,6 @@ function Submit() {
       nav({ to: "/dashboard" });
     }
   };
-
 
   return (
     <>
@@ -204,13 +216,54 @@ function Submit() {
         </p>
 
         <form onSubmit={onSubmit} className="mt-12 space-y-6">
-          {isGuest && (
-            <div className="border border-rule bg-paper p-4 rounded-sm space-y-6">
-              <div className="eyebrow">Your details</div>
-              <Field label="Full name" name="guest_name" required />
-              <Field label="Email address" name="guest_email" type="email" required />
+          <div className="border border-rule bg-paper p-4 rounded-sm space-y-6">
+            <div className="eyebrow">Author details</div>
+            <div>
+              <label className="text-sm font-sans font-medium block mb-2">
+                Salutation<span className="text-destructive"> *</span>
+              </label>
+              <select
+                name="salutation"
+                required
+                defaultValue=""
+                className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm"
+              >
+                <option value="" disabled>
+                  — Select —
+                </option>
+                {SALUTATIONS.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
+            <Field
+              label="Full Name"
+              name="author_name"
+              required
+              defaultValue={prefill.name}
+            />
+            <Field
+              label="Email"
+              name="author_email"
+              type="email"
+              required
+              defaultValue={prefill.email}
+            />
+            <Field
+              label="Contact number"
+              name="contact_number"
+              type="tel"
+              required
+              placeholder="+91 98765 43210"
+            />
+            <Field
+              label="Co-authors' names (comma separated)"
+              name="co_authors"
+              placeholder="Optional"
+            />
+          </div>
 
           <Field label="Article title" name="title" required />
           <Field label="Abstract (50–3000 chars)" name="abstract" textarea rows={5} required />
@@ -323,6 +376,8 @@ function Field({
   rows,
   required,
   type,
+  defaultValue,
+  placeholder,
 }: {
   label: string;
   name: string;
@@ -330,15 +385,22 @@ function Field({
   rows?: number;
   required?: boolean;
   type?: string;
+  defaultValue?: string;
+  placeholder?: string;
 }) {
   return (
     <div>
-      <label className="text-sm font-sans font-medium block mb-2">{label}</label>
+      <label className="text-sm font-sans font-medium block mb-2">
+        {label}
+        {required && <span className="text-destructive"> *</span>}
+      </label>
       {textarea ? (
         <textarea
           name={name}
           rows={rows}
           required={required}
+          defaultValue={defaultValue}
+          placeholder={placeholder}
           className="w-full bg-paper border border-rule px-4 py-3 min-h-[140px] rounded-sm text-sm focus:outline-none focus:border-primary"
         />
       ) : (
@@ -346,6 +408,8 @@ function Field({
           name={name}
           type={type || "text"}
           required={required}
+          defaultValue={defaultValue}
+          placeholder={placeholder}
           className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
         />
       )}
