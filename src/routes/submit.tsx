@@ -388,6 +388,8 @@ function Field({
   type,
   defaultValue,
   placeholder,
+  value,
+  onChange,
 }: {
   label: string;
   name: string;
@@ -397,7 +399,10 @@ function Field({
   type?: string;
   defaultValue?: string;
   placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }) {
+  const controlled = value !== undefined && onChange !== undefined;
   return (
     <div>
       <label className="text-sm font-sans font-medium block mb-2">
@@ -409,7 +414,9 @@ function Field({
           name={name}
           rows={rows}
           required={required}
-          defaultValue={defaultValue}
+          {...(controlled
+            ? { value, onChange: (e) => onChange!(e.target.value) }
+            : { defaultValue })}
           placeholder={placeholder}
           className="w-full bg-paper border border-rule px-4 py-3 min-h-[140px] rounded-sm text-sm focus:outline-none focus:border-primary"
         />
@@ -418,11 +425,14 @@ function Field({
           name={name}
           type={type || "text"}
           required={required}
-          defaultValue={defaultValue}
+          {...(controlled
+            ? { value, onChange: (e) => onChange!(e.target.value) }
+            : { defaultValue })}
           placeholder={placeholder}
           className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
         />
       )}
+
     </div>
   );
 }
