@@ -148,15 +148,27 @@ function Submit() {
       status: "submitted" as const,
     };
 
+    // Precompute the row id so the manuscript path can be stored at insert time.
+    // Guests cannot UPDATE the row afterwards under RLS, so the path must be part
+    // of the initial insert or reviewers never see a download link.
+    const newId = crypto.randomUUID();
+    const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+    const folder = guestNow ? "guest" : currentUid;
+    const path = `${folder}/${newId}${ext}`;
+
     const insertPayload: Record<string, unknown> = guestNow
       ? {
           ...common,
+          id: newId,
+          manuscript_path: path,
           user_id: null,
           guest_name: d.author_name,
           guest_email: d.author_email,
         }
       : {
           ...common,
+          id: newId,
+          manuscript_path: path,
           user_id: currentUid,
           guest_name: null,
           guest_email: null,
@@ -174,9 +186,6 @@ function Submit() {
       return;
     }
 
-    const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-    const folder = guestNow ? "guest" : currentUid;
-    const path = `${folder}/${row.id}${ext}`;
     const { error: upErr } = await supabase.storage.from("manuscripts").upload(path, file, {
       contentType: file.type || "application/octet-stream",
       upsert: false,
@@ -186,9 +195,7 @@ function Submit() {
       toast.error(`Manuscript upload failed: ${upErr.message}`);
       return;
     }
-    if (!guestNow) {
-      await supabase.from("submissions").update({ manuscript_path: path }).eq("id", row.id);
-    }
+
 
     setLoading(false);
     toast.success(`Submitted! Ticket #${row.id.slice(0, 8).toUpperCase()}`);
