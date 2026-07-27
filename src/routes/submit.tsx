@@ -148,15 +148,27 @@ function Submit() {
       status: "submitted" as const,
     };
 
+    // Precompute the row id so the manuscript path can be stored at insert time.
+    // Guests cannot UPDATE the row afterwards under RLS, so the path must be part
+    // of the initial insert or reviewers never see a download link.
+    const newId = crypto.randomUUID();
+    const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+    const folder = guestNow ? "guest" : currentUid;
+    const path = `${folder}/${newId}${ext}`;
+
     const insertPayload: Record<string, unknown> = guestNow
       ? {
           ...common,
+          id: newId,
+          manuscript_path: path,
           user_id: null,
           guest_name: d.author_name,
           guest_email: d.author_email,
         }
       : {
           ...common,
+          id: newId,
+          manuscript_path: path,
           user_id: currentUid,
           guest_name: null,
           guest_email: null,
@@ -174,9 +186,6 @@ function Submit() {
       return;
     }
 
-    const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-    const folder = guestNow ? "guest" : currentUid;
-    const path = `${folder}/${row.id}${ext}`;
     const { error: upErr } = await supabase.storage.from("manuscripts").upload(path, file, {
       contentType: file.type || "application/octet-stream",
       upsert: false,
@@ -186,14 +195,14 @@ function Submit() {
       toast.error(`Manuscript upload failed: ${upErr.message}`);
       return;
     }
-    if (!guestNow) {
-      await supabase.from("submissions").update({ manuscript_path: path }).eq("id", row.id);
-    }
+
 
     setLoading(false);
     toast.success(`Submitted! Ticket #${row.id.slice(0, 8).toUpperCase()}`);
     if (guestNow) {
       form.reset();
+      setPrefill({ name: "", email: "" });
+
       setFile(null);
     } else {
       nav({ to: "/dashboard" });
@@ -242,15 +251,18 @@ function Submit() {
               label="Full Name"
               name="author_name"
               required
-              defaultValue={prefill.name}
+              value={prefill.name}
+              onChange={(v) => setPrefill((p) => ({ ...p, name: v }))}
             />
             <Field
               label="Email"
               name="author_email"
               type="email"
               required
-              defaultValue={prefill.email}
+              value={prefill.email}
+              onChange={(v) => setPrefill((p) => ({ ...p, email: v }))}
             />
+
             <Field
               label="Contact number"
               name="contact_number"
@@ -378,6 +390,8 @@ function Field({
   type,
   defaultValue,
   placeholder,
+  value,
+  onChange,
 }: {
   label: string;
   name: string;
@@ -387,7 +401,10 @@ function Field({
   type?: string;
   defaultValue?: string;
   placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }) {
+  const controlled = value !== undefined && onChange !== undefined;
   return (
     <div>
       <label className="text-sm font-sans font-medium block mb-2">
@@ -399,7 +416,9 @@ function Field({
           name={name}
           rows={rows}
           required={required}
-          defaultValue={defaultValue}
+          {...(controlled
+            ? { value, onChange: (e) => onChange!(e.target.value) }
+            : { defaultValue })}
           placeholder={placeholder}
           className="w-full bg-paper border border-rule px-4 py-3 min-h-[140px] rounded-sm text-sm focus:outline-none focus:border-primary"
         />
@@ -408,11 +427,14 @@ function Field({
           name={name}
           type={type || "text"}
           required={required}
-          defaultValue={defaultValue}
+          {...(controlled
+            ? { value, onChange: (e) => onChange!(e.target.value) }
+            : { defaultValue })}
           placeholder={placeholder}
           className="w-full h-12 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
         />
       )}
+
     </div>
   );
 }
