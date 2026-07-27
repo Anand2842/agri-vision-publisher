@@ -201,6 +201,8 @@ function Submit() {
     toast.success(`Submitted! Ticket #${row.id.slice(0, 8).toUpperCase()}`);
     if (guestNow) {
       form.reset();
+      setPrefill({ name: "", email: "" });
+
       setFile(null);
     } else {
       nav({ to: "/dashboard" });
