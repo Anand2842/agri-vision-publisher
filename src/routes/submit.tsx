@@ -249,15 +249,18 @@ function Submit() {
               label="Full Name"
               name="author_name"
               required
-              defaultValue={prefill.name}
+              value={prefill.name}
+              onChange={(v) => setPrefill((p) => ({ ...p, name: v }))}
             />
             <Field
               label="Email"
               name="author_email"
               type="email"
               required
-              defaultValue={prefill.email}
+              value={prefill.email}
+              onChange={(v) => setPrefill((p) => ({ ...p, email: v }))}
             />
+
             <Field
               label="Contact number"
               name="contact_number"
