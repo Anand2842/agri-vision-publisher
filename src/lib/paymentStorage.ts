@@ -189,7 +189,8 @@ export async function syncOfflineClaims(userId: string) {
           transaction_ref: sanitizedTxRef,
           payment_method: localClaim.payment_method as "upi" | "bank",
           receipt_path: localClaim.receipt_path,
-          status: localClaim.status,
+          // Never trust a client-side status: staff approve claims in the admin panel.
+          status: "pending",
           notes: localClaim.notes
         })
         .select()
