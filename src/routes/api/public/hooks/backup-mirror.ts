@@ -5,10 +5,19 @@ export const Route = createFileRoute("/api/public/hooks/backup-mirror")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Authenticate via apikey header (Supabase anon key, the pg_cron pattern)
-        const apikey = request.headers.get("apikey");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        if (!expected || apikey !== expected) {
+        // Authenticate with a dedicated server-only webhook secret.
+        // The Supabase publishable key is public and must never gate this endpoint.
+        const provided =
+          request.headers.get("x-backup-secret") ??
+          request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
+          "";
+        const expected = process.env.BACKUP_WEBHOOK_SECRET ?? "";
+        const ok =
+          expected.length > 0 &&
+          provided.length === expected.length &&
+          // constant-time-ish comparison
+          provided.split("").reduce((acc, ch, i) => acc | (ch.charCodeAt(0) ^ expected.charCodeAt(i)), 0) === 0;
+        if (!ok) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "Content-Type": "application/json" },

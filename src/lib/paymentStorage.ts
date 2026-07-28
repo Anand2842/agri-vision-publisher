@@ -39,34 +39,9 @@ export const MOCK_PROFILES: Record<string, { full_name: string; institution: str
   }
 };
 
-const DEFAULT_CLAIMS: PaymentClaim[] = [
-  {
-    id: "mock-claim-1",
-    user_id: "mock-user-1",
-    plan: "annual",
-    amount: 500,
-    transaction_ref: "UTR987654321098",
-    payment_method: "upi",
-    receipt_path: "mock_receipt_1.png",
-    status: "pending",
-    notes: null,
-    created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-    updated_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: "mock-claim-2",
-    user_id: "mock-user-2",
-    plan: "lifetime",
-    amount: 2000,
-    transaction_ref: "UTR123456789012",
-    payment_method: "bank",
-    receipt_path: "mock_receipt_2.png",
-    status: "approved",
-    notes: "Payment verified successfully by moderator.",
-    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-    updated_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString()
-  }
-];
+// No pre-seeded claims: seeding an "approved" claim would let any visitor
+// render a fraudulent membership certificate from localStorage.
+const DEFAULT_CLAIMS: PaymentClaim[] = [];
 
 const STORAGE_KEY = "mock_membership_payments";
 
@@ -214,7 +189,8 @@ export async function syncOfflineClaims(userId: string) {
           transaction_ref: sanitizedTxRef,
           payment_method: localClaim.payment_method as "upi" | "bank",
           receipt_path: localClaim.receipt_path,
-          status: localClaim.status,
+          // Never trust a client-side status: staff approve claims in the admin panel.
+          status: "pending",
           notes: localClaim.notes
         })
         .select()
