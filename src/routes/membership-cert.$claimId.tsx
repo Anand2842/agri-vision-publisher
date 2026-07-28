@@ -66,9 +66,28 @@ function MembershipCertificate() {
       setLoading(true);
       setError(null);
 
-      // Preview mode: show mock data without database
+      // Certificates are private: require a signed-in user first.
+      const { data: authData } = await supabase.auth.getUser();
+      const currentUser = authData?.user;
+      if (!currentUser) {
+        setError("Please sign in to view your membership certificate.");
+        setLoading(false);
+        return;
+      }
+
+      // Preview mode: staff-only mock render
       const params = new URLSearchParams(window.location.search);
       if (params.get("preview") === "true") {
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", currentUser.id);
+        const isStaff = (roles ?? []).some((r) => r.role === "admin" || r.role === "moderator");
+        if (!isStaff) {
+          setError("Preview mode is restricted to editorial staff.");
+          setLoading(false);
+          return;
+        }
         setData({
           claim: MOCK_MEMBERSHIP_CERT,
           authorName: "Dr. Anand Kumar",
@@ -79,9 +98,11 @@ function MembershipCertificate() {
         return;
       }
 
-      // 1. Try local storage first to support fully offline mode seamlessly
+      // 1. Local (offline) claim — only if it belongs to the signed-in user
       const localClaims = getLocalStorageClaims();
-      const localClaim = localClaims.find((c) => c.id === claimId);
+      const localClaim = localClaims.find(
+        (c) => c.id === claimId && c.user_id === currentUser.id,
+      );
 
       if (localClaim) {
         const profile = MOCK_PROFILES[localClaim.user_id] || {
