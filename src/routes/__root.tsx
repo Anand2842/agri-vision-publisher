@@ -101,9 +101,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:height", content: "630" },
       { name: "theme-color", content: "#356B3A" },
       { name: "twitter:image", content: "https://agriculturemagazine.in/og-default.jpg" },
+      {
+        name: "google-site-verification",
+        content: "Cm8UqdLMIQQccshAlvkEEcpX53Ke3IhMRZrVOkVEMFs",
+      },
     ],
     links: [
-      { rel: "canonical", href: "https://agriculturemagazine.in" },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
