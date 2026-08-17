@@ -172,16 +172,16 @@ function HeroSlider() {
         );
       })}
       <div className="absolute inset-0 bg-black/10" />
-      <div className="absolute inset-x-0 bottom-12 md:bottom-16 hidden sm:flex flex-col items-center justify-end px-4">
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-        <h1 className="relative font-display text-white text-lg sm:text-xl md:text-2xl text-center leading-tight drop-shadow-lg">
+      <div className="absolute inset-x-0 bottom-12 md:bottom-16 flex flex-col items-center justify-end px-4">
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent pointer-events-none hidden sm:block" />
+        <h1 className="sr-only sm:not-sr-only sm:relative font-display text-white text-lg sm:text-xl md:text-2xl text-center leading-tight drop-shadow-lg">
           The Agriculture Popular Article Magazine
         </h1>
-        <p className="relative mt-2 text-white/80 text-xs sm:text-sm md:text-base text-center font-sans max-w-2xl drop-shadow">
+        <p className="relative mt-2 text-white/80 text-xs sm:text-sm md:text-base text-center font-sans max-w-2xl drop-shadow hidden sm:block">
           Bridging research and practice in agriculture through peer-reviewed popular articles
         </p>
       </div>
-      <h1 className="sr-only sm:hidden">The Agriculture Popular Article Magazine</h1>
+
 
       <button
         onClick={() => setI((p) => (p - 1 + slides.length) % slides.length)}
