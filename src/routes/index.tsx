@@ -135,7 +135,7 @@ function HeroSlider() {
 
   if (slides.length === 0) {
     return (
-      <section className="relative w-full overflow-hidden bg-navy aspect-[4/5] sm:aspect-[16/9]">
+      <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
         <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-primary/30 animate-pulse" />
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-white/60 font-display text-sm uppercase tracking-widest">
