@@ -101,7 +101,7 @@ function PlagiarismPolicy() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mt-12">
-      <h2 className="text-xl md:text-2xl font-display text-[oklch(var(--navy))] border-b border-rule pb-2 mb-4">
+      <h2 className="text-xl md:text-2xl font-display text-[var(--navy)] border-b border-rule pb-2 mb-4">
         {title}
       </h2>
       <div className="text-base leading-[1.8] text-foreground/80">{children}</div>
