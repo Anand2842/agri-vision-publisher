@@ -326,8 +326,15 @@ export function SiteHeader() {
               Sign in
             </Link>
           )}
-          <Link to="/current-issue" className="btn-orange">
+          <Link to="/current-issue" className="btn-orange text-[11px] px-3 md:text-sm md:px-5">
             Current Issue
+          </Link>
+          <Link
+            to="/submit"
+            className="lg:hidden inline-flex items-center gap-1.5 min-h-11 px-3 border border-navy/20 text-navy text-[11px] uppercase tracking-[0.1em] font-condensed font-semibold rounded-full"
+          >
+            <Send className="h-3.5 w-3.5" />
+            Submit
           </Link>
           <button
             onClick={() => setOpen(!open)}
@@ -337,6 +344,7 @@ export function SiteHeader() {
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
+
         </div>
       </div>
 
