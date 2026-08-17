@@ -184,12 +184,13 @@ function CurrentIssue() {
                     <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
                   </a>
                 ) : (
-                  <div className="flex items-center justify-between gap-4 bg-[var(--navy)]/30 text-white/80 px-5 py-4 cursor-not-allowed">
-                    <span className="flex items-center gap-3">
-                      <FileText className="h-5 w-5" />
-                      <span className="text-sm font-semibold">Issue PDF coming soon</span>
+                  <div className="flex items-center gap-3 border border-dashed border-rule bg-muted px-5 py-4 text-muted-foreground">
+                    <FileText className="h-5 w-5 shrink-0" />
+                    <span className="text-sm">
+                      The full-issue PDF is not published yet — read the articles below.
                     </span>
                   </div>
+
                 )}
                 <Link
                   to="/archives"
