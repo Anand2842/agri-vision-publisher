@@ -203,11 +203,11 @@ export function SiteHeader() {
       </a>
 
       {/* ISSN identification strip — visible globally, required by ISSN India */}
-      <div className="bg-primary/[0.06] border-b border-primary/10 py-1 text-center">
-        <span className="text-xs uppercase tracking-[0.2em] font-semibold text-foreground/50 font-sans">
+      <div className="bg-primary/[0.06] border-b border-primary/10 py-0.5 md:py-1 px-4 text-center">
+        <span className="block truncate text-[10px] md:text-xs uppercase tracking-[0.12em] md:tracking-[0.2em] font-semibold text-foreground/60 font-sans">
           {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
           {getHeader("branding", "title_line2") || "Popular Article Magazine"} ·{" "}
-          <span className="text-[oklch(var(--orange))]">
+          <span className="text-orange">
             {getFooter("legal", "eissn")
               ? `E-ISSN: ${getFooter("legal", "eissn")}`
               : getFooter("legal", "pissn")
@@ -217,6 +217,7 @@ export function SiteHeader() {
           · Published Monthly · Online · India
         </span>
       </div>
+
 
       {/* Utility bar */}
       <div className="bg-navy text-white text-xs">
