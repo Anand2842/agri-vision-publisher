@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Image unavailable">
+  <rect width="1200" height="675" fill="#EFE6D3"/>
+  <g fill="none" stroke="#356B3A" stroke-width="10" stroke-linecap="round" opacity="0.5">
+    <path d="M600 300v120"/>
+    <path d="M600 420c-60 0-100-45-100-95 0 0 55-10 85 35 5-70 45-105 45-105s40 45 35 100c30-40 80-30 80-30 0 50-45 95-105 95z"/>
+  </g>
+  <text x="600" y="500" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#8A623B">Image coming soon</text>
+</svg>
