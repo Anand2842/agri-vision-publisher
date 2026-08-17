@@ -151,8 +151,11 @@ function CurrentIssue() {
                 <img
                   src={issue.cover || undefined}
                   alt={`Cover of Volume ${issue.volume}, Issue ${issue.number} — ${issue.title}`}
+                  width={800}
+                  height={1035}
                   className="w-full max-w-md mx-auto shadow-2xl ring-1 ring-[var(--navy)]/10"
                 />
+
                 <div className="absolute -top-3 -left-3 bg-[var(--orange)] text-navy text-xs uppercase tracking-[0.2em] font-semibold px-3 py-1.5">
                   Just Released
                 </div>
