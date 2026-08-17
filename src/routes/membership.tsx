@@ -398,8 +398,11 @@ function Membership() {
                         <img
                           src={qrSrc}
                           alt="UPI QR Code"
+                          width={176}
+                          height={176}
                           className="w-44 h-44 object-contain transition-transform duration-300 group-hover:scale-105"
                         />
+
                       </div>
                       <span className="text-xs text-muted-foreground mt-3 flex items-center gap-1 font-mono uppercase tracking-wider">
                         <QrCode className="h-3 w-3" /> Scannable QR Code
