@@ -177,15 +177,19 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
   return (
     <div>
       <div className="eyebrow mb-4 text-white/50">{title}</div>
-      <ul className="space-y-2">
+      <ul className="space-y-0.5">
         {links.map(([label, to]) => (
           <li key={label}>
-            <Link to={to} className="text-sm text-white/80 hover:text-orange transition-colors">
+            <Link
+              to={to}
+              className="inline-flex items-center min-h-11 py-2 text-sm text-white/80 hover:text-orange transition-colors"
+            >
               {label}
             </Link>
           </li>
         ))}
       </ul>
+
     </div>
   );
 }

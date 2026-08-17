@@ -135,7 +135,7 @@ function HeroSlider() {
 
   if (slides.length === 0) {
     return (
-      <section className="relative w-full overflow-hidden bg-navy aspect-[4/5] sm:aspect-[16/9]">
+      <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
         <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-primary/30 animate-pulse" />
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-white/60 font-display text-sm uppercase tracking-widest">
@@ -147,7 +147,7 @@ function HeroSlider() {
   }
 
   return (
-    <section className="relative w-full overflow-hidden bg-navy aspect-[4/5] sm:aspect-[16/9]">
+    <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
       {slides.map((s, idx) => {
         const isCurrent = idx === i;
         const isAdjacent =
@@ -163,7 +163,7 @@ function HeroSlider() {
               width={1920}
               height={1080}
               loading={isCurrent ? "eager" : "lazy"}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1400ms] ${isCurrent ? "opacity-100" : "opacity-0"}`}
+              className={`absolute inset-0 w-full h-full object-contain sm:object-cover transition-opacity duration-[1400ms] ${isCurrent ? "opacity-100" : "opacity-0"}`}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = "none";
               }}
@@ -173,14 +173,16 @@ function HeroSlider() {
       })}
       <div className="absolute inset-0 bg-black/10" />
       <div className="absolute inset-x-0 bottom-12 md:bottom-16 flex flex-col items-center justify-end px-4">
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-        <h1 className="relative font-display text-white text-lg sm:text-xl md:text-2xl text-center leading-tight drop-shadow-lg">
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent pointer-events-none hidden sm:block" />
+        <h1 className="sr-only sm:not-sr-only sm:relative font-display text-white text-lg sm:text-xl md:text-2xl text-center leading-tight drop-shadow-lg">
           The Agriculture Popular Article Magazine
         </h1>
-        <p className="relative mt-2 text-white/80 text-xs sm:text-sm md:text-base text-center font-sans max-w-2xl drop-shadow">
+        <p className="relative mt-2 text-white/80 text-xs sm:text-sm md:text-base text-center font-sans max-w-2xl drop-shadow hidden sm:block">
           Bridging research and practice in agriculture through peer-reviewed popular articles
         </p>
       </div>
+
+
       <button
         onClick={() => setI((p) => (p - 1 + slides.length) % slides.length)}
         aria-label="Previous slide"

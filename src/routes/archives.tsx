@@ -229,7 +229,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                 href={issue.pdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-[oklch(var(--navy))] border border-[oklch(var(--navy))]/25 px-3 py-1.5 hover:bg-[oklch(var(--navy))]/5 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-[var(--navy)] border border-[var(--navy)]/25 px-3 py-1.5 hover:bg-[var(--navy)]/5 transition-colors"
               >
                 <Download className="h-3.5 w-3.5" /> Full Issue PDF
               </a>
@@ -252,7 +252,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
       {/* Expandable Table of Contents */}
       {open && (
         <div className="border-t border-rule bg-paper px-6 py-5">
-          <div className="text-xs uppercase tracking-[0.2em] font-semibold text-[oklch(var(--orange))] mb-4">
+          <div className="text-xs uppercase tracking-[0.2em] font-semibold text-[var(--orange)] mb-4">
             Table of Contents — Vol {issue.volume}, Issue {issue.number}
           </div>
           {loading ? (
@@ -278,7 +278,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                 const pdf = articlePdf(a.pdfPath);
                 return (
                   <li key={a.slug} className="flex items-start gap-4 py-3">
-                    <span className="font-display text-base text-[oklch(var(--orange))] tabular-nums shrink-0 w-6 text-right">
+                    <span className="font-display text-base text-[var(--orange)] tabular-nums shrink-0 w-6 text-right">
                       {String(idx + 1).padStart(2, "0")}
                     </span>
                     <div className="flex-1 min-w-0">
@@ -288,7 +288,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                       <Link
                         to="/articles/$slug"
                         params={{ slug: a.slug }}
-                        className="font-display text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] transition-colors leading-snug block mt-0.5"
+                        className="font-display text-[var(--navy)] hover:text-[var(--orange)] transition-colors leading-snug block mt-0.5"
                       >
                         {a.title}
                       </Link>
@@ -310,7 +310,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                       <Link
                         to="/articles/$slug"
                         params={{ slug: a.slug }}
-                        className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[oklch(var(--navy))]/60 hover:text-[oklch(var(--navy))] transition-colors"
+                        className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[var(--navy)]/60 hover:text-[var(--navy)] transition-colors"
                       >
                         <FileText className="h-3 w-3" /> Read
                       </Link>
@@ -319,7 +319,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                           href={pdf}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[oklch(var(--orange))] hover:text-[oklch(var(--orange))]/80 transition-colors"
+                          className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[var(--orange)] hover:text-[var(--orange)]/80 transition-colors"
                         >
                           <Download className="h-3 w-3" /> PDF
                         </a>

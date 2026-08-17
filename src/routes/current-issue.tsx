@@ -37,7 +37,7 @@ export const Route = createFileRoute("/current-issue")({
           <ErrorComponent error={error} />
           <button
             onClick={() => router.invalidate()}
-            className="mt-6 px-4 py-2 bg-[oklch(var(--orange))] text-navy text-sm font-semibold uppercase tracking-wider"
+            className="mt-6 px-4 py-2 bg-[var(--orange)] text-navy text-sm font-semibold uppercase tracking-wider"
           >
             Retry
           </button>
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/current-issue")({
     <>
       <SiteHeader />
       <main id="main-content" className="container-editorial py-24 text-center">
-        <h1 className="font-display text-3xl text-[oklch(var(--navy))]">No issue published yet</h1>
+        <h1 className="font-display text-3xl text-[var(--navy)]">No issue published yet</h1>
         <p className="mt-3 text-foreground/70">Please check back soon.</p>
       </main>
       <SiteFooter />
@@ -67,10 +67,10 @@ function CurrentIssue() {
       <>
         <SiteHeader />
         <main id="main-content" className="container-editorial py-24 text-center">
-          <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+          <div className="text-xs uppercase tracking-[0.2em] text-[var(--orange)] font-semibold">
             Current Issue
           </div>
-          <h1 className="font-display text-3xl mt-3 text-[oklch(var(--navy))]">
+          <h1 className="font-display text-3xl mt-3 text-[var(--navy)]">
             No issue published yet
           </h1>
           <p className="mt-3 text-foreground/70">
@@ -78,7 +78,7 @@ function CurrentIssue() {
           </p>
           <Link
             to="/archives"
-            className="inline-flex items-center gap-2 mt-6 text-sm font-semibold uppercase tracking-wider text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))]"
+            className="inline-flex items-center gap-2 mt-6 text-sm font-semibold uppercase tracking-wider text-[var(--navy)] hover:text-[var(--orange)]"
           >
             Browse Archives <ArrowRight className="h-4 w-4" />
           </Link>
@@ -125,19 +125,19 @@ function CurrentIssue() {
       <SiteHeader />
       <main id="main-content">
         {/* Masthead band */}
-        <section className="border-b border-[oklch(var(--navy))]/15 bg-[oklch(var(--navy))]/[0.02]">
+        <section className="border-b border-[var(--navy)]/15 bg-[var(--navy)]/[0.02]">
           <div className="container-editorial py-12 md:py-16">
-            <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+            <div className="text-xs uppercase tracking-[0.2em] text-[var(--orange)] font-semibold">
               Current Issue
             </div>
-            <h1 className="font-display text-2xl md:text-3xl mt-3 text-[oklch(var(--navy))] leading-[1.05] max-w-4xl">
+            <h1 className="font-display text-2xl md:text-3xl mt-3 text-[var(--navy)] leading-[1.05] max-w-4xl">
               Volume {issue.volume}, Issue {issue.number} — {issue.date}
             </h1>
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/70">
-              <span className="font-display italic text-[oklch(var(--navy))] text-base">
+              <span className="font-display italic text-[var(--navy)] text-base">
                 {issue.title}
               </span>
-              <span className="text-[oklch(var(--navy))]/30">·</span>
+              <span className="text-[var(--navy)]/30">·</span>
               <span>{articles.length} articles</span>
             </div>
           </div>
@@ -151,9 +151,12 @@ function CurrentIssue() {
                 <img
                   src={issue.cover || undefined}
                   alt={`Cover of Volume ${issue.volume}, Issue ${issue.number} — ${issue.title}`}
-                  className="w-full max-w-md mx-auto shadow-2xl ring-1 ring-[oklch(var(--navy))]/10"
+                  width={800}
+                  height={1035}
+                  className="w-full max-w-md mx-auto shadow-2xl ring-1 ring-[var(--navy)]/10"
                 />
-                <div className="absolute -top-3 -left-3 bg-[oklch(var(--orange))] text-navy text-xs uppercase tracking-[0.2em] font-semibold px-3 py-1.5">
+
+                <div className="absolute -top-3 -left-3 bg-[var(--orange)] text-navy text-xs uppercase tracking-[0.2em] font-semibold px-3 py-1.5">
                   Just Released
                 </div>
               </div>
@@ -165,7 +168,7 @@ function CurrentIssue() {
                     href={pdfHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center justify-between gap-4 bg-[oklch(var(--navy))] text-white px-5 py-4 hover:bg-[oklch(var(--navy))]/90 transition-colors"
+                    className="group flex items-center justify-between gap-4 bg-[var(--navy)] text-white px-5 py-4 hover:bg-[var(--navy)]/90 transition-colors"
                   >
                     <span className="flex items-center gap-3">
                       <Download className="h-5 w-5" />
@@ -181,19 +184,20 @@ function CurrentIssue() {
                     <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
                   </a>
                 ) : (
-                  <div className="flex items-center justify-between gap-4 bg-[oklch(var(--navy))]/30 text-white/80 px-5 py-4 cursor-not-allowed">
-                    <span className="flex items-center gap-3">
-                      <FileText className="h-5 w-5" />
-                      <span className="text-sm font-semibold">Issue PDF coming soon</span>
+                  <div className="flex items-center gap-3 border border-dashed border-rule bg-muted px-5 py-4 text-muted-foreground">
+                    <FileText className="h-5 w-5 shrink-0" />
+                    <span className="text-sm">
+                      The full-issue PDF is not published yet — read the articles below.
                     </span>
                   </div>
+
                 )}
                 <Link
                   to="/archives"
-                  className="group flex items-center justify-between gap-4 border border-[oklch(var(--navy))]/25 text-[oklch(var(--navy))] px-5 py-4 hover:bg-[oklch(var(--navy))]/5 transition-colors"
+                  className="group flex items-center justify-between gap-4 border border-[var(--navy)]/25 text-[var(--navy)] px-5 py-4 hover:bg-[var(--navy)]/5 transition-colors"
                 >
                   <span className="flex items-center gap-3">
-                    <BookOpen className="h-5 w-5 text-[oklch(var(--orange))]" />
+                    <BookOpen className="h-5 w-5 text-[var(--orange)]" />
                     <span className="text-sm font-semibold">Browse all back issues</span>
                   </span>
                   <ArrowRight className="h-4 w-4 opacity-50 group-hover:translate-x-1 transition-transform" />
@@ -201,8 +205,8 @@ function CurrentIssue() {
               </div>
 
               {/* Citation block */}
-              <div className="mt-8 max-w-md mx-auto border-t border-[oklch(var(--navy))]/15 pt-6">
-                <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+              <div className="mt-8 max-w-md mx-auto border-t border-[var(--navy)]/15 pt-6">
+                <div className="text-xs uppercase tracking-[0.2em] text-[var(--orange)] font-semibold">
                   How to cite
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground font-mono leading-relaxed">
@@ -214,10 +218,10 @@ function CurrentIssue() {
 
             {/* Editorial + ToC */}
             <div className="lg:col-span-7">
-              <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+              <div className="text-xs uppercase tracking-[0.2em] text-[var(--orange)] font-semibold">
                 In This Issue
               </div>
-              <h2 className="font-display text-3xl md:text-4xl mt-3 text-[oklch(var(--navy))] leading-[1.1]">
+              <h2 className="font-display text-3xl md:text-4xl mt-3 text-[var(--navy)] leading-[1.1]">
                 {issue.title}
               </h2>
               <p className="mt-6 text-lg text-foreground/75 leading-relaxed font-display">
@@ -230,27 +234,27 @@ function CurrentIssue() {
 
               {/* Read articles */}
               <div className="mt-14">
-                <div className="flex items-baseline justify-between border-b-2 border-[oklch(var(--navy))] pb-3">
-                  <h3 className="font-display text-2xl text-[oklch(var(--navy))]">
+                <div className="flex items-baseline justify-between border-b-2 border-[var(--navy)] pb-3">
+                  <h3 className="font-display text-2xl text-[var(--navy)]">
                     Read the articles
                   </h3>
                   <span className="text-xs uppercase tracking-wider text-muted-foreground">
                     {articles.length} papers
                   </span>
                 </div>
-                <ol className="divide-y divide-[oklch(var(--navy))]/10">
+                <ol className="divide-y divide-[var(--navy)]/10">
                   {articles.map((a: DBArticle, i: number) => (
                     <li key={a.slug}>
                       <div className="group grid grid-cols-12 gap-4 py-6 items-start">
-                        <div className="col-span-2 sm:col-span-1 font-display text-2xl text-[oklch(var(--orange))] tabular-nums">
+                        <div className="col-span-2 sm:col-span-1 font-display text-2xl text-[var(--orange)] tabular-nums">
                           {String(i + 1).padStart(2, "0")}
                         </div>
                         <div className="col-span-10 sm:col-span-8">
-                          <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[var(--orange)] font-semibold">
                             {a.category}
                           </div>
                           <Link to="/articles/$slug" params={{ slug: a.slug }} className="block">
-                            <h4 className="font-display text-xl md:text-2xl mt-1.5 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] transition-colors leading-snug">
+                            <h4 className="font-display text-xl md:text-2xl mt-1.5 text-[var(--navy)] hover:text-[var(--orange)] transition-colors leading-snug">
                               {a.title}
                             </h4>
                             <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">
@@ -258,10 +262,10 @@ function CurrentIssue() {
                             </p>
                           </Link>
                           <div className="mt-3 text-xs text-muted-foreground">
-                            <span className="text-[oklch(var(--navy))] font-medium">
+                            <span className="text-[var(--navy)] font-medium">
                               {a.author}
                             </span>
-                            <span className="mx-2 text-[oklch(var(--navy))]/30">·</span>
+                            <span className="mx-2 text-[var(--navy)]/30">·</span>
                             <span className="italic">{a.affiliation}</span>
                             <div className="mt-1 flex items-center gap-1.5 font-sans">
                               Vol. {issue.volume} · Issue {issue.number}
@@ -282,7 +286,7 @@ function CurrentIssue() {
                               href={articlePdf(a.pdfPath)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 mt-1 text-[oklch(var(--navy))] hover:text-[oklch(var(--orange))] uppercase tracking-wider font-semibold"
+                              className="inline-flex items-center gap-1 mt-1 text-[var(--navy)] hover:text-[var(--orange)] uppercase tracking-wider font-semibold"
                             >
                               <Download className="h-3 w-3" /> PDF
                             </a>
@@ -299,12 +303,12 @@ function CurrentIssue() {
               </div>
 
               {/* Submit CTA */}
-              <div className="mt-16 border border-[oklch(var(--navy))]/15 bg-[oklch(var(--navy))]/[0.03] p-8 flex flex-col md:flex-row md:items-center gap-6 justify-between">
+              <div className="mt-16 border border-[var(--navy)]/15 bg-[var(--navy)]/[0.03] p-8 flex flex-col md:flex-row md:items-center gap-6 justify-between">
                 <div>
-                  <div className="text-xs uppercase tracking-[0.2em] text-[oklch(var(--orange))] font-semibold">
+                  <div className="text-xs uppercase tracking-[0.2em] text-[var(--orange)] font-semibold">
                     {get("call_for_papers", "heading")}
                   </div>
-                  <h4 className="font-display text-2xl mt-2 text-[oklch(var(--navy))]">
+                  <h4 className="font-display text-2xl mt-2 text-[var(--navy)]">
                     {get("call_for_papers", "subheading")}
                   </h4>
                   <p className="mt-2 text-sm text-foreground/70 max-w-md">
@@ -313,7 +317,7 @@ function CurrentIssue() {
                 </div>
                 <Link
                   to="/submit"
-                  className="inline-flex items-center gap-2 bg-[oklch(var(--orange))] text-navy px-6 py-3 text-sm font-semibold uppercase tracking-wider hover:bg-[oklch(var(--orange))]/90 transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-2 bg-[var(--orange)] text-navy px-6 py-3 text-sm font-semibold uppercase tracking-wider hover:bg-[var(--orange)]/90 transition-colors whitespace-nowrap"
                 >
                   Submit Article <ArrowRight className="h-4 w-4" />
                 </Link>

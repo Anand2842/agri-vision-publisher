@@ -203,11 +203,11 @@ export function SiteHeader() {
       </a>
 
       {/* ISSN identification strip — visible globally, required by ISSN India */}
-      <div className="bg-primary/[0.06] border-b border-primary/10 py-1 text-center">
-        <span className="text-xs uppercase tracking-[0.2em] font-semibold text-foreground/50 font-sans">
+      <div className="bg-primary/[0.06] border-b border-primary/10 py-0.5 md:py-1 px-4 text-center">
+        <span className="block truncate text-[10px] md:text-xs uppercase tracking-[0.12em] md:tracking-[0.2em] font-semibold text-foreground/60 font-sans">
           {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
           {getHeader("branding", "title_line2") || "Popular Article Magazine"} ·{" "}
-          <span className="text-[oklch(var(--orange))]">
+          <span className="text-orange">
             {getFooter("legal", "eissn")
               ? `E-ISSN: ${getFooter("legal", "eissn")}`
               : getFooter("legal", "pissn")
@@ -217,6 +217,7 @@ export function SiteHeader() {
           · Published Monthly · Online · India
         </span>
       </div>
+
 
       {/* Utility bar */}
       <div className="bg-navy text-white text-xs">
@@ -325,8 +326,15 @@ export function SiteHeader() {
               Sign in
             </Link>
           )}
-          <Link to="/current-issue" className="btn-orange">
+          <Link to="/current-issue" className="btn-orange text-[11px] px-3 md:text-sm md:px-5">
             Current Issue
+          </Link>
+          <Link
+            to="/submit"
+            className="lg:hidden inline-flex items-center gap-1.5 min-h-11 px-3 border border-navy/20 text-navy text-[11px] uppercase tracking-[0.1em] font-condensed font-semibold rounded-full"
+          >
+            <Send className="h-3.5 w-3.5" />
+            Submit
           </Link>
           <button
             onClick={() => setOpen(!open)}
@@ -336,6 +344,7 @@ export function SiteHeader() {
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
+
         </div>
       </div>
 
