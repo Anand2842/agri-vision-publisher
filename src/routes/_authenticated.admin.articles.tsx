@@ -78,13 +78,19 @@ function AdminArticles() {
     }
 
     const status = String(fd.get("status")) as "draft" | "published" | "archived";
+    const content = String(fd.get("content") || "").trim();
+    const pdfUrl = String(fd.get("pdf_url") || "").trim();
+    if (status === "published" && (!content || !pdfUrl)) {
+      toast.error("Published articles require both full text and a downloadable PDF.");
+      return;
+    }
     const payload = {
       title,
       slug,
       abstract: String(fd.get("abstract") || "") || null,
-      content: String(fd.get("content") || "") || null,
+      content: content || null,
       cover_url: String(fd.get("cover_url") || "") || null,
-      pdf_url: String(fd.get("pdf_url") || "") || null,
+      pdf_url: pdfUrl || null,
       status,
       read_time: Number(fd.get("read_time") || 5),
       category_id: String(fd.get("category_id") || "") || null,
