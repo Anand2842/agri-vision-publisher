@@ -104,8 +104,8 @@ function CurrentIssue() {
       url: "https://agriculturemagazine.in",
     },
     publisher: {
-      "@type": "Organization",
-      name: "The Agriculture Popular Article Magazine",
+      "@type": "Person",
+      name: "Dr. Dileep Kumar",
       url: "https://agriculturemagazine.in",
     },
     hasPart: articles.map((a: DBArticle) => ({

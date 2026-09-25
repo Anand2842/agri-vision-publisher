@@ -263,7 +263,7 @@ function Intro() {
               <tr className="hover:bg-primary/5 transition-colors">
                 <th className="py-3 px-6 font-semibold text-ink">Publisher name</th>
                 <td className="py-3 px-6 text-foreground/80">
-                  Ram Mangalam Agri – Rural Development Foundation
+                  Dr. Dileep Kumar
                 </td>
               </tr>
               <tr className="hover:bg-primary/5 transition-colors">

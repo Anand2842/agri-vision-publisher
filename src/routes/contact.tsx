@@ -139,7 +139,6 @@ function Contact() {
               <div className="eyebrow">Publisher</div>
             </div>
             <h3 className="font-display text-2xl mt-3 leading-tight">{get("publisher", "name")}</h3>
-            <p className="text-sm text-foreground/70 mt-3 leading-relaxed">(R.A.D.F.)</p>
             <ul className="mt-4 space-y-2 text-sm">
               <li className="flex gap-3">
                 <MapPin className="h-4 w-4 mt-1 text-primary shrink-0" />{" "}

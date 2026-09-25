@@ -38,11 +38,19 @@ export type IssueRow = {
   pdfUrl: string | null;
 };
 
-const issuePdf = (path?: string | null) =>
-  path ? supabase.storage.from("article-pdfs").getPublicUrl(path).data.publicUrl : null;
+const issuePdf = (path?: string | null) => {
+  if (!path) return null;
+  return /^https?:\/\//i.test(path)
+    ? path
+    : supabase.storage.from("article-pdfs").getPublicUrl(path).data.publicUrl;
+};
 
-const articlePdf = (path?: string | null) =>
-  path ? supabase.storage.from("article-pdfs").getPublicUrl(path).data.publicUrl : "";
+const articlePdf = (path?: string | null) => {
+  if (!path) return "";
+  return /^https?:\/\//i.test(path)
+    ? path
+    : supabase.storage.from("article-pdfs").getPublicUrl(path).data.publicUrl;
+};
 
 function fmtDate(d?: string | null) {
   if (!d) return "";

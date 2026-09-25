@@ -110,8 +110,8 @@ function Article() {
       },
       datePublished: a.publishedAt,
       publisher: {
-        "@type": "Organization",
-        name: "The Agriculture Popular Article Magazine",
+        "@type": "Person",
+        name: "Dr. Dileep Kumar",
         url: "https://agriculturemagazine.in",
         logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp",
       },
