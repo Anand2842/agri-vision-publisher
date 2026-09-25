@@ -276,7 +276,7 @@ function AdminArticles() {
               <tr>
                 <Th>Title</Th>
                 <Th>Status</Th>
-                <Th>PDF</Th>
+                <Th>Publication files</Th>
                 <Th></Th>
               </tr>
             </thead>
@@ -293,18 +293,12 @@ function AdminArticles() {
                     </span>
                   </Td>
                   <Td>
-                    {r.pdf_url ? (
-                      <a
-                        href={r.pdf_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-primary underline"
-                      >
-                        Open
-                      </a>
-                    ) : (
-                      "—"
-                    )}
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      <span className={r.content?.trim() ? "text-primary" : "text-destructive"}>{r.content?.trim() ? "Full text ready" : "Full text missing"}</span>
+                      <span aria-hidden="true">·</span>
+                      {r.pdf_url ? <a href={r.pdf_url} target="_blank" rel="noreferrer" className="text-primary underline">PDF ready</a> : <span className="text-destructive">PDF missing</span>}
+                    </div>
+                    {r.status === "published" && (!r.content?.trim() || !r.pdf_url) && <div className="mt-1 text-xs font-semibold text-destructive">Not ISSN-ready</div>}
                   </Td>
                   <Td className="text-right whitespace-nowrap">
                     <IconBtn onClick={() => setEditing(r)}>
