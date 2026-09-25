@@ -283,6 +283,7 @@ function EditorialBoardCms() {
         <TextareaEditor page="editorial_board" section="hero" contentKey="subtitle" label="Subtitle" initialValue={get("hero", "subtitle")} />
       </CmsSection>
       <CmsSection title="Editors">
+        <p className="text-sm text-muted-foreground">ISSN compliance requires every displayed member to have an official designation, department, institution, postal address, institutional email, and institutional profile.</p>
         <JsonObjectArrayEditor
           page="editorial_board"
           section="editors"
@@ -293,10 +294,16 @@ function EditorialBoardCms() {
             { key: "name", label: "Name", type: "text" },
             { key: "role", label: "Role", type: "text" },
             { key: "title", label: "Title", type: "text" },
+            { key: "designation", label: "Official Designation", type: "text" },
+            { key: "department", label: "Department", type: "text" },
             { key: "inst", label: "Institution", type: "text" },
+            { key: "address", label: "Official Postal Address", type: "textarea" },
+            { key: "email", label: "Institutional Email", type: "text" },
+            { key: "profile_url", label: "Official Institutional Profile URL", type: "text" },
             { key: "country", label: "Country", type: "text" },
             { key: "photo_url", label: "Photo", type: "image" },
           ]}
+          complianceFields={["name", "designation", "department", "inst", "address", "email", "profile_url"]}
         />
       </CmsSection>
       <CmsSection title="Advisory Board">
@@ -308,10 +315,16 @@ function EditorialBoardCms() {
           initialValue={get("advisory", "items")}
           fields={[
             { key: "name", label: "Name", type: "text" },
+            { key: "designation", label: "Official Designation", type: "text" },
+            { key: "department", label: "Department", type: "text" },
             { key: "inst", label: "Institution", type: "text" },
+            { key: "address", label: "Official Postal Address", type: "textarea" },
+            { key: "email", label: "Institutional Email", type: "text" },
+            { key: "profile_url", label: "Official Institutional Profile URL", type: "text" },
             { key: "country", label: "Country", type: "text" },
             { key: "photo_url", label: "Photo", type: "image" },
           ]}
+          complianceFields={["name", "designation", "department", "inst", "address", "email", "profile_url"]}
         />
       </CmsSection>
       <CmsSection title="Reviewers">
@@ -323,8 +336,15 @@ function EditorialBoardCms() {
           initialValue={get("reviewers", "items")}
           fields={[
             { key: "name", label: "Name", type: "text" },
+            { key: "designation", label: "Official Designation", type: "text" },
+            { key: "department", label: "Department", type: "text" },
             { key: "inst", label: "Institution", type: "text" },
+            { key: "address", label: "Official Postal Address", type: "textarea" },
+            { key: "email", label: "Institutional Email", type: "text" },
+            { key: "profile_url", label: "Official Institutional Profile URL", type: "text" },
+            { key: "country", label: "Country", type: "text" },
           ]}
+          complianceFields={["name", "designation", "department", "inst", "address", "email", "profile_url"]}
         />
       </CmsSection>
     </div>

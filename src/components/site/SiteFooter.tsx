@@ -150,7 +150,7 @@ export function SiteFooter() {
             © {new Date().getFullYear()} {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
             {getHeader("branding", "title_line2") || "Popular Article Magazine"}. Published by{" "}
             {getFooter("legal", "publisher_name") ||
-              "Ram Mangalam Agri – Rural Development Foundation"}
+              "Dr. Dileep Kumar"}
             .
           </div>
           <div>Published monthly · Peer reviewed · Open access</div>

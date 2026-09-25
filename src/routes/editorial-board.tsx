@@ -129,6 +129,26 @@ function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
   );
 }
 
+function DirectoryEntry({ member }: { member: BoardMember & { dept?: string } }) {
+  const department = member.department || member.dept;
+  return (
+    <article className="py-5 border-b border-[var(--navy)]/10 grid sm:grid-cols-[minmax(0,1fr)_minmax(220px,0.8fr)] gap-3 sm:gap-6">
+      <div className="min-w-0">
+        <div className="font-display text-lg text-[var(--navy)] leading-snug">
+          {member.profile_url ? <a href={member.profile_url} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--orange)] transition-colors">{member.name}</a> : member.name}
+        </div>
+        {(member.designation || department) && <div className="mt-1 text-xs text-foreground/65">{[member.designation, department].filter(Boolean).join(" · ")}</div>}
+        {member.email && <a href={`mailto:${member.email}`} className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-xs text-[var(--navy)]/70 hover:text-[var(--orange)] transition-colors break-all"><Mail className="h-3 w-3 shrink-0" />{member.email}</a>}
+      </div>
+      <div className="text-sm text-muted-foreground sm:text-right leading-snug">
+        {member.inst && <span className="block italic">{member.inst}</span>}
+        {member.address && <span className="block mt-1 text-xs text-foreground/55">{member.address}</span>}
+        {member.country && <span className="block mt-1 text-xs text-foreground/50">{member.country}</span>}
+      </div>
+    </article>
+  );
+}
+
 function Board() {
   const { get, getJson } = useSiteContent("editorial_board");
   const editorialBoard = getJson<"editors", "items", BoardMember[]>("editors", "items");
@@ -182,31 +202,7 @@ function Board() {
         />
         <p className="-mt-6 mb-10 text-foreground/70 max-w-2xl">{get("advisory", "description")}</p>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-[var(--navy)]/15">
-          {advisoryCommittee.map((m) => (
-            <div
-              key={`${m.name}-${m.inst}`}
-              className="py-5 border-b border-[var(--navy)]/10 flex items-start gap-4"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="font-display text-lg text-[var(--navy)] leading-snug">
-                  {m.name}
-                </div>
-                {m.email && (
-                  <a
-                    href={`mailto:${m.email}`}
-                    className="inline-flex items-center gap-1 mt-1 text-xs text-[var(--navy)]/55 hover:text-[var(--orange)] transition-colors break-all"
-                  >
-                    <Mail className="h-3 w-3 shrink-0" />
-                    {m.email}
-                  </a>
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground text-right max-w-[55%] leading-snug shrink-0">
-                <span className="italic">{m.inst}</span>
-                {m.country && <span className="block text-foreground/50">{m.country}</span>}
-              </div>
-            </div>
-          ))}
+          {advisoryCommittee.map((m) => <DirectoryEntry key={`${m.name}-${m.inst}`} member={m} />)}
         </div>
 
         <SectionHeader eyebrow={`${reviewers.length} Reviewers`} title="Peer Reviewers" />
@@ -214,33 +210,7 @@ function Board() {
           {get("reviewers", "description")}
         </p>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-[var(--navy)]/15">
-          {reviewers.map((r, i) => (
-            <div
-              key={`${r.name}-${i}`}
-              className="py-5 border-b border-[var(--navy)]/10 flex items-start gap-4"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="font-display text-lg text-[var(--navy)] leading-snug">
-                  {r.name}
-                </div>
-                {r.email && (
-                  <a
-                    href={`mailto:${r.email}`}
-                    className="inline-flex items-center gap-1 mt-1 text-xs text-[var(--navy)]/55 hover:text-[var(--orange)] transition-colors break-all"
-                  >
-                    <Mail className="h-3 w-3 shrink-0" />
-                    {r.email}
-                  </a>
-                )}
-              </div>
-              {r.inst && (
-                <div className="text-sm text-muted-foreground text-right max-w-[55%] leading-snug shrink-0">
-                  {r.dept && <span className="block">{r.dept}</span>}
-                  <span className="italic">{r.inst}</span>
-                </div>
-              )}
-            </div>
-          ))}
+          {reviewers.map((r, i) => <DirectoryEntry key={`${r.name}-${i}`} member={r} />)}
         </div>
       </main>
       <SiteFooter />

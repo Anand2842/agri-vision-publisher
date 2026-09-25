@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, Save, Loader2, Upload, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, Upload, Image as ImageIcon, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { updateSiteContentCache } from "@/hooks/useSiteContent";
@@ -343,6 +343,7 @@ export function JsonObjectArrayEditor({
   contentKey,
   initialValue,
   fields,
+  complianceFields = [],
 }: {
   label: string;
   page: string;
@@ -354,6 +355,7 @@ export function JsonObjectArrayEditor({
     label: string;
     type?: "text" | "textarea" | "number" | "boolean" | "array" | "image";
   }[];
+  complianceFields?: string[];
 }) {
   const [items, setItems] = useState<any[]>(() => {
     try {
@@ -380,6 +382,17 @@ export function JsonObjectArrayEditor({
     setItems(newItems);
   };
 
+  const complianceProblems = (item: any) => {
+    const missing = complianceFields.filter((key) => !String(item[key] || "").trim());
+    const email = String(item.email || "").trim().toLowerCase();
+    const profile = String(item.profile_url || "").trim().toLowerCase();
+    return {
+      missing,
+      personalEmail: /@(gmail|yahoo|hotmail|outlook|icloud|rediffmail)\./.test(email),
+      nonInstitutionalProfile: profile.includes("linkedin.com") || profile.includes("scholar.google"),
+    };
+  };
+
   return (
     <div className="space-y-2 border p-4 rounded-md bg-muted/20">
       <div className="flex items-center justify-between mb-4">
@@ -393,7 +406,10 @@ export function JsonObjectArrayEditor({
         />
       </div>
       <div className="space-y-6">
-        {items.map((item, i) => (
+        {items.map((item, i) => {
+          const problems = complianceProblems(item);
+          const hasProblems = problems.missing.length > 0 || problems.personalEmail || problems.nonInstitutionalProfile;
+          return (
           <div key={i} className="space-y-3 p-4 border bg-background rounded-md relative">
             <Button
               variant="ghost"
@@ -455,8 +471,18 @@ export function JsonObjectArrayEditor({
                 )}
               </div>
             ))}
+            {complianceFields.length > 0 && hasProblems && (
+              <div className="flex gap-2 border border-destructive/30 bg-destructive/5 p-3 text-xs text-destructive">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                <div>
+                  {problems.missing.length > 0 && <div>Missing: {problems.missing.join(", ")}</div>}
+                  {problems.personalEmail && <div>Replace the personal email with an official institutional address.</div>}
+                  {problems.nonInstitutionalProfile && <div>Use an official institution profile, not LinkedIn or Google Scholar.</div>}
+                </div>
+              </div>
+            )}
           </div>
-        ))}
+        )})}
       </div>
       <Button variant="outline" size="sm" onClick={addItem} className="mt-4">
         <Plus className="h-4 w-4 mr-2" /> Add Object

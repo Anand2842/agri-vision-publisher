@@ -301,7 +301,7 @@ function PublicationCertificate() {
 
           {/* Footnote */}
           <div className="text-[8px] font-sans text-muted-foreground uppercase tracking-widest mt-3">
-            Published on: {dateStr} • This document is cryptographically verified and valid under RADF publishing schedules.
+            Published on: {dateStr} • This document is cryptographically verified and valid under the magazine publishing schedule.
           </div>
 
         </div>

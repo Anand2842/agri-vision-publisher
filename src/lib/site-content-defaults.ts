@@ -156,7 +156,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       phone: "+91 9509164410",
       email: "dkdkdangi@gmail.com",
     },
-    legal: { publisher_name: "Ram Mangalam Agri – Rural Development Foundation", eissn: "", pissn: "" },
+    legal: { publisher_name: "Dr. Dileep Kumar", eissn: "", pissn: "" },
     navigation: {
       columns: JSON.stringify([
         {
@@ -224,7 +224,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
   about: {
     hero: {
       tagline: "A peer-reviewed magazine for India's agricultural community.",
-      para1: "The Agriculture Popular Article Magazine is a monthly, online, peer-reviewed publication dedicated to advancing Indian agriculture through knowledge, innovation, sustainability and community. It is published by the Ram Mangalam Agri – Rural Development Foundation (RADF) and edited by Dr. Dileep Kumar, Senior Scientist (Agriculture Extension) at ICAR–RRS–CAZRI, Jaisalmer.",
+      para1: "The Agriculture Popular Article Magazine is a monthly, online, peer-reviewed publication dedicated to advancing Indian agriculture through knowledge, innovation, sustainability and community. It is published and edited by Dr. Dileep Kumar, Senior Scientist (Agriculture Extension) at ICAR–RRS–CAZRI, Jaisalmer.",
       para2: "We sit between the academic journal and the trade magazine: rigorous enough for research, accessible enough for the field officer, the KVK scientist and the progressive farmer. Every article is reviewed by qualified specialists before it reaches our readers.",
       para3: "Our pages cover agronomy, horticulture, soil and water management, animal sciences, agri-business, extension and allied disciplines — with a particular focus on the arid and semi-arid systems of western India and on the smallholder economies of South Asia.",
       para4: "The magazine is open-access. Copyright of accepted articles is transferred to the publisher upon acceptance. Readers pay nothing. Members and institutional partners support the work that makes the magazine possible.",
@@ -238,7 +238,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       items: '["Disseminate practical, science-based agricultural knowledge to farmers, extension workers, students and policy-makers.","Highlight indigenous innovations, traditional wisdom and locally adapted practices alongside contemporary research.","Bridge the gap between scientific research and on-farm application through accessible popular articles.","Support young scientists, research scholars and field practitioners with a credible publishing platform.","Encourage interdisciplinary work across agronomy, horticulture, animal sciences, extension and allied fields.","Strengthen India\'s rural development ecosystem by amplifying voices from KVKs, ICAR institutes and state universities."]',
     },
     particulars: {
-      items: '[["Title","The Agriculture Popular Article Magazine"],["E-ISSN","Applied For"],["P-ISSN","Applied For"],["Frequency","Monthly"],["Subject","Agriculture"],["Language","English"],["Format","Online (PDF)"],["Starting Year","2026"],["Publisher","Ram Mangalam Agri – Rural Development Foundation (RADF)"],["Chief Editor","Dr. Dileep Kumar"],["Address","ICAR–CAZRI–RRS Jaisalmer, Jodhpur Road, Jaisalmer 345001, Rajasthan, India"],["Mobile","+91 95091 64410"],["Email","dkdkdangi@gmail.com"]]',
+      items: '[["Title","The Agriculture Popular Article Magazine"],["E-ISSN","Applied For"],["P-ISSN","Applied For"],["Frequency","Monthly"],["Subject","Agriculture"],["Language","English"],["Format","Online (PDF)"],["Starting Year","2026"],["Publisher","Dr. Dileep Kumar"],["Chief Editor","Dr. Dileep Kumar"],["Publisher Address","ICAR–CAZRI–RRS Jaisalmer, Jodhpur Road, Jaisalmer 345001, Rajasthan, India"],["Mobile","+91 95091 64410"],["Email","dkdkdangi@gmail.com"]]',
     },
   },
   contact: {
@@ -252,8 +252,8 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       turnaround: "Editorial decisions are typically returned within 21 days.",
     },
     publisher: {
-      name: "Ram Mangalam Agri – Rural Development Foundation",
-      address: "c/o Dr. Dileep Kumar, ICAR-CAZRI–RRS Jaisalmer, Jodhpur Road, Jaisalmer 345001, Rajasthan, India",
+      name: "Dr. Dileep Kumar",
+      address: "ICAR–CAZRI–RRS Jaisalmer, Jodhpur Road, Jaisalmer 345001, Rajasthan, India",
     },
     advertise: {
       heading: "Reach the agriculture community",
@@ -492,7 +492,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       items: '[{"l":"Title","v":"Times New Roman 14 pt · Bold · Centered"},{"l":"Author details","v":"TNR 12 pt — name, designation, affiliation"},{"l":"Corresponding email","v":"TNR 12 pt · Bold"},{"l":"Headings","v":"TNR 14 pt · Bold"},{"l":"Sub-headings","v":"TNR 12 pt · Bold"},{"l":"Body text","v":"TNR 12 pt · Justified · 1.5 line spacing"},{"l":"Units & abbreviations","v":"SI units · IUB / IUPAC nomenclature"},{"l":"File format","v":"Microsoft Word (.doc / .docx) only"}]',
     },
     originality: {
-      items: '["Submissions must be the authors\' own original work and not under review elsewhere.","Plagiarism is screened on every submission; manuscripts above 15% similarity are returned.","Proper attribution must be given to all data, figures and ideas borrowed from other sources.","Copyright of the accepted article is transferred to the publisher (Ram Mangalam Agri–Rural Development Foundation) upon acceptance."]',
+      items: '["Submissions must be the authors\' own original work and not under review elsewhere.","Plagiarism is screened on every submission; manuscripts above 15% similarity are returned.","Proper attribution must be given to all data, figures and ideas borrowed from other sources.","Copyright of the accepted article is transferred to the publisher, Dr. Dileep Kumar, upon acceptance."]',
     },
     publication: {
       body: "Published articles are made available as a downloadable PDF on the magazine's website and are also e-mailed directly to the corresponding author. Each author receives a digital publication certificate for the article.",
@@ -513,7 +513,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
     },
     about: {
       title: "About — The Agriculture Popular Article Magazine",
-      description: "About The Agriculture Popular Article Magazine — a peer-reviewed monthly published by Ram Mangalam Agri – Rural Development Foundation, edited by Dr. Dileep Kumar.",
+      description: "About The Agriculture Popular Article Magazine — a peer-reviewed monthly published and edited by Dr. Dileep Kumar.",
     },
     contact: {
       title: "Contact — The Agriculture Popular Article Magazine",
@@ -616,14 +616,14 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
   certificate: {
     branding: {
       magazine_name: "The Agriculture Popular Article Magazine",
-      publisher: "Ram Mangalam Agri–Rural Development Foundation (RADF)",
+      publisher: "Dr. Dileep Kumar",
       chief_editor: "Dr. Dileep Kumar",
       chief_editor_title: "Chief Editor, ICAR-CAZRI",
       chief_editor_signature: "Dileep K. Dangi",
-      publisher_title: "Managing Director",
-      publisher_institution: "RADF Jaipur",
-      publisher_signature: "Ram Mangalam",
-      seal_text: "• TAPAM • RADF JAIPUR • RESEARCH & POPULAR SCIENCE PUBLICATION",
+      publisher_title: "Publisher",
+      publisher_institution: "The Agriculture Popular Article Magazine",
+      publisher_signature: "Dileep Kumar",
+      seal_text: "• TAPAM • PUBLISHER • RESEARCH & POPULAR SCIENCE PUBLICATION",
       seal_text_membership: "• TAPAM ESTD 2026 • SCIENCE & AGRICULTURE RURAL ADVANCEMENT"
     }
   },
