@@ -54,14 +54,6 @@ function PublicationCertificate() {
       setLoading(true);
       setError(null);
 
-      // Preview mode: show mock data without database
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("preview") === "true") {
-        setData(MOCK_ARTICLE_CERT);
-        setLoading(false);
-        return;
-      }
-
       try {
         // Require authentication
         const { data: userData } = await supabase.auth.getUser();
@@ -69,10 +61,23 @@ function PublicationCertificate() {
           throw new Error("You must be signed in to view a publication certificate.");
         }
 
+        // Preview mode (sample data) is restricted to editorial staff
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("preview") === "true") {
+          const { data: roles } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", userData.user.id);
+          const isStaff = (roles ?? []).some((r) => r.role === "admin" || r.role === "moderator");
+          if (!isStaff) throw new Error("Preview mode is restricted to editorial staff.");
+          setData(MOCK_ARTICLE_CERT);
+          return;
+        }
+
         // 1. Fetch submission details (RLS restricts to owner/admin/moderator)
         const { data: dbSub, error: subErr } = await supabase
           .from("submissions")
-          .select("id,title,status,user_id,created_at,updated_at")
+          .select("id,title,status,user_id,salutation,author_name,created_at,updated_at")
           .eq("id", submissionId)
           .maybeSingle();
 
@@ -101,7 +106,10 @@ function PublicationCertificate() {
             created_at: dbSub.created_at,
             updated_at: dbSub.updated_at || dbSub.created_at,
           },
-          authorName: dbProfile?.full_name || "Agri Researcher",
+          authorName:
+            dbProfile?.full_name ||
+            [dbSub.salutation, dbSub.author_name].filter(Boolean).join(" ") ||
+            "Agri Researcher",
           institution: dbProfile?.institution || "Agricultural Research Institute",
           country: dbProfile?.country || "India",
         });

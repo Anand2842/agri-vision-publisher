@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Session } from "@supabase/supabase-js";
-import { getLocalStorageClaims, syncOfflineClaims, type PaymentClaim } from "@/lib/paymentStorage";
+import { syncOfflineClaims, type PaymentClaim } from "@/lib/paymentStorage";
 import {
   ShieldCheck,
   Clock,
@@ -84,14 +84,8 @@ function Dashboard() {
       }
 
       if (payRes.error) {
-        console.warn("Payments fetch error, attempting local storage fallback:", payRes.error);
-        try {
-          const localClaims = getLocalStorageClaims(session.user.id);
-          setPayments(localClaims);
-        } catch (fallbackErr) {
-          console.error("Failed to load local storage claims:", fallbackErr);
-          setPayments([]);
-        }
+        console.error("Payments fetch error:", payRes.error);
+        setPayments([]);
       } else {
         setPayments(payRes.data || []);
       }

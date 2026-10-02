@@ -20,7 +20,6 @@ import { fetchSeoMetadata, useSiteContent } from "@/hooks/useSiteContent";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Session } from "@supabase/supabase-js";
-import { saveLocalStorageClaim, getLocalStorageClaims } from "@/lib/paymentStorage";
 import { logSimulatedEmail } from "@/lib/notificationLogs";
 
 export const Route = createFileRoute("/membership")({
@@ -120,54 +119,49 @@ function Membership() {
       return;
     }
 
-    // Deduplication check
-    const existingClaims = getLocalStorageClaims();
-    const isDuplicate = existingClaims.some(
-      (c) => c.transaction_ref.trim().toLowerCase() === transactionRef.trim().toLowerCase(),
-    );
-    if (isDuplicate) {
+    // Deduplication check (RLS limits this to the user's own claims)
+    const { data: dupes } = await supabase
+      .from("membership_payments")
+      .select("id")
+      .ilike("transaction_ref", cleanRef)
+      .limit(1);
+    if (dupes && dupes.length > 0) {
       toast.error("This Transaction Reference (UTR) has already been submitted.");
+      return;
+    }
+
+    const numAmount = parseFloat(amountPaid);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      toast.error("Invalid transaction amount.");
       return;
     }
 
     setSubmitting(true);
 
     try {
-      // 1. Upload receipt to Storage bucket 'payment-receipts'
+      // 1. Upload receipt to the private 'payment-receipts' bucket
       const fileExt = receiptFile.name.slice(receiptFile.name.lastIndexOf(".")).toLowerCase();
       const storagePath = `${session.user.id}/${Date.now()}_receipt${fileExt}`;
 
-      let uploadSuccessful = false;
-      try {
-        const { error: uploadErr } = await supabase.storage
-          .from("payment-receipts")
-          .upload(storagePath, receiptFile, {
-            contentType: receiptFile.type || "application/octet-stream",
-            cacheControl: "3600",
-            upsert: false,
-          });
-        if (!uploadErr) {
-          uploadSuccessful = true;
-        }
-      } catch (uploadExc) {
-        console.warn("Storage bucket upload exception, will fallback:", uploadExc);
-      }
+      const { error: uploadErr } = await supabase.storage
+        .from("payment-receipts")
+        .upload(storagePath, receiptFile, {
+          contentType: receiptFile.type || "application/octet-stream",
+          cacheControl: "3600",
+          upsert: false,
+        });
+      if (uploadErr) throw new Error(`Receipt upload failed: ${uploadErr.message}`);
 
       // 2. Insert payment verification record
-      const numAmount = parseFloat(amountPaid);
-      if (isNaN(numAmount) || numAmount <= 0) {
-        throw new Error("Invalid transaction amount.");
-      }
-
       const { data: claimData, error: dbErr } = await supabase
         .from("membership_payments")
         .insert({
           user_id: session.user.id,
           plan: selectedPlan,
           amount: numAmount,
-          transaction_ref: transactionRef.trim(),
+          transaction_ref: cleanRef,
           payment_method: activeTab,
-          receipt_path: uploadSuccessful ? storagePath : null,
+          receipt_path: storagePath,
           status: "pending",
         })
         .select()
@@ -179,9 +173,9 @@ function Membership() {
 
       setClaimId(claimData.id);
       setSubmitSuccess(true);
-      toast.success("Payment verification claim registered in database!");
+      toast.success("Payment verification claim submitted for review.");
 
-      // Dispatch simulated email notification to editors
+      // Notify the editorial inbox
       const { data: dbProfile } = await supabase
         .from("profiles")
         .select("full_name")
@@ -191,56 +185,18 @@ function Membership() {
 
       logSimulatedEmail(
         "New Payment Claim Submitted",
-        "dkdkdangi@gmail.com",
-        `Dear Editor-in-Chief,\n\nA new online payment claim has been submitted for review:\n\nAuthor Name: ${authorName}\nPlan: ${selectedPlan.toUpperCase()}\nAmount: ₹${numAmount}\nPayment Method: ${activeTab.toUpperCase()}\nTransaction UTR Ref: ${transactionRef.trim()}\nClaim ID: ${claimData.id}\n\nPlease review and approve this claim in the administrative board console.\n\nWarm regards,\nAgri Magazine Notification System`,
+        "editor",
+        `Dear Editor-in-Chief,\n\nA new online payment claim has been submitted for review:\n\nAuthor Name: ${authorName}\nPlan: ${selectedPlan.toUpperCase()}\nAmount: ₹${numAmount}\nPayment Method: ${activeTab.toUpperCase()}\nTransaction UTR Ref: ${cleanRef}\nClaim ID: ${claimData.id}\n\nPlease review and approve this claim in the administrative board console.\n\nWarm regards,\nAgri Magazine Notification System`,
       );
 
       // Clear form inputs
       setTransactionRef("");
       setReceiptFile(null);
-    } catch (err: any) {
-      console.warn(
-        "Remote database insertion failed. Attempting offline local storage fallback. Error details:",
-        err,
+    } catch (err) {
+      console.error("Payment claim submission failed:", err);
+      toast.error(
+        `Could not submit your claim: ${err instanceof Error ? err.message : "unknown error"}. Please try again.`,
       );
-
-      try {
-        const numAmount = parseFloat(amountPaid);
-        if (isNaN(numAmount) || numAmount <= 0) {
-          toast.error("Invalid transaction amount.");
-          setSubmitting(false);
-          return;
-        }
-
-        const mockClaim = saveLocalStorageClaim({
-          user_id: session.user.id,
-          plan: selectedPlan,
-          amount: numAmount,
-          transaction_ref: transactionRef.trim(),
-          payment_method: activeTab,
-          receipt_path: receiptFile ? receiptFile.name : null,
-          status: "pending",
-          notes: null,
-        });
-
-        setClaimId(mockClaim.id);
-        setSubmitSuccess(true);
-        toast.info("Offline Mode: Claim registered successfully in local storage!");
-
-        // Log simulated email dispatch
-        logSimulatedEmail(
-          "New Payment Claim Submitted (Offline)",
-          "dkdkdangi@gmail.com",
-          `Dear Editor-in-Chief,\n\nA new payment claim has been submitted offline (Local Storage fallback):\n\nAuthor Name: Dr. Anand Kumar (Test Author)\nPlan: ${selectedPlan.toUpperCase()}\nAmount: ₹${numAmount}\nPayment Method: ${activeTab.toUpperCase()}\nTransaction UTR Ref: ${transactionRef.trim()}\nClaim ID: ${mockClaim.id}\n\nPlease review and approve this claim in the administrative board console.\n\nWarm regards,\nAgri Magazine Notification System`,
-        );
-
-        // Clear form inputs
-        setTransactionRef("");
-        setReceiptFile(null);
-      } catch (fallbackErr) {
-        console.error("Local storage fallback failed:", fallbackErr);
-        toast.error("Failed to save verification claim. Please check your inputs.");
-      }
     } finally {
       setSubmitting(false);
     }
@@ -528,24 +484,6 @@ function Membership() {
                       We will cross-examine the bank settlement and activate your plan within{" "}
                       <strong>2 business days</strong>.
                     </p>
-                    <div className="bg-ochre/15 border border-ochre/30 p-3.5 rounded-sm text-xs text-ochre text-left space-y-2 mt-4">
-                      <p className="font-semibold flex items-center gap-1 text-ochre">
-                        <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-ochre" /> Important
-                        Offline Notice
-                      </p>
-                      <p className="leading-relaxed text-background/90">
-                        Your verification claim and status are stored{" "}
-                        <strong>locally in this browser</strong>. Please screenshot your Ticket ID:{" "}
-                        <strong className="font-mono text-background bg-ink px-1.5 py-0.5 rounded border border-background/25">
-                          #{claimId.slice(0, 8).toUpperCase()}
-                        </strong>{" "}
-                        for your records.
-                      </p>
-                      <p className="leading-relaxed text-background/60 text-xs">
-                        Note: To access this claim across other devices or sync with our central
-                        systems, the backend database must be fully deployed.
-                      </p>
-                    </div>
                   </div>
 
                   <div className="mt-12 space-y-3">

@@ -175,19 +175,14 @@ function Submit() {
         };
 
     setLoading(true);
-    const { data: row, error } = await supabase
-      .from("submissions")
-      .insert(insertPayload as never)
-      .select()
-      .single();
-    if (error || !row) {
-      setLoading(false);
-      toast.error(error?.message || "Failed to create submission");
-      return;
-    }
-
+    // Upload first so a failed upload never leaves a submission without a manuscript.
     const { error: upErr } = await supabase.storage.from("manuscripts").upload(path, file, {
-      contentType: file.type || "application/octet-stream",
+      // Derived from the extension: browsers often report an empty type for .doc, and the
+      // bucket only accepts Word MIME types.
+      contentType:
+        ext === ".doc"
+          ? "application/msword"
+          : "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       upsert: false,
     });
     if (upErr) {
@@ -196,9 +191,17 @@ function Submit() {
       return;
     }
 
+    // No .select(): guests have no SELECT policy on submissions, so reading the
+    // row back would fail even though the insert succeeded.
+    const { error } = await supabase.from("submissions").insert(insertPayload as never);
+    if (error) {
+      setLoading(false);
+      toast.error(error.message || "Failed to create submission");
+      return;
+    }
 
     setLoading(false);
-    toast.success(`Submitted! Ticket #${row.id.slice(0, 8).toUpperCase()}`);
+    toast.success(`Submitted! Ticket #${newId.slice(0, 8).toUpperCase()}`);
     if (guestNow) {
       form.reset();
       setPrefill({ name: "", email: "" });
