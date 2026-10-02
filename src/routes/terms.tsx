@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchSeoMetadata } from "@/hooks/useSiteContent";
-import DOMPurify from "isomorphic-dompurify";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 export const Route = createFileRoute("/terms")({
   component: TermsAndConditions,
@@ -89,7 +89,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <section className="mt-12">
       <h2
         className="font-display text-2xl md:text-3xl text-ink"
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(title) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(title) }}
       />
       <div className="rule-thick mt-3 mb-5 max-w-[60px]" />
       <div className="prose-editorial text-foreground/80 leading-relaxed max-w-3xl space-y-3">

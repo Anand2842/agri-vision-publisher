@@ -7,7 +7,7 @@ import { fetchArticleBySlug, fetchPublishedArticles, articlePdf, type DBArticle 
 import { Bookmark, Share2, Download, Quote, Clock, Eye, Printer, FileText, BookOpen, ExternalLink } from "lucide-react";
 import logo from "@/assets/logo.webp";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import DOMPurify from "isomorphic-dompurify";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 const escapeJsonLd = (json: string) => json.replace(/<\/script/gi, "<\\/script");
 
@@ -302,7 +302,7 @@ function Article() {
             {a.content ? (
               <div
                 className="article-content prose prose-stone max-w-none prose-p:text-foreground/85 prose-p:leading-[1.65] prose-headings:font-display prose-headings:text-ink prose-a:text-primary hover:prose-a:text-orange"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(a.content) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(a.content) }}
               />
             ) : (
               <p className="drop-cap text-lg leading-[1.65] text-foreground/85">{a.abstract}</p>
