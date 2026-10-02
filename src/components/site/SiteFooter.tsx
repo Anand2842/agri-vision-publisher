@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import React from "react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.webp";
 import { useGlobalSiteContent } from "@/hooks/useSiteContent";
 import { z } from "zod";
 

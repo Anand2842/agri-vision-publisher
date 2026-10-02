@@ -355,3 +355,53 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Article body (HTML from the CMS). No typography plugin is installed, so the
+   `prose` classes on the article page do nothing on their own. */
+@layer components {
+  .article-content > * + * {
+    margin-top: 1em;
+  }
+  .article-content h2,
+  .article-content h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    margin-top: 1.75em;
+  }
+  .article-content h4 {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    margin-top: 1.5em;
+  }
+  .article-content ul,
+  .article-content ol {
+    padding-left: 1.5em;
+  }
+  .article-content ul {
+    list-style: disc;
+  }
+  .article-content ol {
+    list-style: decimal;
+  }
+  .article-content li + li {
+    margin-top: 0.35em;
+  }
+  .article-content p:has(> strong:only-child) + ul,
+  .article-content p:has(> strong:only-child) + ol {
+    margin-top: 0.5em;
+  }
+  .article-content figure img {
+    margin-inline: auto;
+    max-height: 420px;
+    width: auto;
+    border: 1px solid var(--color-rule);
+  }
+  .article-content a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+}

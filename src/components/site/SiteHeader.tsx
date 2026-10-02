@@ -23,7 +23,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useGlobalSiteContent } from "@/hooks/useSiteContent";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.webp";
 import { z } from "zod";
 
 const NavItemSchema = z.object({
