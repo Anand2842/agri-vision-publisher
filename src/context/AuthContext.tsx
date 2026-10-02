@@ -86,15 +86,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     refresh().finally(() => clearTimeout(timeout));
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+    // Must stay synchronous: supabase-js runs this callback while holding its auth lock,
+    // so awaiting a Supabase query here deadlocks every later request (pages hang on
+    // navigation for signed-in users). Defer the roles query until the lock is released.
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
       setUser(newSession?.user ?? null);
-      if (newSession?.user?.id) {
-        await fetchRoles(newSession.user.id);
-      } else {
-        setRoles([]);
-      }
-      setLoading(false);
+      const uid = newSession?.user?.id ?? null;
+      setTimeout(() => {
+        fetchRoles(uid).finally(() => setLoading(false));
+      }, 0);
     });
 
     return () => {
