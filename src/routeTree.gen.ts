@@ -44,6 +44,8 @@ import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated.admin.categories'
 import { Route as AuthenticatedAdminBackupsRouteImport } from './routes/_authenticated.admin.backups'
 import { Route as AuthenticatedAdminArticlesRouteImport } from './routes/_authenticated.admin.articles'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicHooksBackupMirrorRouteImport } from './routes/api/public/hooks/backup-mirror'
 
 const SubmitRoute = SubmitRouteImport.update({
@@ -229,6 +231,16 @@ const AuthenticatedAdminArticlesRoute =
     path: '/articles',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksBackupMirrorRoute =
   ApiPublicHooksBackupMirrorRouteImport.update({
     id: '/api/public/hooks/backup-mirror',
@@ -272,6 +284,8 @@ export interface FileRoutesByFullPath {
   '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/backup-mirror': typeof ApiPublicHooksBackupMirrorRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -308,6 +322,8 @@ export interface FileRoutesByTo {
   '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/backup-mirror': typeof ApiPublicHooksBackupMirrorRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -347,6 +363,8 @@ export interface FileRoutesById {
   '/article/certificate/$submissionId': typeof ArticleCertificateSubmissionIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/hooks/backup-mirror': typeof ApiPublicHooksBackupMirrorRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -386,6 +404,8 @@ export interface FileRouteTypes {
     | '/article/certificate/$submissionId'
     | '/admin/'
     | '/api/public/hooks/backup-mirror'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -422,6 +442,8 @@ export interface FileRouteTypes {
     | '/article/certificate/$submissionId'
     | '/admin'
     | '/api/public/hooks/backup-mirror'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
   id:
     | '__root__'
     | '/'
@@ -460,6 +482,8 @@ export interface FileRouteTypes {
     | '/article/certificate/$submissionId'
     | '/_authenticated/admin/'
     | '/api/public/hooks/backup-mirror'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -486,6 +510,8 @@ export interface RootRouteChildren {
   MembershipCertClaimIdRoute: typeof MembershipCertClaimIdRoute
   ArticleCertificateSubmissionIdRoute: typeof ArticleCertificateSubmissionIdRoute
   ApiPublicHooksBackupMirrorRoute: typeof ApiPublicHooksBackupMirrorRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -735,6 +761,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminArticlesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/backup-mirror': {
       id: '/api/public/hooks/backup-mirror'
       path: '/api/public/hooks/backup-mirror'
@@ -814,6 +854,8 @@ const rootRouteChildren: RootRouteChildren = {
   MembershipCertClaimIdRoute: MembershipCertClaimIdRoute,
   ArticleCertificateSubmissionIdRoute: ArticleCertificateSubmissionIdRoute,
   ApiPublicHooksBackupMirrorRoute: ApiPublicHooksBackupMirrorRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
