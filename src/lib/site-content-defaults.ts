@@ -1,4 +1,4 @@
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.webp";
 import heroTractor from "@/assets/hero-tractor.jpg";
 import heroPaddy from "@/assets/hero-paddy.jpg";
 import heroWheat from "@/assets/hero-wheat.jpg";

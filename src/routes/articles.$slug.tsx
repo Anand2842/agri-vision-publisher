@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { fetchArticleBySlug, fetchPublishedArticles, articlePdf } from "@/lib/data";
+import { fetchArticleBySlug, fetchPublishedArticles, articlePdf, type DBArticle } from "@/lib/data";
 import { Bookmark, Share2, Download, Quote, Clock, Eye } from "lucide-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import DOMPurify from "isomorphic-dompurify";
@@ -38,8 +38,9 @@ export const Route = createFileRoute("/articles/$slug")({
         { name: "description", content: loaderData.a.abstract },
         { property: "og:title", content: loaderData.a.title },
         { property: "og:description", content: loaderData.a.abstract },
-        { property: "og:image", content: loaderData.a.cover },
+        { property: "og:image", content: absoluteUrl(loaderData.a.cover) },
         { property: "og:type", content: "article" },
+        ...citationMeta(loaderData.a, params.slug),
       ]
       : [{ title: "Article — The Agriculture Popular Article Magazine" }],
     links: [{ rel: "canonical", href: `https://agriculturemagazine.in/articles/${params.slug}` }],
@@ -294,4 +295,33 @@ function Article() {
       <SiteFooter />
     </>
   );
+}
+
+const SITE = "https://agriculturemagazine.in";
+
+function absoluteUrl(url: string) {
+  return url.startsWith("/") ? `${SITE}${url}` : url;
+}
+
+// Google Scholar / Highwire tags so articles can be indexed as scholarly content.
+function citationMeta(a: DBArticle, slug: string) {
+  const tags: { name: string; content: string }[] = [
+    { name: "citation_title", content: a.title },
+    ...a.author
+      .split(",")
+      .map((n) => n.trim())
+      .filter((n) => n && n !== "Editorial Team")
+      .map((n) => ({ name: "citation_author", content: n })),
+    { name: "citation_journal_title", content: "The Agriculture Popular Article Magazine" },
+    { name: "citation_abstract_html_url", content: `${SITE}/articles/${slug}` },
+  ];
+  if (a.affiliation) tags.push({ name: "citation_author_institution", content: a.affiliation });
+  if (a.publishedAt)
+    tags.push({ name: "citation_publication_date", content: a.publishedAt.slice(0, 10).replace(/-/g, "/") });
+  if (a.volume) tags.push({ name: "citation_volume", content: String(a.volume) });
+  if (a.issueNumber) tags.push({ name: "citation_issue", content: String(a.issueNumber) });
+  if (a.pageStart) tags.push({ name: "citation_firstpage", content: String(a.pageStart) });
+  if (a.pageEnd) tags.push({ name: "citation_lastpage", content: String(a.pageEnd) });
+  if (a.pdfPath) tags.push({ name: "citation_pdf_url", content: articlePdf(a.pdfPath) });
+  return tags;
 }

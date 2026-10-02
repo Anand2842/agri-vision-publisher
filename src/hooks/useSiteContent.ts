@@ -81,6 +81,39 @@ export function useSiteContent<P extends keyof SiteContentKeys>(page: P) {
     }
 
     async function load() {
+      // If loading header or footer, batch-load both in a single query
+      if (page === "header" || page === "footer") {
+        const batchKey = "global_header_footer";
+        if (!pendingRequests[batchKey]) {
+          pendingRequests[batchKey] = Promise.resolve(
+            supabase
+              .from("site_content")
+              .select("page, section, key, value")
+              .in("page", ["header", "footer"])
+              .then(({ data, error }) => {
+                const headerContent: PageContent = {};
+                const footerContent: PageContent = {};
+                if (data && !error) {
+                  data.forEach((row) => {
+                    const target = row.page === "header" ? headerContent : footerContent;
+                    if (!target[row.section]) target[row.section] = {};
+                    target[row.section][row.key] = row.value || "";
+                  });
+                }
+                cache["header"] = headerContent;
+                cache["footer"] = footerContent;
+                notifyListeners("header");
+                notifyListeners("footer");
+                return { header: headerContent, footer: footerContent };
+              })
+          );
+        }
+        await pendingRequests[batchKey];
+        setContent(cache[page as string] || {});
+        setLoading(false);
+        return;
+      }
+
       if (!pendingRequests[page as string]) {
         pendingRequests[page as string] = Promise.resolve(
           supabase

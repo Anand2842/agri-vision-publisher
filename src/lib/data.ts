@@ -94,6 +94,8 @@ type ArticleJoin = {
   published_at: string | null;
   categories: { name: string } | null;
   profiles: { full_name: string | null; institution: string | null } | null;
+  authors: string | null;
+  affiliation: string | null;
   content: string | null;
   author_bio: string | null;
   page_start: number | null;
@@ -109,8 +111,8 @@ function mapArticle(r: ArticleJoin): DBArticle {
     abstract: r.abstract ?? "",
     cover: r.cover_url || "",
     category: r.categories?.name ?? "Article",
-    author: r.profiles?.full_name ?? "Editorial Team",
-    affiliation: r.profiles?.institution ?? "",
+    author: r.authors || r.profiles?.full_name || "Editorial Team",
+    affiliation: r.affiliation || r.profiles?.institution || "",
     readTime: r.read_time ?? 5,
     views: String(r.views ?? 0),
     date: fmtDate(r.published_at),
@@ -129,7 +131,7 @@ export async function fetchPublishedArticles(limit?: number): Promise<DBArticle[
   let q = supabase
     .from("articles")
     .select(
-      "id,slug,title,abstract,content,author_bio,cover_url,read_time,views,pdf_url,published_at,page_start,page_end,categories(name),profiles(full_name,institution),issues(volume,issue_number)",
+      "id,slug,title,abstract,content,author_bio,cover_url,read_time,views,pdf_url,published_at,page_start,page_end,authors,affiliation,categories(name),profiles(full_name,institution),issues(volume,issue_number)",
     )
     .eq("status", "published")
     .order("published_at", { ascending: false });
@@ -147,7 +149,7 @@ export async function searchArticles(term: string, limit: number = 50): Promise<
   const { data } = await supabase
     .from("articles")
     .select(
-      "id,slug,title,abstract,content,author_bio,cover_url,read_time,views,pdf_url,published_at,page_start,page_end,categories(name),profiles(full_name,institution),issues(volume,issue_number)",
+      "id,slug,title,abstract,content,author_bio,cover_url,read_time,views,pdf_url,published_at,page_start,page_end,authors,affiliation,categories(name),profiles(full_name,institution),issues(volume,issue_number)",
     )
     .eq("status", "published")
     .or(`title.ilike.${cleanTerm},abstract.ilike.${cleanTerm}`)
@@ -162,7 +164,7 @@ export async function fetchArticleBySlug(slug: string): Promise<DBArticle | null
   const { data } = await supabase
     .from("articles")
     .select(
-      "id,slug,title,abstract,content,author_bio,cover_url,read_time,views,pdf_url,published_at,page_start,page_end,categories(name),profiles(full_name,institution),issues(volume,issue_number)",
+      "id,slug,title,abstract,content,author_bio,cover_url,read_time,views,pdf_url,published_at,page_start,page_end,authors,affiliation,categories(name),profiles(full_name,institution),issues(volume,issue_number)",
     )
     .eq("slug", slug)
     .eq("status", "published")

@@ -2,12 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { 
-  getLocalStorageClaims, 
-  updateLocalStorageClaimStatus, 
-  updateLocalStorageClaimNotes, 
-  MOCK_PROFILES 
-} from "@/lib/paymentStorage";
 import { logSimulatedEmail } from "@/lib/notificationLogs";
 import { 
   Check, 
@@ -83,7 +77,6 @@ function AdminMemberships() {
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
   const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
-  const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [receiptUrls, setReceiptUrls] = useState<Record<string, string>>({});
 
   const loadData = async () => {
@@ -100,9 +93,10 @@ function AdminMemberships() {
       if (claimsErr) throw claimsErr;
       claimsData = (remoteClaims || []) as PaymentClaim[];
     } catch (err: any) {
-      console.warn("Supabase membership payments fetch failed, falling back to local storage:", err);
-      setIsOfflineMode(true);
-      claimsData = getLocalStorageClaims() as PaymentClaim[];
+      toast.error(`Failed to load membership claims: ${err.message || err}`);
+      setClaims([]);
+      setLoading(false);
+      return;
     }
 
     try {
@@ -127,25 +121,14 @@ function AdminMemberships() {
         }
       }
 
-      // Merge / fallback with MOCK_PROFILES for any missing profiles
       userIds.forEach((uid) => {
         if (!profilesMap[uid] || !profilesMap[uid].full_name) {
-          const mockProf = MOCK_PROFILES[uid];
-          if (mockProf) {
-            profilesMap[uid] = {
-              id: uid,
-              full_name: mockProf.full_name,
-              institution: mockProf.institution,
-              country: mockProf.country
-            };
-          } else {
-            profilesMap[uid] = {
-              id: uid,
-              full_name: "Agri Researcher",
-              institution: "Agricultural Research Center",
-              country: "India"
-            };
-          }
+          profilesMap[uid] = {
+            id: uid,
+            full_name: "Agri Researcher",
+            institution: "Agricultural Research Center",
+            country: "India"
+          };
         }
       });
 
@@ -213,26 +196,6 @@ function AdminMemberships() {
       }
     }
     
-    if (isOfflineMode) {
-      try {
-        updateLocalStorageClaimStatus(id, status, notes, memberId);
-        toast.success(`Claim status updated to ${status} (Local Storage)`);
-        
-        // Log simulated email dispatch
-        const profile = MOCK_PROFILES[claim.user_id] || { full_name: "Test Author" };
-        logSimulatedEmail(
-          status === "approved" ? "Membership Verified" : "Membership Rejected",
-          profile.full_name,
-          `Dear ${profile.full_name},\n\nYour offline bank/UPI transfer payment claim for the ${claim.plan.toUpperCase()} Membership plan has been reviewed and ${status.toUpperCase()}.\n\n${status === "approved" ? `Your sequential Member ID is: ${memberId}. You can now download your certificate and submit manuscripts in your author dashboard.` : `Moderator feedback: ${notes || "None provided"}`}\n\nWarm regards,\nDr. Dileep Kumar Dangi\nEditor-in-Chief\nAgri Popular Article Magazine`
-        );
-
-        loadData();
-      } catch (err: any) {
-        toast.error("Failed to update status in local storage");
-      }
-      return;
-    }
-    
     try {
       const updatePayload: any = { 
         status, 
@@ -277,7 +240,7 @@ function AdminMemberships() {
 
       logSimulatedEmail(
         status === "approved" ? "Membership Verified" : "Membership Rejected",
-        authorName,
+        claim.user_id,
         `Dear ${authorName},\n\nYour online membership verification claim for the ${claim.plan.toUpperCase()} Membership plan has been reviewed and ${status.toUpperCase()}.\n\n${status === "approved" ? `Your sequential Member ID is: ${memberId || getClaimMemberId({ notes })}. You can now download your certificate and submit manuscripts in your author dashboard.` : `Moderator feedback: ${notes || "None provided"}`}\n\nWarm regards,\nDr. Dileep Kumar Dangi\nEditor-in-Chief\nAgri Popular Article Magazine`
       );
 
@@ -288,23 +251,6 @@ function AdminMemberships() {
   };
 
   const handleSaveNotes = async (id: string, notes: string) => {
-    if (isOfflineMode) {
-      try {
-        updateLocalStorageClaimNotes(id, notes);
-        toast.success("Notes saved successfully (Local Storage)");
-        setClaims((prev) =>
-          prev
-            ? prev.map((c) =>
-                c.id === id ? { ...c, notes, updated_at: new Date().toISOString() } : c
-              )
-            : null
-        );
-      } catch (err: any) {
-        toast.error("Failed to save notes in local storage");
-      }
-      return;
-    }
-    
     try {
       const { error } = await supabase
         .from("membership_payments")
@@ -387,17 +333,6 @@ function AdminMemberships() {
 
   return (
     <div className="space-y-6">
-      {isOfflineMode && (
-        <div className="bg-orange/5 border border-orange/20 p-4 rounded flex items-start gap-3 shadow-sm">
-          <AlertCircle className="h-5 w-5 text-orange shrink-0 mt-0.5 font-bold" />
-          <div>
-            <h3 className="font-display text-sm text-ink font-bold">Offline Local Storage Mode Active</h3>
-            <p className="text-xs text-foreground/80 mt-1 leading-relaxed">
-              Remote database table <code className="bg-orange/10 px-1 py-0.5 rounded font-mono text-xs text-orange">membership_payments</code> was not detected. All claim audits and approvals are stored in local storage for local demonstration.
-            </p>
-          </div>
-        </div>
-      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl text-ink">Membership Claims</h2>

@@ -1,4 +1,6 @@
-import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,66 +21,6 @@ import {
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  beforeLoad: async ({ location }) => {
-    // Skip on SSR — auth session lives in localStorage and isn't available
-    // during prerender. The client re-runs beforeLoad after hydration.
-    if (typeof window === "undefined") {
-      return { role: undefined };
-    }
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw redirect({
-        to: "/auth",
-        search: { redirect: location.pathname + location.search + location.hash },
-      });
-    }
-
-    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
-
-    const list = (roles || []).map((r) => r.role);
-    const isAdmin = list.includes("admin");
-    const isModerator = list.includes("moderator");
-
-    if (!isAdmin && !isModerator) {
-      // Check if there are any admins in the system
-      const { count } = await supabase
-        .from("user_roles")
-        .select("id", { count: "exact", head: true })
-        .eq("role", "admin");
-
-      if (count === 0) {
-        if (location.pathname === "/admin" || location.pathname === "/admin/") {
-          return { role: null };
-        }
-      }
-
-      throw redirect({
-        to: "/dashboard",
-        replace: true,
-      });
-    }
-
-    const role = isAdmin ? "admin" : "moderator";
-
-    if (role === "moderator") {
-      const allowedPaths = ["/admin/queue", "/admin/memberships"];
-      const isPathAllowed = allowedPaths.some(
-        (p) => location.pathname === p || location.pathname.startsWith(p + "/"),
-      );
-      if (!isPathAllowed) {
-        throw redirect({
-          to: "/admin/queue",
-          replace: true,
-        });
-      }
-    }
-
-    return { role };
-  },
   component: AdminLayout,
   head: () => ({
     meta: [
@@ -117,11 +59,38 @@ const items: {
 ];
 
 function AdminLayout() {
-  const { role } = Route.useRouteContext() as { role: EditorRole | null | undefined };
+  const { user, isAdmin, isModerator, loading } = useAuth();
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
 
-  // On server rendering or before hydration completes, show checking access
-  if (typeof window === "undefined" || role === undefined) {
+  const role: EditorRole | null = isAdmin ? "admin" : isModerator ? "moderator" : null;
+
+  useEffect(() => {
+    if (!loading && typeof window !== "undefined") {
+      if (!user) {
+        navigate({
+          to: "/auth",
+          search: {
+            redirect: window.location.pathname + window.location.search + window.location.hash,
+          },
+        });
+      } else if (role === "moderator") {
+        const allowedPaths = ["/admin/queue", "/admin/memberships"];
+        const isPathAllowed = allowedPaths.some(
+          (p) => window.location.pathname === p || window.location.pathname.startsWith(p + "/"),
+        );
+        if (!isPathAllowed) {
+          navigate({
+            to: "/admin/queue",
+            replace: true,
+          });
+        }
+      }
+    }
+  }, [user, role, loading, navigate]);
+
+  // On server rendering or while client auth is resolving, show checking access
+  if (typeof window === "undefined" || loading) {
     return (
       <>
         <SiteHeader />

@@ -12,21 +12,30 @@ import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import ScrollToTop from "@/components/site/ScrollToTop";
 
+import { AlertTriangle, Home, RefreshCw } from "lucide-react";
+
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-5xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+    <div className="flex min-h-[70vh] items-center justify-center bg-background px-4 py-16">
+      <div className="max-w-md text-center bg-paper border border-rule p-8 sm:p-10 rounded-sm shadow-sm">
+        <div className="eyebrow text-orange">404 Error</div>
+        <h1 className="font-display text-3xl md:text-4xl mt-2 text-navy font-bold">Page Not Found</h1>
+        <div className="rule-thick my-4 mx-auto max-w-[50px]" />
+        <p className="text-sm text-foreground/75 leading-relaxed">
+          The publication page or article you are looking for does not exist, has been renamed, or has been archived.
         </p>
-        <div className="mt-6">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="btn-orange text-xs"
           >
-            Go home
+            <Home className="h-3.5 w-3.5 mr-1.5 inline" /> Return to Homepage
+          </Link>
+          <Link
+            to="/archives"
+            className="text-xs uppercase tracking-wider font-semibold text-primary hover:text-orange transition-colors font-sans py-2.5 px-4 border border-rule bg-white"
+          >
+            Browse Archives
           </Link>
         </div>
       </div>
@@ -35,34 +44,39 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
+  console.error("Application Error:", error);
   const router = useRouter();
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+    <div className="flex min-h-[70vh] items-center justify-center bg-background px-4 py-16">
+      <div className="max-w-md text-center bg-paper border border-rule p-8 sm:p-10 rounded-sm shadow-sm">
+        <div className="h-12 w-12 rounded-full bg-orange/10 text-orange grid place-items-center mx-auto mb-3">
+          <AlertTriangle className="h-6 w-6" />
+        </div>
+        <div className="eyebrow text-orange">Notice</div>
+        <h1 className="font-display text-2xl md:text-3xl mt-2 text-navy font-bold">
+          Unable to Load Content
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <div className="rule-thick my-4 mx-auto max-w-[50px]" />
+        <p className="text-sm text-foreground/75 leading-relaxed">
+          We encountered an unexpected issue while loading this page. Please try refreshing or return to the magazine homepage.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="btn-orange text-xs cursor-pointer inline-flex items-center"
           >
-            Try again
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" /> Try Again
           </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+          <Link
+            to="/"
+            className="text-xs uppercase tracking-wider font-semibold text-primary hover:text-orange transition-colors font-sans py-2.5 px-4 border border-rule bg-white inline-flex items-center"
           >
-            Go home
-          </a>
+            <Home className="h-3.5 w-3.5 mr-1.5" /> Homepage
+          </Link>
         </div>
       </div>
     </div>
@@ -158,11 +172,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" style={{ scrollPaddingTop: "140px" }}>
+    <html lang="en" style={{ scrollPaddingTop: "140px" }} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {children}
         <Scripts />
       </body>
@@ -170,14 +184,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { AuthProvider } from "@/context/AuthContext";
+import { WhatsAppButton } from "@/components/site/WhatsAppButton";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <Toaster />
-      <ScrollToTop />
+      <AuthProvider>
+        <Outlet />
+        <Toaster position="top-right" richColors closeButton />
+        <WhatsAppButton />
+        <ScrollToTop />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

@@ -1,7 +1,7 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getLocalStorageClaims, MOCK_PROFILES, PaymentClaim } from "@/lib/paymentStorage";
+import type { PaymentClaim } from "@/lib/paymentStorage";
 import { getClaimMemberId } from "./_authenticated.admin.memberships";
 import { Printer, ArrowLeft, Loader2, Award, ShieldCheck } from "lucide-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
@@ -98,29 +98,7 @@ function MembershipCertificate() {
         return;
       }
 
-      // 1. Local (offline) claim — only if it belongs to the signed-in user
-      const localClaims = getLocalStorageClaims();
-      const localClaim = localClaims.find(
-        (c) => c.id === claimId && c.user_id === currentUser.id,
-      );
-
-      if (localClaim) {
-        const profile = MOCK_PROFILES[localClaim.user_id] || {
-          full_name: "Dr. Anand Kumar",
-          institution: "Indian Agricultural Research Institute (IARI)",
-          country: "India",
-        };
-        setData({
-          claim: localClaim,
-          authorName: profile.full_name,
-          institution: profile.institution,
-          country: profile.country,
-        });
-        setLoading(false);
-        return;
-      }
-
-      // 2. Fallback to Supabase remote fetch
+      // Claims are only ever read from the database: browser-stored claims can be forged.
       try {
         const { data: dbClaim, error: claimErr } = await supabase
           .from("membership_payments")

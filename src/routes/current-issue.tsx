@@ -1,4 +1,4 @@
-import { createFileRoute, Link, ErrorComponent, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, ErrorComponent, useRouter, type ErrorComponentProps } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchIssues, fetchPublishedArticles, articlePdf, type DBArticle } from "@/lib/data";
@@ -28,24 +28,7 @@ export const Route = createFileRoute("/current-issue")({
       : [{ title: "Current Issue — The Agriculture Popular Article Magazine" }],
     links: [{ rel: "canonical", href: "https://agriculturemagazine.in/current-issue" }],
   }),
-  errorComponent: ({ error }) => {
-    const router = useRouter();
-    return (
-      <>
-        <SiteHeader />
-        <main id="main-content" className="container-editorial py-24">
-          <ErrorComponent error={error} />
-          <button
-            onClick={() => router.invalidate()}
-            className="mt-6 px-4 py-2 bg-[var(--orange)] text-navy text-sm font-semibold uppercase tracking-wider"
-          >
-            Retry
-          </button>
-        </main>
-        <SiteFooter />
-      </>
-    );
-  },
+  errorComponent: CurrentIssueError,
   notFoundComponent: () => (
     <>
       <SiteHeader />
@@ -325,6 +308,25 @@ function CurrentIssue() {
             </div>
           </div>
         </section>
+      </main>
+      <SiteFooter />
+    </>
+  );
+}
+
+function CurrentIssueError({ error }: ErrorComponentProps) {
+  const router = useRouter();
+  return (
+    <>
+      <SiteHeader />
+      <main id="main-content" className="container-editorial py-24">
+        <ErrorComponent error={error} />
+        <button
+          onClick={() => router.invalidate()}
+          className="mt-6 px-4 py-2 bg-[var(--orange)] text-navy text-sm font-semibold uppercase tracking-wider"
+        >
+          Retry
+        </button>
       </main>
       <SiteFooter />
     </>

@@ -21,8 +21,9 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 import { useGlobalSiteContent } from "@/hooks/useSiteContent";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.webp";
 import { z } from "zod";
 
 const NavItemSchema = z.object({
@@ -99,8 +100,8 @@ const iconFor = (label: string) => {
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const [signedIn, setSignedIn] = useState(false);
-  const [editorRole, setEditorRole] = useState<"admin" | "moderator" | "author" | null>(null);
+  const { user, editorRole } = useAuth();
+  const signedIn = !!user;
   const [q, setQ] = useState("");
   const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -136,30 +137,6 @@ export function SiteHeader() {
     setOpen(false);
   };
 
-  useEffect(() => {
-    const loadRole = async (userId: string | null) => {
-      if (!userId) {
-        setEditorRole(null);
-        return;
-      }
-      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-      const list = (data || []).map((r) => r.role);
-      if (list.includes("admin")) setEditorRole("admin");
-      else if (list.includes("moderator")) setEditorRole("moderator");
-      else if (list.includes("author")) setEditorRole("author");
-      else setEditorRole(null);
-    };
-    supabase.auth.getSession().then(({ data }) => {
-      setSignedIn(!!data.session);
-      loadRole(data.session?.user.id ?? null);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSignedIn(!!s);
-      loadRole(s?.user.id ?? null);
-    });
-    return () => sub.subscription.unsubscribe();
-  }, []);
-
   // Smart header: hide on scroll down, show on scroll up (public pages only).
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -187,13 +164,18 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isAdmin, open]);
 
+  const issnText = getFooter("legal", "eissn")
+    ? `E-ISSN: ${getFooter("legal", "eissn")}`
+    : getFooter("legal", "pissn")
+      ? `ISSN: ${getFooter("legal", "pissn")}`
+      : "ISSN: Applied for";
+
   return (
     <header
       className={`sticky top-0 z-40 bg-background border-b border-rule transform-gpu will-change-transform transition-transform duration-300 motion-reduce:transition-none ${
         hidden ? "-translate-y-full" : "translate-y-0"
       } ${scrolled ? "shadow-[0_2px_8px_-4px_rgba(0,0,0,0.15)]" : ""}`}
     >
-
       {/* Skip-to-content — visible on keyboard focus only */}
       <a
         href="#main-content"
@@ -202,58 +184,48 @@ export function SiteHeader() {
         Skip to main content
       </a>
 
-      {/* ISSN identification strip — visible globally, required by ISSN India */}
-      <div className="bg-primary/[0.06] border-b border-primary/10 py-0.5 md:py-1 px-4 text-center">
-        <span className="block truncate text-[10px] md:text-xs uppercase tracking-[0.12em] md:tracking-[0.2em] font-semibold text-foreground/60 font-sans">
-          {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
-          {getHeader("branding", "title_line2") || "Popular Article Magazine"} ·{" "}
-          <span className="text-orange">
-            {getFooter("legal", "eissn")
-              ? `E-ISSN: ${getFooter("legal", "eissn")}`
-              : getFooter("legal", "pissn")
-                ? `ISSN: ${getFooter("legal", "pissn")}`
-                : "ISSN: Applied for"}
-          </span>{" "}
-          · Published Monthly · Online · India
-        </span>
-      </div>
-
-
       {/* Utility bar */}
       <div className="bg-navy text-white text-xs">
-        <div className="container-editorial flex items-center justify-between min-h-[44px]">
-          <a
-            href={`tel:${getHeader("topbar", "phone")}`}
-            className="flex items-center gap-2 text-orange font-medium"
-          >
-            <Phone className="h-3.5 w-3.5" />
-            {getHeader("topbar", "phone")}
-          </a>
-          <div className="flex items-center gap-5">
-            <Link to="/" className="hover:text-orange transition-colors hidden sm:inline">
+        <div className="container-editorial flex items-center justify-between min-h-[32px] py-0.5">
+          <div className="flex items-center gap-3 min-w-0">
+            <a
+              href={`tel:${getHeader("topbar", "phone") || "+91 9509164410"}`}
+              className="flex items-center gap-1.5 text-orange font-medium hover:brightness-110 shrink-0"
+            >
+              <Phone className="h-3.5 w-3.5" />
+              <span>{getHeader("topbar", "phone") || "+91 9509164410"}</span>
+            </a>
+            <span className="text-white/40">|</span>
+            <span className="truncate text-orange/90 font-semibold">
+              {issnText}
+              <span className="hidden lg:inline font-normal text-white/70"> · Published Monthly · Online · India</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="hover:text-orange transition-colors hidden md:inline">
               Home
             </Link>
-            <Link to="/about" className="hover:text-orange transition-colors hidden sm:inline">
+            <Link to="/about" className="hover:text-orange transition-colors hidden md:inline">
               About
             </Link>
-            <Link to="/contact" className="hover:text-orange transition-colors hidden sm:inline">
+            <Link to="/contact" className="hover:text-orange transition-colors hidden md:inline">
               Contact
             </Link>
-            <span className="hidden sm:inline w-px h-4 bg-white/20" />
+            <span className="hidden md:inline w-px h-3.5 bg-white/20" />
             <a
-              href={`mailto:${getHeader("topbar", "email")}`}
+              href={`mailto:${getHeader("topbar", "email") || "dkdkdangi@gmail.com"}`}
               aria-label="Email"
               className="hover:text-orange flex items-center gap-1.5"
             >
               <Mail className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{getHeader("topbar", "email")}</span>
+              <span className="hidden sm:inline">{getHeader("topbar", "email") || "dkdkdangi@gmail.com"}</span>
             </a>
           </div>
         </div>
       </div>
 
       {/* Logo + search + Special Issue */}
-      <div className="container-editorial flex items-center justify-between gap-6 py-3 md:py-4">
+      <div className="container-editorial flex items-center justify-between gap-6 py-2">
         <Link to="/" className="flex items-center gap-3 shrink-0">
           <img
             src={getHeader("branding", "logo_url") || logo}
@@ -264,7 +236,7 @@ export function SiteHeader() {
             }
             width={140}
             height={140}
-            className="h-10 md:h-14 w-auto"
+            className="h-10 md:h-12 w-auto"
           />
           <div className="hidden sm:block leading-tight">
             <div className="font-display font-bold text-navy text-base md:text-lg">
@@ -281,7 +253,7 @@ export function SiteHeader() {
 
         <form
           onSubmit={submitSearch}
-          className="hidden md:flex flex-1 min-w-[260px] max-w-[560px] h-12 items-center border-2 border-rule focus-within:border-orange overflow-hidden bg-paper rounded-sm"
+          className="hidden md:flex flex-1 min-w-[260px] max-w-[560px] h-10 items-center border-2 border-rule focus-within:border-orange overflow-hidden bg-paper rounded-sm"
         >
           <input
             type="search"
@@ -370,7 +342,7 @@ export function SiteHeader() {
                           }
                         : undefined
                     }
-                    className={`relative flex items-center gap-1.5 px-4 py-4 font-condensed uppercase tracking-[0.08em] text-xs font-medium transition-colors duration-200 ${
+                    className={`relative flex items-center gap-1.5 px-4 py-3 font-condensed uppercase tracking-[0.08em] text-xs font-medium transition-colors duration-200 ${
                       active ? "text-orange" : "text-white/90 hover:text-orange"
                     }`}
                   >
@@ -429,7 +401,7 @@ export function SiteHeader() {
           </ul>
           <Link
             to="/submit"
-            className="hidden xl:inline-flex items-center gap-1.5 px-4 py-4 font-condensed uppercase tracking-[0.08em] text-[12px] font-semibold text-navy bg-orange hover:brightness-110 transition"
+            className="hidden xl:inline-flex items-center gap-1.5 px-4 py-3 font-condensed uppercase tracking-[0.08em] text-[12px] font-semibold text-navy bg-orange hover:brightness-110 transition"
           >
             <Send className="h-3.5 w-3.5" />
             Submit Article

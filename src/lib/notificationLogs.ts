@@ -1,3 +1,5 @@
+import { sendNotificationEmail } from "@/lib/email.functions";
+
 export interface EmailLog {
   id: string;
   timestamp: string;
@@ -6,8 +8,13 @@ export interface EmailLog {
   payload: string;
 }
 
+// Sends a real email via the server (see email.functions.ts) and keeps a copy in this
+// browser's notification log. `recipient` is "editor", a user id, or an email address.
 export function logSimulatedEmail(type: string, recipient: string, payload: string) {
   if (typeof window === "undefined") return;
+  sendNotificationEmail({ data: { to: recipient, subject: type, body: payload } }).catch((err) =>
+    console.error("Failed to send notification email:", err),
+  );
   try {
     const raw = localStorage.getItem("system_email_logs");
     const logs: EmailLog[] = raw ? JSON.parse(raw) : [];
