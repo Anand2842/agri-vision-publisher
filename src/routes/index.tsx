@@ -120,7 +120,7 @@ function Hero({ deadline, latest }: { deadline: string; latest: DBArticle[] }) {
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               to="/submit"
-              className="inline-flex items-center gap-2 bg-orange text-navy font-semibold px-6 py-3 rounded-sm hover:bg-primary hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 bg-orange text-ink font-semibold px-6 py-3 rounded-sm hover:bg-primary hover:text-white transition-colors"
             >
               Submit your article <ArrowRight className="h-4 w-4" />
             </Link>

@@ -36,7 +36,7 @@ export const Route = createFileRoute("/articles/$slug")({
     meta: loaderData
       ? [
         { title: `${loaderData.a.title} — The Agriculture Popular Article Magazine` },
-        { name: "description", content: loaderData.a.abstract },
+        { name: "description", content: metaDescription(loaderData.a.abstract) },
         { property: "og:title", content: loaderData.a.title },
         { property: "og:description", content: loaderData.a.abstract },
         { property: "og:image", content: absoluteUrl(loaderData.a.cover) },
@@ -101,21 +101,34 @@ function Article() {
   const articleSchema = a
     ? JSON.stringify({
       "@context": "https://schema.org",
-      "@type": "Article",
+      "@type": "ScholarlyArticle",
       headline: a.title,
       description: a.abstract,
-      image: a.cover,
-      author: {
+      image: a.cover ? absoluteUrl(a.cover) : undefined,
+      author: citationAuthors(a).map((name) => ({
         "@type": "Person",
-        name: a.author,
+        name,
         ...(a.affiliation
           ? { affiliation: { "@type": "Organization", name: a.affiliation } }
           : {}),
-      },
+      })),
       datePublished: a.publishedAt,
+      ...(a.volume && a.issueNumber
+        ? {
+            isPartOf: {
+              "@type": "PublicationIssue",
+              issueNumber: a.issueNumber,
+              isPartOf: {
+                "@type": "PublicationVolume",
+                volumeNumber: a.volume,
+                isPartOf: { "@type": "Periodical", name: siteTitle, url: "https://agriculturemagazine.in" },
+              },
+            },
+          }
+        : {}),
       publisher: {
-        "@type": "Person",
-        name: "Dr. Dileep Kumar",
+        "@type": "Organization",
+        name: siteTitle,
         url: "https://agriculturemagazine.in",
         logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp",
       },
@@ -369,6 +382,11 @@ function pdfDownloadHref(href: string, slug: string) {
   return href.includes("/storage/v1/object/public/")
     ? `${href}${href.includes("?") ? "&" : "?"}download=${encodeURIComponent(`${slug}.pdf`)}`
     : href;
+}
+
+// Search results show ~155 characters; cut at a word boundary.
+function metaDescription(text: string) {
+  return text.length <= 158 ? text : `${text.slice(0, 155).replace(/\s+\S*$/, "")}…`;
 }
 
 function absoluteUrl(url: string) {
