@@ -405,3 +405,14 @@
     text-decoration: underline;
   }
 }
+
+/* Print / "Save as PDF" of article pages: white paper, figures kept whole. */
+@media print {
+  body {
+    background: #fff !important;
+  }
+  .article-content figure,
+  .article-content img {
+    break-inside: avoid;
+  }
+}

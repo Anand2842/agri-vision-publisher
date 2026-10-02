@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchArticleBySlug, fetchPublishedArticles, articlePdf, type DBArticle } from "@/lib/data";
-import { Bookmark, Share2, Download, Quote, Clock, Eye } from "lucide-react";
+import { Bookmark, Share2, Download, Quote, Clock, Eye, Printer, FileText, BookOpen, ExternalLink } from "lucide-react";
+import logo from "@/assets/logo.webp";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import DOMPurify from "isomorphic-dompurify";
 
@@ -83,6 +84,8 @@ function Article() {
     " " +
     (getHeader("branding", "title_line2") || "Popular Article Magazine");
   const pdfHref = articlePdf(a.pdfPath);
+  const [view, setView] = useState<"read" | "pdf">("read");
+  const citation = `${a.author} (${a.date}). ${a.title}. ${siteTitle}${a.volume ? `, Vol. ${a.volume}` : ""}${a.issueNumber ? `, No. ${a.issueNumber}` : ""}.`;
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const onShare = async () => {
     if (navigator.share) {
@@ -134,9 +137,24 @@ function Article() {
           dangerouslySetInnerHTML={{ __html: escapeJsonLd(articleSchema) }}
         />
       )}
-      <SiteHeader />
+      <div className="print:hidden">
+        <SiteHeader />
+      </div>
       <main id="main-content">
-        <header className="container-editorial pt-16 pb-12">
+        {/* Letterhead, only when printing / saving as PDF */}
+        <div className="hidden print:flex items-center gap-3 border-b-2 border-ink pb-3 mb-6">
+          <img src={logo} alt="" width={48} height={48} className="h-12 w-12" />
+          <div className="flex-1">
+            <div className="font-display text-lg leading-tight">{siteTitle}</div>
+            <div className="text-xs">
+              {a.volume ? `Vol. ${a.volume}` : ""}
+              {a.issueNumber ? `, No. ${a.issueNumber}` : ""}
+              {a.date ? ` · ${a.date}` : ""} · ISSN: Applied for
+            </div>
+          </div>
+          <div className="text-xs">agriculturemagazine.in</div>
+        </div>
+        <header className="container-editorial pt-16 pb-12 print:pt-0 print:pb-6">
           <div className="max-w-3xl mx-auto text-center">
             <div className="eyebrow">{a.category}</div>
             <h1 className="font-display text-2xl md:text-3xl mt-5 text-ink leading-[1.05]">
@@ -148,10 +166,10 @@ function Article() {
               <span>{a.affiliation}</span>
               <span>·</span>
               <span>{a.date}</span>
-              <span className="inline-flex items-center gap-1">
+              <span className="inline-flex items-center gap-1 print:hidden">
                 <Clock className="h-3 w-3" /> {a.readTime} min
               </span>
-              <span className="inline-flex items-center gap-1">
+              <span className="inline-flex items-center gap-1 print:hidden">
                 <Eye className="h-3 w-3" /> {a.views}
               </span>
             </div>
@@ -190,21 +208,74 @@ function Article() {
           </div>
         </header>
 
-        <div className="container-editorial">
-          <img
-            src={a.cover || "/placeholder.svg"}
-            alt={a.title}
-            width={1600}
-            height={900}
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = "/placeholder.svg";
-            }}
-            className="w-full max-h-[500px] aspect-[4/5] sm:aspect-[16/9] object-cover border border-rule rounded-sm bg-paper"
-          />
+        <div className="container-editorial print:hidden">
+          <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-2">
+            {pdfHref ? (
+              <>
+                <div className="inline-flex rounded-sm border border-rule p-0.5" role="tablist">
+                  <button
+                    role="tab"
+                    aria-selected={view === "read"}
+                    onClick={() => setView("read")}
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm rounded-sm ${view === "read" ? "bg-navy text-white" : "text-foreground/75 hover:text-primary"}`}
+                  >
+                    <BookOpen className="h-4 w-4" /> Read online
+                  </button>
+                  <button
+                    role="tab"
+                    aria-selected={view === "pdf"}
+                    onClick={() => setView("pdf")}
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm rounded-sm ${view === "pdf" ? "bg-navy text-white" : "text-foreground/75 hover:text-primary"}`}
+                  >
+                    <FileText className="h-4 w-4" /> View PDF
+                  </button>
+                </div>
+                <a
+                  href={pdfDownloadHref(pdfHref, a.slug)}
+                  download={`${a.slug}.pdf`}
+                  className="inline-flex items-center gap-1.5 bg-orange text-white px-4 py-2.5 text-sm rounded-sm hover:bg-primary transition-colors"
+                >
+                  <Download className="h-4 w-4" /> Download PDF
+                </a>
+              </>
+            ) : (
+              <button
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-1.5 border border-rule px-4 py-2.5 text-sm rounded-sm hover:border-orange hover:text-orange transition-colors"
+              >
+                <Printer className="h-4 w-4" /> Print / Save as PDF
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="container-editorial grid md:grid-cols-12 gap-12 mt-14">
-          <aside className="md:col-span-1 md:sticky md:top-36 self-start flex flex-col gap-3 text-muted-foreground">
+        {pdfHref && view === "pdf" && (
+          <div className="container-editorial mt-8 print:hidden">
+            <object
+              data={pdfHref}
+              type="application/pdf"
+              aria-label={`PDF of ${a.title}`}
+              className="w-full h-[85vh] border border-rule rounded-sm bg-paper"
+            >
+              <div className="p-10 text-center text-sm text-muted-foreground">
+                This browser can't show the PDF inside the page.
+              </div>
+            </object>
+            <div className="mt-2 text-center text-xs">
+              <a
+                href={pdfHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-primary hover:text-orange"
+              >
+                <ExternalLink className="h-3.5 w-3.5" /> Open the PDF in a new tab
+              </a>
+            </div>
+          </div>
+        )}
+
+        <div className={`container-editorial grid md:grid-cols-12 gap-12 mt-14 print:mt-0 print:block ${view === "pdf" ? "hidden" : ""}`}>
+          <aside className="md:col-span-1 md:sticky md:top-36 self-start flex flex-col gap-3 text-muted-foreground print:hidden">
             <button
               onClick={onShare}
               className="p-2 hover:text-primary"
@@ -212,25 +283,8 @@ function Article() {
             >
               <Share2 className="h-4 w-4" />
             </button>
-            {pdfHref ? (
-              <a
-                href={pdfHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 hover:text-primary"
-                aria-label="Download PDF"
-              >
-                <Download className="h-4 w-4" />
-              </a>
-            ) : (
-              <span className="p-2 opacity-30" aria-label="PDF unavailable">
-                <Download className="h-4 w-4" />
-              </span>
-            )}
             <button
-              onClick={() =>
-                navigator.clipboard?.writeText(`${a.author} (${a.date}). ${a.title}. ${siteTitle}.`)
-              }
+              onClick={() => navigator.clipboard?.writeText(citation)}
               className="p-2 hover:text-primary"
               aria-label="Copy citation"
             >
@@ -254,7 +308,12 @@ function Article() {
               <p className="drop-cap text-lg leading-[1.65] text-foreground/85">{a.abstract}</p>
             )}
 
-            <div className="rule-thin mt-16 pt-8">
+            {/* Citation footer, only when printing / saving as PDF */}
+            <div className="hidden print:block mt-8 border-t border-ink pt-2 text-xs">
+              Cite as: {citation} Available at https://agriculturemagazine.in/articles/{a.slug}
+            </div>
+
+            <div className="rule-thin mt-16 pt-8 print:hidden">
               <div className="eyebrow">About the author</div>
               <div className="flex items-start gap-4 mt-4">
                 <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center font-display text-primary text-lg">
@@ -274,7 +333,7 @@ function Article() {
               </div>
             </div>
           </article>
-          <aside className="md:col-span-4">
+          <aside className="md:col-span-4 print:hidden">
             <div className="md:sticky md:top-36">
               <h2 className="eyebrow">Related</h2>
               <div className="rule-thick mt-3" />
@@ -295,12 +354,22 @@ function Article() {
           </aside>
         </div>
       </main>
-      <SiteFooter />
+      <div className="print:hidden">
+        <SiteFooter />
+      </div>
     </>
   );
 }
 
 const SITE = "https://agriculturemagazine.in";
+
+// Supabase Storage serves a file as an attachment when ?download=<name> is added;
+// the `download` attribute alone is ignored for files on another domain.
+function pdfDownloadHref(href: string, slug: string) {
+  return href.includes("/storage/v1/object/public/")
+    ? `${href}${href.includes("?") ? "&" : "?"}download=${encodeURIComponent(`${slug}.pdf`)}`
+    : href;
+}
 
 function absoluteUrl(url: string) {
   return url.startsWith("/") ? `${SITE}${url}` : url;

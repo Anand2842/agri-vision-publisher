@@ -1,11 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { adminKey, db, useAdminRefresh } from "@/lib/adminQuery";
 import { QueryState } from "@/components/admin/QueryState";
 import { toast } from "sonner";
-import { Trash2, Pencil, Plus, X, Upload } from "lucide-react";
+import { Trash2, Pencil, Plus, X, Upload, FileDown, Files } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/admin/articles")({
   component: AdminArticles,
@@ -57,6 +64,47 @@ function AdminArticles() {
   const refresh = useAdminRefresh();
   const [editing, setEditing] = useState<Partial<Article> | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [issueFilter, setIssueFilter] = useState("");
+  const [missingOnly, setMissingOnly] = useState(false);
+  const [bulkFiles, setBulkFiles] = useState<File[] | null>(null);
+
+  const visible = useMemo(
+    () =>
+      (rows ?? []).filter(
+        (r) => (!issueFilter || r.issue_id === issueFilter) && (!missingOnly || !r.pdf_url),
+      ),
+    [rows, issueFilter, missingOnly],
+  );
+  const missingCount = (rows ?? []).filter((r) => r.status === "published" && !r.pdf_url).length;
+
+  // Uploads a PDF and returns its public URL.
+  const storePdf = async (file: File, slug: string) => {
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      throw new Error(`${file.name} is not a PDF`);
+    }
+    const path = `articles/${slug}-${Date.now()}.pdf`;
+    await db(
+      supabase.storage
+        .from("article-pdfs")
+        .upload(path, file, { upsert: false, contentType: "application/pdf" }),
+    );
+    return supabase.storage.from("article-pdfs").getPublicUrl(path).data.publicUrl;
+  };
+
+  // Attach (or replace) the PDF of an article straight from the list.
+  const attachPdf = async (article: Article, file: File) => {
+    setUploading(true);
+    try {
+      const url = await storePdf(file, article.slug);
+      await db(supabase.from("articles").update({ pdf_url: url }).eq("id", article.id));
+      toast.success(`PDF attached to "${article.title}"`);
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const save = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -84,8 +132,8 @@ function AdminArticles() {
     const status = String(fd.get("status")) as "draft" | "published" | "archived";
     const content = String(fd.get("content") || "").trim();
     const pdfUrl = String(fd.get("pdf_url") || "").trim();
-    if (status === "published" && (!content || !pdfUrl)) {
-      toast.error("Published articles require both full text and a downloadable PDF.");
+    if (status === "published" && !content) {
+      toast.error("Published articles need the full text.");
       return;
     }
     const payload = {
@@ -115,6 +163,9 @@ function AdminArticles() {
     const { error } = await op;
     if (error) return toast.error(error.message);
     toast.success(editing?.id ? "Article updated" : "Article created");
+    if (status === "published" && !pdfUrl) {
+      toast.warning("No PDF yet: readers can only print the page until you upload one.");
+    }
     setEditing(null);
     refresh();
   };
@@ -165,14 +216,62 @@ function AdminArticles() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-ink">Articles</h1>
-        <button
-          onClick={() => setEditing({ status: "draft", read_time: 8 })}
-          className="bg-navy text-white px-4 py-2 text-xs uppercase tracking-wider flex items-center gap-2"
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href="/templates/article-letterhead-template.docx"
+            download
+            className="inline-flex items-center gap-2 border border-rule px-3 py-2 text-xs hover:border-orange"
+          >
+            <FileDown className="h-4 w-4" /> Word letterhead template
+          </a>
+          <label className="inline-flex items-center gap-2 border border-rule px-3 py-2 text-xs cursor-pointer hover:border-orange">
+            <Files className="h-4 w-4" /> Upload PDFs in bulk
+            <input
+              type="file"
+              accept="application/pdf"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                const files = Array.from(e.target.files ?? []);
+                e.target.value = "";
+                if (files.length) setBulkFiles(files);
+              }}
+            />
+          </label>
+          <button
+            onClick={() => setEditing({ status: "draft", read_time: 8 })}
+            className="bg-navy text-white px-4 py-2 text-xs uppercase tracking-wider flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" /> New article
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+        <select
+          value={issueFilter}
+          onChange={(e) => setIssueFilter(e.target.value)}
+          className="h-9 bg-background border border-rule px-3"
+          aria-label="Filter by issue"
         >
-          <Plus className="h-4 w-4" /> New article
-        </button>
+          <option value="">All issues</option>
+          {issues.map((i) => (
+            <option key={i.id} value={i.id}>
+              Vol {i.volume}, Issue {i.issue_number}
+            </option>
+          ))}
+        </select>
+        <label className="inline-flex items-center gap-2">
+          <input type="checkbox" checked={missingOnly} onChange={(e) => setMissingOnly(e.target.checked)} />
+          PDF missing only
+        </label>
+        {missingCount > 0 && (
+          <span className="text-xs text-amber-700">
+            {missingCount} published article{missingCount === 1 ? "" : "s"} without a PDF
+          </span>
+        )}
       </div>
 
       {editing && (
@@ -290,8 +389,10 @@ function AdminArticles() {
       <div className="mt-6 border border-rule overflow-x-auto">
         {rows === null ? (
           <QueryState query={query} />
-        ) : rows.length === 0 ? (
-          <div className="p-10 text-center text-muted-foreground">No articles yet.</div>
+        ) : visible.length === 0 ? (
+          <div className="p-10 text-center text-muted-foreground">
+            {rows.length === 0 ? "No articles yet." : "No articles match these filters."}
+          </div>
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-secondary/40 text-left">
@@ -303,7 +404,7 @@ function AdminArticles() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {visible.map((r) => (
                 <tr key={r.id} className="border-t border-rule">
                   <Td className="font-display text-ink">
                     {r.title}
@@ -319,8 +420,20 @@ function AdminArticles() {
                       <span className={r.content?.trim() ? "text-primary" : "text-destructive"}>{r.content?.trim() ? "Full text ready" : "Full text missing"}</span>
                       <span aria-hidden="true">·</span>
                       {r.pdf_url ? <a href={r.pdf_url} target="_blank" rel="noreferrer" className="text-primary underline">PDF ready</a> : <span className="text-destructive">PDF missing</span>}
+                      <label className={`inline-flex items-center gap-1 cursor-pointer text-navy hover:text-orange ${uploading ? "pointer-events-none opacity-50" : ""}`}>
+                        <Upload className="h-3.5 w-3.5" /> {r.pdf_url ? "Replace" : "Upload PDF"}
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            e.target.value = "";
+                            if (f) attachPdf(r, f);
+                          }}
+                        />
+                      </label>
                     </div>
-                    {r.status === "published" && (!r.content?.trim() || !r.pdf_url) && <div className="mt-1 text-xs font-semibold text-destructive">Not ISSN-ready</div>}
                   </Td>
                   <Td className="text-right whitespace-nowrap">
                     <IconBtn onClick={() => setEditing(r)}>
@@ -336,7 +449,124 @@ function AdminArticles() {
           </table>
         )}
       </div>
+
+      {bulkFiles && rows && (
+        <BulkPdfDialog
+          files={bulkFiles}
+          articles={rows}
+          onClose={() => setBulkFiles(null)}
+          upload={async (pairs) => {
+            let ok = 0;
+            for (const { file, article } of pairs) {
+              try {
+                const url = await storePdf(file, article.slug);
+                await db(supabase.from("articles").update({ pdf_url: url }).eq("id", article.id));
+                ok++;
+              } catch (e) {
+                toast.error(`${file.name}: ${e instanceof Error ? e.message : String(e)}`);
+              }
+            }
+            if (ok) toast.success(`${ok} PDF${ok === 1 ? "" : "s"} attached`);
+            refresh();
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+const fileKey = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/\.pdf$/, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+// Bulk upload: each PDF is matched to an article whose slug matches the file name
+// (e.g. precision-farming-western-rajasthan.pdf). The editor checks or fixes every
+// match before anything is uploaded.
+function BulkPdfDialog({
+  files,
+  articles,
+  onClose,
+  upload,
+}: {
+  files: File[];
+  articles: Article[];
+  onClose: () => void;
+  upload: (pairs: { file: File; article: Article }[]) => Promise<void>;
+}) {
+  const [choice, setChoice] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      files.map((f) => {
+        const key = fileKey(f.name);
+        const match =
+          articles.find((a) => a.slug === key) ?? articles.find((a) => key.includes(a.slug));
+        return [f.name, match?.id ?? ""];
+      }),
+    ),
+  );
+  const [busy, setBusy] = useState(false);
+  const pairs = files
+    .map((file) => ({ file, article: articles.find((a) => a.id === choice[file.name]) }))
+    .filter((p): p is { file: File; article: Article } => !!p.article);
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && !busy && onClose()}>
+      <DialogContent className="sm:max-w-[640px] bg-paper border-rule">
+        <DialogHeader>
+          <DialogTitle>Attach {files.length} PDF{files.length === 1 ? "" : "s"}</DialogTitle>
+        </DialogHeader>
+        <p className="text-xs text-muted-foreground">
+          Matched by file name. Check each one; files left on "Skip" are not uploaded.
+        </p>
+        <ul className="max-h-[50vh] overflow-y-auto divide-y divide-rule text-sm">
+          {files.map((f) => (
+            <li key={f.name} className="py-2 grid sm:grid-cols-2 gap-2 items-center">
+              <span className="truncate" title={f.name}>
+                {f.name}
+              </span>
+              <select
+                value={choice[f.name]}
+                onChange={(e) => setChoice({ ...choice, [f.name]: e.target.value })}
+                className="h-9 bg-background border border-rule px-2 text-sm"
+              >
+                <option value="">Skip</option>
+                {articles.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.title}
+                    {a.pdf_url ? " (replaces PDF)" : ""}
+                  </option>
+                ))}
+              </select>
+            </li>
+          ))}
+        </ul>
+        <DialogFooter>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onClose}
+            className="px-4 py-2 border border-rule text-xs uppercase tracking-wider disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={busy || pairs.length === 0}
+            onClick={async () => {
+              setBusy(true);
+              await upload(pairs);
+              setBusy(false);
+              onClose();
+            }}
+            className="px-4 py-2 bg-navy text-white text-xs uppercase tracking-wider disabled:opacity-50"
+          >
+            {busy ? "Uploading…" : `Upload ${pairs.length}`}
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

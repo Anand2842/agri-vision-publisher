@@ -8,7 +8,7 @@ export function WhatsAppButton() {
   const phoneFormatted = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
 
   return (
-    <aside aria-label="Quick Support" className="fixed bottom-6 right-6 z-40 flex items-center group">
+    <aside aria-label="Quick Support" className="print:hidden fixed bottom-6 right-6 z-40 flex items-center group">
       <a
         href={`https://wa.me/${phoneFormatted}?text=${encodeURIComponent(
           "Hello, I have a query regarding The Agriculture Popular Article Magazine."
