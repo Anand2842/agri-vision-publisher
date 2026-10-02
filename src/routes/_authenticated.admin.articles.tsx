@@ -23,6 +23,8 @@ type Article = {
   published_at: string | null;
   page_start: number | null;
   page_end: number | null;
+  authors: string | null;
+  affiliation: string | null;
 };
 type Issue = { id: string; volume: number; issue_number: number; title: string };
 type Cat = { id: string; name: string };
@@ -88,6 +90,8 @@ function AdminArticles() {
       title,
       slug,
       abstract: String(fd.get("abstract") || "") || null,
+      authors: String(fd.get("authors") || "").trim() || null,
+      affiliation: String(fd.get("affiliation") || "").trim() || null,
       content: content || null,
       cover_url: String(fd.get("cover_url") || "") || null,
       pdf_url: pdfUrl || null,
@@ -187,6 +191,16 @@ function AdminArticles() {
             required
             defaultValue={editing.title}
             className="sm:col-span-2"
+          />
+          <Field
+            name="authors"
+            label="Authors (comma-separated, as printed)"
+            defaultValue={editing.authors ?? ""}
+          />
+          <Field
+            name="affiliation"
+            label="Affiliation"
+            defaultValue={editing.affiliation ?? ""}
           />
           <Field name="slug" label="Slug (auto from title)" defaultValue={editing.slug} />
           <SelectField

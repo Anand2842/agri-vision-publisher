@@ -160,49 +160,47 @@ function AdminSubmissions() {
     if (!promotingSub) return;
     setIsPromoting(true);
     try {
-      let pdfUrl: string | null = null;
-      if (promotingSub.manuscript_path) {
-        toast.info("Transferring manuscript to public storage...");
-        const { data: blob, error: downloadError } = await supabase.storage
-          .from("manuscripts")
-          .download(promotingSub.manuscript_path);
-        if (downloadError) throw new Error(`Failed to download manuscript: ${downloadError.message}`);
-        const fileExt = promotingSub.manuscript_path.slice(promotingSub.manuscript_path.lastIndexOf("."));
-        const newPath = `promoted/${promotingSub.id}-${Date.now()}${fileExt}`;
-        let contentType = "application/octet-stream";
-        if (fileExt.toLowerCase() === ".pdf") contentType = "application/pdf";
-        else if (fileExt.toLowerCase() === ".docx")
-          contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        else if (fileExt.toLowerCase() === ".doc") contentType = "application/msword";
-        const { error: uploadError } = await supabase.storage
-          .from("article-pdfs")
-          .upload(newPath, blob, { contentType, upsert: true });
-        if (uploadError) throw new Error(`Failed to upload manuscript: ${uploadError.message}`);
-        const { data: publicUrlData } = supabase.storage.from("article-pdfs").getPublicUrl(newPath);
-        pdfUrl = publicUrlData.publicUrl;
-      }
+      // The manuscript (.doc/.docx) is not copied to public storage: readers need a typeset
+      // PDF, which editors attach on the Articles page.
+      const mainAuthor =
+        [promotingSub.salutation, promotingSub.author_name].filter(Boolean).join(" ") ||
+        (promotingSub.user_id ? profiles[promotingSub.user_id]?.full_name : promotingSub.guest_name) ||
+        null;
+      const authors = [mainAuthor, promotingSub.co_authors].filter(Boolean).join(", ") || null;
+      const affiliation = promotingSub.user_id
+        ? profiles[promotingSub.user_id]?.institution ?? null
+        : null;
       const wordCount = (promotingSub.content || "").trim().split(/\s+/).length || 5;
       const readTime = Math.max(1, Math.ceil(wordCount / 200));
-      const { error: insertError } = await supabase.from("articles").insert({
-        title: customTitle,
-        slug: customSlug || generateSlug(customTitle),
-        abstract: customAbstract || null,
-        content: promotingSub.content || "",
-        author_id: promotingSub.user_id,
-        category_id: selectedCategoryId || null,
-        issue_id: selectedIssueId || null,
-        status: "published" as const,
-        pdf_url: pdfUrl,
-        published_at: new Date().toISOString(),
-        read_time: readTime,
-      });
+      const { data: article, error: insertError } = await supabase
+        .from("articles")
+        .insert({
+          title: customTitle,
+          slug: customSlug || generateSlug(customTitle),
+          abstract: customAbstract || null,
+          content: promotingSub.content || "",
+          author_id: promotingSub.user_id,
+          authors,
+          affiliation,
+          category_id: selectedCategoryId || null,
+          issue_id: selectedIssueId || null,
+          status: "published" as const,
+          published_at: new Date().toISOString(),
+          read_time: readTime,
+        })
+        .select("id")
+        .single();
       if (insertError) throw insertError;
       const { error: updateError } = await supabase
         .from("submissions")
         .update({ status: "published" })
         .eq("id", promotingSub.id);
-      if (updateError) throw updateError;
-      toast.success("Successfully promoted submission to a published article!");
+      if (updateError) {
+        // Roll back so a retry doesn't create a duplicate article.
+        await supabase.from("articles").delete().eq("id", article.id);
+        throw updateError;
+      }
+      toast.success("Promoted to a published article. Attach the typeset PDF on the Articles page.");
       setPromotingSub(null);
       load();
     } catch (err) {

@@ -17,8 +17,10 @@ export type Database = {
       articles: {
         Row: {
           abstract: string | null
+          affiliation: string | null
           author_bio: string | null
           author_id: string | null
+          authors: string | null
           category_id: string | null
           content: string | null
           cover_url: string | null
@@ -37,8 +39,10 @@ export type Database = {
         }
         Insert: {
           abstract?: string | null
+          affiliation?: string | null
           author_bio?: string | null
           author_id?: string | null
+          authors?: string | null
           category_id?: string | null
           content?: string | null
           cover_url?: string | null
@@ -57,8 +61,10 @@ export type Database = {
         }
         Update: {
           abstract?: string | null
+          affiliation?: string | null
           author_bio?: string | null
           author_id?: string | null
+          authors?: string | null
           category_id?: string | null
           content?: string | null
           cover_url?: string | null
@@ -477,6 +483,7 @@ export type Database = {
     }
     Functions: {
       claim_admin_if_none: { Args: never; Returns: boolean }
+      increment_article_views: { Args: { article_id: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

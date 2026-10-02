@@ -36,6 +36,8 @@ CREATE POLICY "Users create own payments"
   ON public.membership_payments FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+-- Replay fix: 20260522210153 creates a policy with the same name.
+DROP POLICY IF EXISTS "Users view own payments" ON public.membership_payments;
 CREATE POLICY "Users view own payments"
   ON public.membership_payments FOR SELECT
   USING (auth.uid() = user_id
