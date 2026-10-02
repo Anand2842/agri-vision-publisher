@@ -1,15 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { ArrowRight, BadgeCheck, BookOpenCheck, CalendarClock, Globe2 } from "lucide-react";
 import { fetchPublishedArticles, type DBArticle } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { useSiteContent, fetchSeoMetadata } from "@/hooks/useSiteContent";
 import { ArticleGridSkeleton } from "@/components/site/Skeletons";
 import heroPaddyWebp from "@/assets/hero-paddy.webp";
-import heroTractorWebp from "@/assets/hero-tractor.webp";
-import heroWheatWebp from "@/assets/hero-wheat.webp";
-import heroFieldsWebp from "@/assets/hero-fields.webp";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -76,37 +73,7 @@ function Home() {
     <>
       <SiteHeader />
       <main id="main-content">
-        <HeroSlider />
-
-        {/* Submission Deadline Banner */}
-        <section className="bg-primary/5 border-b border-rule py-4">
-          <div className="container-editorial flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <span className="inline-flex items-center justify-center bg-orange text-navy text-xs uppercase tracking-wider font-semibold px-2 py-0.5 rounded-sm font-sans shrink-0">
-                Next Deadline
-              </span>
-              <p className="text-sm font-sans text-foreground/80 leading-normal">
-                Submissions for the upcoming monthly issue close on{" "}
-                <span className="text-primary font-bold font-display">{deadlineText}</span>.
-              </p>
-            </div>
-            <div className="flex gap-4 items-center shrink-0">
-              <Link
-                to="/submit"
-                className="text-xs uppercase tracking-wider font-semibold text-primary hover:text-orange transition-colors font-sans"
-              >
-                Submit Online →
-              </Link>
-              <span className="h-3 w-px bg-rule hidden sm:inline" />
-              <Link
-                to="/submission-guidelines"
-                className="text-xs uppercase tracking-wider font-semibold text-muted-foreground hover:text-ink transition-colors font-sans"
-              >
-                Author Guidelines
-              </Link>
-            </div>
-          </div>
-        </section>
+        <Hero deadline={deadlineText} latest={loaderData?.articles ?? []} />
 
         <Intro />
         <RecentBlogs initialArticles={loaderData?.articles} />
@@ -117,121 +84,105 @@ function Home() {
   );
 }
 
-function HeroSlider() {
-  const { get, getJson } = useSiteContent("home");
-  const slides = getJson<"hero", "slide_images", { img: string; alt: string }[]>(
-    "hero",
-    "slide_images",
-  );
-  const webpMap: Record<string, string> = {
-    ["/hero-tractor"]: heroTractorWebp,
-    ["/hero-paddy"]: heroPaddyWebp,
-    ["/hero-wheat"]: heroWheatWebp,
-    ["/hero-fields"]: heroFieldsWebp,
-  };
-  const [i, setI] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+const BENEFITS = [
+  { icon: Globe2, text: "Open access: farmers, students and scientists read your work free, with no paywall" },
+  { icon: BookOpenCheck, text: "Peer-reviewed by our editorial board, published monthly" },
+  { icon: BadgeCheck, text: "A citable article page and a certificate of publication for you" },
+];
 
-  useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      setPrefersReducedMotion(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (slides.length === 0 || paused || prefersReducedMotion) return;
-    const t = setInterval(() => setI((p) => (p + 1) % slides.length), 5500);
-    return () => clearInterval(t);
-  }, [slides.length, paused, prefersReducedMotion]);
-
-  if (slides.length === 0) {
-    return (
-      <section className="relative w-full overflow-hidden bg-navy aspect-[16/9] sm:aspect-[21/9] md:aspect-[2.4/1] max-h-[420px]">
-        <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-primary/30 animate-pulse" />
-        <div className="absolute inset-0 grid place-items-center">
-          <div className="text-white/60 font-display text-sm uppercase tracking-widest">
-            Loading featured stories…
-          </div>
-        </div>
-      </section>
-    );
-  }
+// Home hero: tells authors why to publish here and gives one clear next step.
+function Hero({ deadline, latest }: { deadline: string; latest: DBArticle[] }) {
+  const { getJson } = useSiteContent("home");
+  // Admin → Site Content → hero slide images: the first one is used as the photo.
+  const photo = getJson<"hero", "slide_images", { img: string; alt: string }[]>("hero", "slide_images")[0];
+  const issue = latest[0];
 
   return (
-    <section className="relative w-full overflow-hidden bg-navy aspect-[16/9] sm:aspect-[21/9] md:aspect-[2.4/1] max-h-[420px]">
-      {slides.map((s, idx) => {
-        const isCurrent = idx === i;
-        const isAdjacent =
-          idx === (i - 1 + slides.length) % slides.length || idx === (i + 1) % slides.length;
-        if (!isCurrent && !isAdjacent) return null;
-        const webpSrc = Object.entries(webpMap).find(([key]) => s.img.includes(key))?.[1];
-        return (
-          <picture key={idx}>
-            {webpSrc && <source srcSet={webpSrc} type="image/webp" />}
-            <img
-              src={s.img}
-              alt={s.alt}
-              width={1920}
-              height={1080}
-              loading={isCurrent ? "eager" : "lazy"}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1400ms] ${isCurrent ? "opacity-100" : "opacity-0"}`}
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-              }}
-            />
-          </picture>
-        );
-      })}
-      <div className="absolute inset-0 bg-black/15" />
-      <div className="absolute inset-x-0 bottom-10 md:bottom-14 flex flex-col items-center justify-end px-4">
-        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/60 to-transparent pointer-events-none hidden sm:block" />
-        <h1 className="sr-only sm:not-sr-only sm:relative font-display text-white text-lg sm:text-xl md:text-2xl text-center leading-tight drop-shadow-lg">
-          The Agriculture Popular Article Magazine
-        </h1>
-        <p className="relative mt-2 text-white/80 text-xs sm:text-sm md:text-base text-center font-sans max-w-2xl drop-shadow hidden sm:block">
-          Bridging research and practice in agriculture through peer-reviewed popular articles
-        </p>
-      </div>
+    <section className="border-b border-rule bg-paper">
+      <div className="container-editorial grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-14 items-center py-10 md:py-14">
+        <div>
+          <div className="eyebrow text-primary">Monthly · Peer-reviewed · Open access</div>
+          <h1 className="font-display text-3xl md:text-4xl lg:text-[2.75rem] text-ink leading-[1.1] mt-3">
+            Turn your agricultural research into an article people actually read
+          </h1>
+          <p className="mt-4 text-base md:text-lg text-foreground/75 leading-relaxed max-w-xl">
+            Publish a popular article in The Agriculture Popular Article Magazine and take your
+            work from the lab to the field.
+          </p>
+          <ul className="mt-6 space-y-3">
+            {BENEFITS.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-start gap-3 text-sm md:text-base text-foreground/85">
+                <Icon className="h-5 w-5 shrink-0 text-primary mt-0.5" aria-hidden="true" />
+                {text}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link
+              to="/submit"
+              className="inline-flex items-center gap-2 bg-orange text-navy font-semibold px-6 py-3 rounded-sm hover:bg-primary hover:text-white transition-colors"
+            >
+              Submit your article <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/current-issue"
+              className="inline-flex items-center gap-2 border border-ink/20 px-6 py-3 rounded-sm text-ink hover:border-primary hover:text-primary transition-colors"
+            >
+              Read the current issue
+            </Link>
+          </div>
+          <p className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-foreground/70">
+            <CalendarClock className="h-4 w-4 text-orange" aria-hidden="true" />
+            Next issue: submissions close <strong className="text-ink">{deadline}</strong>
+            <span aria-hidden="true">·</span>
+            <Link to="/submission-guidelines" className="text-primary hover:text-orange underline-offset-2 hover:underline">
+              Author guidelines
+            </Link>
+          </p>
+        </div>
 
-      <button
-        onClick={() => setI((p) => (p - 1 + slides.length) % slides.length)}
-        aria-label="Previous slide"
-        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 h-11 w-11 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur rounded-sm"
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </button>
-      <button
-        onClick={() => setI((p) => (p + 1) % slides.length)}
-        aria-label="Next slide"
-        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 h-11 w-11 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur rounded-sm"
-      >
-        <ChevronRight className="h-5 w-5" />
-      </button>
-      <button
-        onClick={() => setPaused(!paused)}
-        className="absolute bottom-4 right-4 z-20 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors"
-        aria-label={paused ? "Resume slideshow" : "Pause slideshow"}
-      >
-        {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-      </button>
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-        {slides.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setI(idx)}
-            aria-label={`Go to slide ${idx + 1}`}
-            aria-current={idx === i ? "true" : undefined}
-            className={`min-h-11 min-w-11 grid place-items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange rounded-full`}
-          >
-            <span
-              className={`block h-2 rounded-full transition-all ${idx === i ? "w-8 bg-white" : "w-2 bg-white/50"}`}
-            />
-          </button>
-        ))}
+        <div className="relative lg:pb-6">
+          <img
+            src={photo?.img || heroPaddyWebp}
+            alt={photo?.alt || "Paddy field"}
+            width={1200}
+            height={900}
+            fetchPriority="high"
+            className="hidden sm:block w-full aspect-[4/3] object-cover rounded-sm border border-rule"
+          />
+          {issue && (
+            <div className="sm:absolute sm:left-6 sm:right-6 sm:-bottom-6 lg:-left-8 lg:right-10 bg-background border border-rule rounded-sm shadow-lg p-5">
+              <div className="flex items-baseline justify-between gap-3">
+                <div className="eyebrow">Latest issue</div>
+                {issue.volume ? (
+                  <div className="text-xs text-muted-foreground">
+                    Vol. {issue.volume}, No. {issue.issueNumber}
+                    {issue.date ? ` · ${issue.date}` : ""}
+                  </div>
+                ) : null}
+              </div>
+              <ul className="mt-3 space-y-2">
+                {latest.slice(0, 3).map((a) => (
+                  <li key={a.slug}>
+                    <Link
+                      to="/articles/$slug"
+                      params={{ slug: a.slug }}
+                      className="font-display text-ink leading-snug hover:text-primary line-clamp-1"
+                    >
+                      {a.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/current-issue"
+                className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-orange"
+              >
+                See all articles <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
