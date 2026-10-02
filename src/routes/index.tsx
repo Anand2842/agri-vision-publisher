@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { ChevronLeft, ChevronRight, Pause, Play, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { fetchPublishedArticles, type DBArticle } from "@/lib/data";
 import { useEffect, useState } from "react";
 import { useSiteContent, fetchSeoMetadata } from "@/hooks/useSiteContent";
@@ -111,9 +111,6 @@ function Home() {
         <Intro />
         <RecentBlogs initialArticles={loaderData?.articles} />
         <VisionMission />
-        <Testimonials />
-        <Readership />
-        <Partners />
       </main>
       <SiteFooter />
     </>
@@ -153,7 +150,7 @@ function HeroSlider() {
 
   if (slides.length === 0) {
     return (
-      <section className="relative w-full overflow-hidden bg-navy aspect-[16/9] sm:aspect-[21/9] md:aspect-[2.4/1] max-h-[520px]">
+      <section className="relative w-full overflow-hidden bg-navy aspect-[16/9] sm:aspect-[21/9] md:aspect-[2.4/1] max-h-[420px]">
         <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-primary/30 animate-pulse" />
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-white/60 font-display text-sm uppercase tracking-widest">
@@ -165,7 +162,7 @@ function HeroSlider() {
   }
 
   return (
-    <section className="relative w-full overflow-hidden bg-navy aspect-[16/9] sm:aspect-[21/9] md:aspect-[2.4/1] max-h-[520px]">
+    <section className="relative w-full overflow-hidden bg-navy aspect-[16/9] sm:aspect-[21/9] md:aspect-[2.4/1] max-h-[420px]">
       {slides.map((s, idx) => {
         const isCurrent = idx === i;
         const isAdjacent =
@@ -402,13 +399,13 @@ function RecentBlogs({ initialArticles }: { initialArticles?: DBArticle[] }) {
                       )}
                     </span>
                   </div>
-                  <p className="mt-2.5 text-xs text-foreground/70 leading-relaxed line-clamp-2 flex-1">
+                  <p className="mt-2.5 text-xs text-foreground/70 leading-relaxed line-clamp-3">
                     {a.abstract}
                   </p>
                   <Link
                     to="/articles/$slug"
                     params={{ slug: a.slug }}
-                    className="mt-4 inline-flex items-center text-xs uppercase font-condensed tracking-wider font-semibold text-orange hover:text-navy transition-colors"
+                    className="mt-auto pt-4 inline-flex items-center text-xs uppercase font-condensed tracking-wider font-semibold text-orange hover:text-navy transition-colors"
                   >
                     Read Article →
                   </Link>
@@ -417,6 +414,11 @@ function RecentBlogs({ initialArticles }: { initialArticles?: DBArticle[] }) {
             ))}
           </div>
         )}
+        <div className="mt-8 text-center">
+          <Link to="/current-issue" className="btn-orange">
+            View All Articles in the Current Issue
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -434,160 +436,6 @@ function VisionMission() {
       <p className="max-w-3xl mx-auto text-center text-foreground/75 leading-relaxed text-base">
         {get("vision_mission", "body")}
       </p>
-    </section>
-  );
-}
-
-function Testimonials() {
-  const { get, getJson } = useSiteContent("home");
-  const testimonials = getJson<
-    "testimonials",
-    "items",
-    { quote: string; name: string; role: string }[]
-  >("testimonials", "items");
-  return (
-    <section className="bg-navy text-white py-12 md:py-16">
-      <div className="container-editorial">
-        <div className="hr-divider mb-10">
-          <h2 className="section-title text-xl md:text-2xl text-center text-white">
-            {get("testimonials", "heading")}
-          </h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-8">
-          {testimonials.map((t) => (
-            <blockquote
-              key={t.name}
-              className="relative bg-white/[0.04] border border-white/10 p-6 md:p-8"
-            >
-              <Quote className="absolute -top-3.5 left-6 h-9 w-9 text-orange bg-navy px-1" />
-              <p className="text-white/85 leading-relaxed text-sm md:text-base italic">"{t.quote}"</p>
-              <div className="mt-5 flex items-center gap-3.5">
-                <div className="h-10 w-10 rounded-full bg-orange/30 grid place-items-center font-display text-orange text-sm font-bold">
-                  {t.name
-                    .split(" ")
-                    .map((p) => p[0])
-                    .slice(0, 2)
-                    .join("")}
-                </div>
-                <div>
-                  <div className="font-display text-base font-semibold">{t.name}</div>
-                  <div className="text-[11px] text-white/60 uppercase tracking-widest font-condensed">
-                    {t.role}
-                  </div>
-                </div>
-              </div>
-            </blockquote>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Readership() {
-  const { get, getJson } = useSiteContent("home");
-  const readership = getJson<"readership", "items", { label: string; value: number }[]>(
-    "readership",
-    "items",
-  );
-  return (
-    <section className="container-editorial py-12 md:py-16">
-      <div className="hr-divider mb-10">
-        <h2 className="section-title text-xl md:text-2xl text-center">
-          {get("readership", "heading")}
-        </h2>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
-        {readership.map((s) => (
-          <Counter key={s.label} value={s.value} label={s.label} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function Counter({ value, label }: { value: number; label: string }) {
-  const [n, setN] = useState(0);
-  const [inView, setInView] = useState(false);
-  const [ref, setRef] = useState<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!ref) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.2 }
-    );
-    observer.observe(ref);
-    return () => observer.disconnect();
-  }, [ref]);
-
-  useEffect(() => {
-    if (!inView) return;
-    const start = performance.now();
-    const dur = 1400;
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - start) / dur);
-      setN(Math.floor(value * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }, [value, inView]);
-
-  return (
-    <div ref={setRef} className="p-4 bg-paper/60 border border-rule/60 rounded-sm">
-      <div className="font-display font-bold text-2xl md:text-3xl text-orange tabular-nums">
-        {n.toLocaleString()}+
-      </div>
-      <div className="mt-1.5 text-xs uppercase tracking-widest font-condensed text-navy font-semibold">
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function Partners() {
-  const { get, getJson } = useSiteContent("home");
-  const partners = getJson<"partners", "items", { name: string; logo_url?: string }[]>(
-    "partners",
-    "items",
-  );
-  return (
-    <section className="bg-paper border-t border-rule py-12 md:py-16">
-      <div className="container-editorial">
-        <div className="hr-divider mb-10">
-          <h2 className="section-title text-xl md:text-2xl text-center">
-            {get("partners", "heading")}
-          </h2>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5 items-center">
-          {partners.map((p, idx) => (
-            <div
-              key={p.name + "-" + idx}
-              className="aspect-[3/2] bg-white border border-rule grid place-items-center text-center p-3 hover-lift overflow-hidden rounded-sm"
-            >
-              {p.logo_url ? (
-                <img
-                  src={p.logo_url}
-                  alt={p.name}
-                  width={240}
-                  height={160}
-                  loading="lazy"
-                  className="max-h-full max-w-full object-contain"
-                />
-              ) : (
-                <span className="font-display text-navy text-sm md:text-base leading-tight font-semibold">
-                  {p.name}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }

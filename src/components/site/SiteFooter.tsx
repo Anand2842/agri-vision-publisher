@@ -128,6 +128,7 @@ export function SiteFooter() {
           </ul>
         </div>
       </div>
+      {(getFooter("legal", "eissn") || getFooter("legal", "pissn")) && (
       <div className="border-t border-white/10 bg-white/[0.03]">
         <div className="container-editorial py-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-xs uppercase tracking-[0.18em] text-white/80">
           {getFooter("legal", "eissn") && (
@@ -144,6 +145,7 @@ export function SiteFooter() {
           )}
         </div>
       </div>
+      )}
       <div className="border-t border-white/10">
         <div className="container-editorial py-6 flex flex-col md:flex-row justify-between text-xs text-white/60 gap-2">
           <div>

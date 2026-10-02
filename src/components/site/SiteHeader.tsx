@@ -184,28 +184,22 @@ export function SiteHeader() {
         Skip to main content
       </a>
 
-      {/* ISSN identification strip — visible on tablet/desktop */}
-      <div className="hidden sm:block bg-primary/[0.06] border-b border-primary/10 py-1 px-4 text-center">
-        <span className="block truncate text-xs uppercase tracking-[0.16em] font-semibold text-foreground/65 font-sans">
-          {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
-          {getHeader("branding", "title_line2") || "Popular Article Magazine"} ·{" "}
-          <span className="text-orange font-bold">{issnText}</span> · Published Monthly · Online · India
-        </span>
-      </div>
-
       {/* Utility bar */}
       <div className="bg-navy text-white text-xs">
-        <div className="container-editorial flex items-center justify-between min-h-[38px] py-1">
-          <div className="flex items-center gap-3">
+        <div className="container-editorial flex items-center justify-between min-h-[32px] py-0.5">
+          <div className="flex items-center gap-3 min-w-0">
             <a
               href={`tel:${getHeader("topbar", "phone") || "+91 9509164410"}`}
-              className="flex items-center gap-1.5 text-orange font-medium hover:brightness-110"
+              className="flex items-center gap-1.5 text-orange font-medium hover:brightness-110 shrink-0"
             >
               <Phone className="h-3.5 w-3.5" />
               <span>{getHeader("topbar", "phone") || "+91 9509164410"}</span>
             </a>
-            <span className="sm:hidden text-white/40">|</span>
-            <span className="sm:hidden text-orange/90 font-semibold">{issnText}</span>
+            <span className="text-white/40">|</span>
+            <span className="truncate text-orange/90 font-semibold">
+              {issnText}
+              <span className="hidden lg:inline font-normal text-white/70"> · Published Monthly · Online · India</span>
+            </span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/" className="hover:text-orange transition-colors hidden md:inline">
@@ -219,19 +213,19 @@ export function SiteHeader() {
             </Link>
             <span className="hidden md:inline w-px h-3.5 bg-white/20" />
             <a
-              href={`mailto:${getHeader("topbar", "email") || "theagricultureonline@gmail.com"}`}
+              href={`mailto:${getHeader("topbar", "email") || "dkdkdangi@gmail.com"}`}
               aria-label="Email"
               className="hover:text-orange flex items-center gap-1.5"
             >
               <Mail className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{getHeader("topbar", "email") || "theagricultureonline@gmail.com"}</span>
+              <span className="hidden sm:inline">{getHeader("topbar", "email") || "dkdkdangi@gmail.com"}</span>
             </a>
           </div>
         </div>
       </div>
 
       {/* Logo + search + Special Issue */}
-      <div className="container-editorial flex items-center justify-between gap-6 py-3 md:py-4">
+      <div className="container-editorial flex items-center justify-between gap-6 py-2">
         <Link to="/" className="flex items-center gap-3 shrink-0">
           <img
             src={getHeader("branding", "logo_url") || logo}
@@ -242,7 +236,7 @@ export function SiteHeader() {
             }
             width={140}
             height={140}
-            className="h-10 md:h-14 w-auto"
+            className="h-10 md:h-12 w-auto"
           />
           <div className="hidden sm:block leading-tight">
             <div className="font-display font-bold text-navy text-base md:text-lg">
@@ -259,7 +253,7 @@ export function SiteHeader() {
 
         <form
           onSubmit={submitSearch}
-          className="hidden md:flex flex-1 min-w-[260px] max-w-[560px] h-12 items-center border-2 border-rule focus-within:border-orange overflow-hidden bg-paper rounded-sm"
+          className="hidden md:flex flex-1 min-w-[260px] max-w-[560px] h-10 items-center border-2 border-rule focus-within:border-orange overflow-hidden bg-paper rounded-sm"
         >
           <input
             type="search"
@@ -348,7 +342,7 @@ export function SiteHeader() {
                           }
                         : undefined
                     }
-                    className={`relative flex items-center gap-1.5 px-4 py-4 font-condensed uppercase tracking-[0.08em] text-xs font-medium transition-colors duration-200 ${
+                    className={`relative flex items-center gap-1.5 px-4 py-3 font-condensed uppercase tracking-[0.08em] text-xs font-medium transition-colors duration-200 ${
                       active ? "text-orange" : "text-white/90 hover:text-orange"
                     }`}
                   >
@@ -407,7 +401,7 @@ export function SiteHeader() {
           </ul>
           <Link
             to="/submit"
-            className="hidden xl:inline-flex items-center gap-1.5 px-4 py-4 font-condensed uppercase tracking-[0.08em] text-[12px] font-semibold text-navy bg-orange hover:brightness-110 transition"
+            className="hidden xl:inline-flex items-center gap-1.5 px-4 py-3 font-condensed uppercase tracking-[0.08em] text-[12px] font-semibold text-navy bg-orange hover:brightness-110 transition"
           >
             <Send className="h-3.5 w-3.5" />
             Submit Article
