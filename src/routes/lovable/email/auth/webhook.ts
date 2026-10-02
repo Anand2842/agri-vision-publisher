@@ -9,11 +9,10 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 // Configuration
-const SITE_NAME = "Agri Insights Magazine"
+const SITE_NAME = "The Agriculture Popular Article Magazine"
 const SENDER_DOMAIN = "notify.agriupdates.online"
-const ROOT_DOMAIN = "agriupdates.online"
 const FROM_DOMAIN = "notify.agriupdates.online"
-const SITE_URL = `https://${ROOT_DOMAIN}`
+const SITE_URL = "https://agriculturemagazine.in"
 
 // The SDK handler owns verification, dispatch, and retry semantics; this file
 // owns only the email decisions: subjects, templates, and per-type props.
