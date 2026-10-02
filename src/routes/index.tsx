@@ -13,14 +13,23 @@ import heroFieldsWebp from "@/assets/hero-fields.webp";
 
 export const Route = createFileRoute("/")({
   component: Home,
-  loader: () => fetchSeoMetadata("home"),
+  loader: async () => {
+    const [seo, articles] = await Promise.all([
+      fetchSeoMetadata("home"),
+      fetchPublishedArticles(4).catch((err) => {
+        console.error("Failed to SSR-load published articles:", err);
+        return [] as DBArticle[];
+      }),
+    ]);
+    return { seo, articles };
+  },
   head: ({ loaderData }) => ({
-    meta: loaderData
+    meta: loaderData?.seo
       ? [
-          { title: loaderData.title },
-          { name: "description", content: loaderData.description },
-          { property: "og:title", content: loaderData.title },
-          { property: "og:description", content: loaderData.description },
+          { title: loaderData.seo.title },
+          { name: "description", content: loaderData.seo.description },
+          { property: "og:title", content: loaderData.seo.title },
+          { property: "og:description", content: loaderData.seo.description },
         ]
       : [{ title: "The Agriculture Popular Article Magazine" }],
     links: [{ rel: "canonical", href: "https://agriculturemagazine.in/" }],
@@ -58,6 +67,7 @@ function getDeadlineText() {
 }
 
 function Home() {
+  const loaderData = Route.useLoaderData();
   const { get } = useSiteContent("home");
   const cmsDeadline = get("banner", "deadline_date");
   const deadlineText = cmsDeadline || getDeadlineText();
@@ -99,7 +109,7 @@ function Home() {
         </section>
 
         <Intro />
-        <RecentBlogs />
+        <RecentBlogs initialArticles={loaderData?.articles} />
         <VisionMission />
         <Testimonials />
         <Readership />
@@ -124,8 +134,16 @@ function HeroSlider() {
   };
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
-  const prefersReducedMotion =
-    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setPrefersReducedMotion(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (slides.length === 0 || paused || prefersReducedMotion) return;
@@ -135,7 +153,7 @@ function HeroSlider() {
 
   if (slides.length === 0) {
     return (
-      <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
+      <section className="relative w-full overflow-hidden bg-navy aspect-[16/9] sm:aspect-[21/9] md:aspect-[2.4/1] max-h-[520px]">
         <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/90 to-primary/30 animate-pulse" />
         <div className="absolute inset-0 grid place-items-center">
           <div className="text-white/60 font-display text-sm uppercase tracking-widest">
@@ -147,7 +165,7 @@ function HeroSlider() {
   }
 
   return (
-    <section className="relative w-full overflow-hidden bg-navy aspect-[16/9]">
+    <section className="relative w-full overflow-hidden bg-navy aspect-[16/9] sm:aspect-[21/9] md:aspect-[2.4/1] max-h-[520px]">
       {slides.map((s, idx) => {
         const isCurrent = idx === i;
         const isAdjacent =
@@ -163,7 +181,7 @@ function HeroSlider() {
               width={1920}
               height={1080}
               loading={isCurrent ? "eager" : "lazy"}
-              className={`absolute inset-0 w-full h-full object-contain sm:object-cover transition-opacity duration-[1400ms] ${isCurrent ? "opacity-100" : "opacity-0"}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1400ms] ${isCurrent ? "opacity-100" : "opacity-0"}`}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = "none";
               }}
@@ -171,9 +189,9 @@ function HeroSlider() {
           </picture>
         );
       })}
-      <div className="absolute inset-0 bg-black/10" />
-      <div className="absolute inset-x-0 bottom-12 md:bottom-16 flex flex-col items-center justify-end px-4">
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent pointer-events-none hidden sm:block" />
+      <div className="absolute inset-0 bg-black/15" />
+      <div className="absolute inset-x-0 bottom-10 md:bottom-14 flex flex-col items-center justify-end px-4">
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/60 to-transparent pointer-events-none hidden sm:block" />
         <h1 className="sr-only sm:not-sr-only sm:relative font-display text-white text-lg sm:text-xl md:text-2xl text-center leading-tight drop-shadow-lg">
           The Agriculture Popular Article Magazine
         </h1>
@@ -182,18 +200,17 @@ function HeroSlider() {
         </p>
       </div>
 
-
       <button
         onClick={() => setI((p) => (p - 1 + slides.length) % slides.length)}
         aria-label="Previous slide"
-        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 h-11 w-11 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur"
+        className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 h-11 w-11 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur rounded-sm"
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
       <button
         onClick={() => setI((p) => (p + 1) % slides.length)}
         aria-label="Next slide"
-        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 h-11 w-11 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur"
+        className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 h-11 w-11 grid place-items-center bg-white/15 hover:bg-white/30 text-white backdrop-blur rounded-sm"
       >
         <ChevronRight className="h-5 w-5" />
       </button>
@@ -206,8 +223,6 @@ function HeroSlider() {
       </button>
       <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
         {slides.map((_, idx) => (
-          // dot button — tap-target expanded, inner pill is the visible indicator
-
           <button
             key={idx}
             onClick={() => setI(idx)}
@@ -228,98 +243,83 @@ function HeroSlider() {
 function Intro() {
   const { get } = useSiteContent("home");
   return (
-    <section className="container-editorial py-16 md:py-24">
+    <section className="container-editorial py-12 md:py-16">
       <div className="hr-divider mb-8">
         <h2 className="section-title text-xl md:text-2xl text-center">{get("intro", "heading")}</h2>
       </div>
-      <p className="max-w-4xl mx-auto text-center text-foreground/75 leading-relaxed text-base">
+      <p className="max-w-3xl mx-auto text-center text-foreground/75 leading-relaxed text-base md:text-lg">
         {get("intro", "body")}
       </p>
 
-      {/* ISSN Required Journal Particulars Table */}
-      <div className="max-w-3xl mx-auto mt-12 bg-paper border border-rule overflow-hidden">
-        <div className="bg-primary/5 py-3 border-b border-rule px-6">
-          <h3 className="font-display text-lg text-primary uppercase tracking-wider text-center">
-            Journal Particulars
-          </h3>
+      {/* Magazine Highlights Cards */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10 max-w-5xl mx-auto">
+        <div className="bg-paper border border-rule p-5 text-center hover-lift flex flex-col items-center">
+          <div className="h-10 w-10 rounded-full bg-primary/10 text-primary grid place-items-center mb-3 font-display font-bold text-base">
+            01
+          </div>
+          <h3 className="font-display text-navy font-bold text-base">Monthly Edition</h3>
+          <p className="text-xs text-foreground/70 mt-1.5 leading-relaxed">
+            Timely monthly publications bringing latest agricultural innovations and research to light.
+          </p>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left font-sans">
-            <tbody className="divide-y divide-rule/50">
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink w-1/3">Title</th>
-                <td className="py-3 px-6 text-foreground/80">
-                  The Agriculture Popular Article Magazine
-                </td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">Frequency</th>
-                <td className="py-3 px-6 text-foreground/80">Monthly</td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">ISSN</th>
-                <td className="py-3 px-6 text-foreground/80">Applied for</td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">Publisher name</th>
-                <td className="py-3 px-6 text-foreground/80">
-                  Dr. Dileep Kumar
-                </td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">Publisher address</th>
-                <td className="py-3 px-6 text-foreground/80">
-                  ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India
-                </td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">Starting Year</th>
-                <td className="py-3 px-6 text-foreground/80">2026</td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">Subject</th>
-                <td className="py-3 px-6 text-foreground/80">Agriculture and Allied Sciences</td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">Language</th>
-                <td className="py-3 px-6 text-foreground/80">English</td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">Publication Format</th>
-                <td className="py-3 px-6 text-foreground/80">Online</td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">Email Id</th>
-                <td className="py-3 px-6 text-foreground/80">
-                  <a href="mailto:dkdkdangi@gmail.com" className="text-primary hover:underline">
-                    dkdkdangi@gmail.com
-                  </a>
-                </td>
-              </tr>
-              <tr className="hover:bg-primary/5 transition-colors">
-                <th className="py-3 px-6 font-semibold text-ink">Mobile No.</th>
-                <td className="py-3 px-6 text-foreground/80">+91 9509164410</td>
-              </tr>
-            </tbody>
-          </table>
+
+        <div className="bg-paper border border-rule p-5 text-center hover-lift flex flex-col items-center">
+          <div className="h-10 w-10 rounded-full bg-primary/10 text-primary grid place-items-center mb-3 font-display font-bold text-base">
+            02
+          </div>
+          <h3 className="font-display text-navy font-bold text-base">Peer-Reviewed</h3>
+          <p className="text-xs text-foreground/70 mt-1.5 leading-relaxed">
+            Rigorous editorial review ensuring scientific accuracy and popular readership appeal.
+          </p>
+        </div>
+
+        <div className="bg-paper border border-rule p-5 text-center hover-lift flex flex-col items-center">
+          <div className="h-10 w-10 rounded-full bg-primary/10 text-primary grid place-items-center mb-3 font-display font-bold text-base">
+            03
+          </div>
+          <h3 className="font-display text-navy font-bold text-base">Open Access</h3>
+          <p className="text-xs text-foreground/70 mt-1.5 leading-relaxed">
+            Free and unrestricted access under CC BY-NC 4.0 for scientists, students, and farmers.
+          </p>
+        </div>
+
+        <div className="bg-paper border border-rule p-5 text-center hover-lift flex flex-col items-center">
+          <div className="h-10 w-10 rounded-full bg-primary/10 text-primary grid place-items-center mb-3 font-display font-bold text-base">
+            04
+          </div>
+          <h3 className="font-display text-navy font-bold text-base">Digital Certificates</h3>
+          <p className="text-xs text-foreground/70 mt-1.5 leading-relaxed">
+            Verifiable e-certificates issued for published authors and registered members.
+          </p>
         </div>
       </div>
 
-      <div className="mt-10 flex justify-center">
+      <div className="mt-8 flex flex-wrap justify-center items-center gap-4">
         <Link to="/about" className="btn-orange">
-          Know more
+          About The Magazine
+        </Link>
+        <Link
+          to="/about"
+          className="text-xs uppercase tracking-wider font-semibold text-primary hover:text-orange transition-colors font-sans py-2 px-4 border border-rule hover:border-orange bg-white"
+        >
+          View Journal Particulars →
         </Link>
       </div>
     </section>
   );
 }
 
-function RecentBlogs() {
-  const [articles, setArticles] = useState<DBArticle[]>([]);
-  const [loading, setLoading] = useState(true);
+function RecentBlogs({ initialArticles }: { initialArticles?: DBArticle[] }) {
+  const [articles, setArticles] = useState<DBArticle[]>(initialArticles ?? []);
+  const [loading, setLoading] = useState(!initialArticles || initialArticles.length === 0);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    if (initialArticles && initialArticles.length > 0) {
+      setArticles(initialArticles);
+      setLoading(false);
+      return;
+    }
     fetchPublishedArticles(4)
       .then((data) => {
         setArticles(data);
@@ -332,13 +332,13 @@ function RecentBlogs() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [initialArticles]);
 
   return (
-    <section className="bg-paper border-y border-rule py-16 md:py-24">
+    <section className="bg-paper border-y border-rule py-12 md:py-16">
       <div className="container-editorial">
-        <div className="hr-divider mb-12">
-          <h2 className="section-title text-xl md:text-2xl text-center">Recent Blogs</h2>
+        <div className="hr-divider mb-10">
+          <h2 className="section-title text-xl md:text-2xl text-center">Recent Articles</h2>
         </div>
 
         {loading ? (
@@ -352,23 +352,23 @@ function RecentBlogs() {
             No published articles found.
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-7">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {articles.slice(0, 4).map((a) => (
               <article
                 key={a.slug}
-                className="bg-white border border-rule hover-lift flex flex-col"
+                className="bg-white border border-rule hover-lift flex flex-col group overflow-hidden"
               >
                 <Link
                   to="/articles/$slug"
                   params={{ slug: a.slug }}
-                  className="block aspect-video overflow-hidden"
+                  className="block aspect-[16/10] overflow-hidden bg-muted"
                 >
                   <img
                     src={a.cover || "/placeholder.svg"}
                     alt={a.title}
                     width={800}
-                    height={450}
-                    className="w-full h-full object-cover border-b border-rule hover:scale-105 transition-transform duration-700"
+                    height={500}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                     onError={(e) => {
                       const t = e.currentTarget as HTMLImageElement;
@@ -376,23 +376,23 @@ function RecentBlogs() {
                     }}
                   />
                 </Link>
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="text-xs text-orange font-semibold uppercase tracking-wider">
+                <div className="p-5 flex flex-col flex-1">
+                  <div className="text-[11px] text-orange font-semibold uppercase tracking-wider">
                     {a.category}
                   </div>
-                  <h3 className="font-display text-lg md:text-xl mt-2 leading-tight text-navy">
+                  <h3 className="font-display text-base md:text-lg mt-1.5 font-bold leading-snug text-navy">
                     <Link
                       to="/articles/$slug"
                       params={{ slug: a.slug }}
-                      className="hover:text-orange transition-colors"
+                      className="hover:text-orange transition-colors line-clamp-2"
                     >
                       {a.title}
                     </Link>
                   </h3>
                   <div className="mt-2 text-xs text-muted-foreground font-sans leading-relaxed">
-                    <span className="font-medium text-foreground/80">{a.author}</span>
+                    <span className="font-medium text-foreground/85">{a.author}</span>
                     <br />
-                    <span className="inline-flex items-center gap-1 mt-0.5">
+                    <span className="inline-flex items-center gap-1 text-[11px] text-foreground/60 mt-0.5">
                       Vol. {a.volume} · Issue {a.issueNumber}
                       {(a.pageStart || a.pageEnd) && (
                         <span>
@@ -402,15 +402,15 @@ function RecentBlogs() {
                       )}
                     </span>
                   </div>
-                  <p className="mt-3 text-base text-foreground/70 leading-relaxed line-clamp-3 flex-1">
+                  <p className="mt-2.5 text-xs text-foreground/70 leading-relaxed line-clamp-2 flex-1">
                     {a.abstract}
                   </p>
                   <Link
                     to="/articles/$slug"
                     params={{ slug: a.slug }}
-                    className="mt-5 inline-flex items-center text-xs uppercase font-condensed tracking-widest text-orange hover:text-navy"
+                    className="mt-4 inline-flex items-center text-xs uppercase font-condensed tracking-wider font-semibold text-orange hover:text-navy transition-colors"
                   >
-                    Read More →
+                    Read Article →
                   </Link>
                 </div>
               </article>
@@ -425,13 +425,13 @@ function RecentBlogs() {
 function VisionMission() {
   const { get } = useSiteContent("home");
   return (
-    <section className="container-editorial py-16 md:py-24">
-      <div className="hr-divider mb-10">
+    <section className="container-editorial py-12 md:py-16">
+      <div className="hr-divider mb-8">
         <h2 className="section-title text-xl md:text-2xl text-center">
           {get("vision_mission", "heading")}
         </h2>
       </div>
-      <p className="max-w-4xl mx-auto text-center text-foreground/75 leading-relaxed text-base">
+      <p className="max-w-3xl mx-auto text-center text-foreground/75 leading-relaxed text-base">
         {get("vision_mission", "body")}
       </p>
     </section>
@@ -446,23 +446,23 @@ function Testimonials() {
     { quote: string; name: string; role: string }[]
   >("testimonials", "items");
   return (
-    <section className="bg-navy text-white py-16 md:py-24">
+    <section className="bg-navy text-white py-12 md:py-16">
       <div className="container-editorial">
-        <div className="hr-divider mb-14">
+        <div className="hr-divider mb-10">
           <h2 className="section-title text-xl md:text-2xl text-center text-white">
             {get("testimonials", "heading")}
           </h2>
         </div>
-        <div className="grid md:grid-cols-2 gap-10">
+        <div className="grid md:grid-cols-2 gap-8">
           {testimonials.map((t) => (
             <blockquote
               key={t.name}
-              className="relative bg-white/[0.04] border border-white/10 p-8 md:p-10"
+              className="relative bg-white/[0.04] border border-white/10 p-6 md:p-8"
             >
-              <Quote className="absolute -top-4 left-6 h-11 w-11 text-orange bg-navy px-1.5" />
-              <p className="text-white/85 leading-relaxed text-base italic">"{t.quote}"</p>
-              <div className="mt-6 flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-orange/30 grid place-items-center font-display text-orange">
+              <Quote className="absolute -top-3.5 left-6 h-9 w-9 text-orange bg-navy px-1" />
+              <p className="text-white/85 leading-relaxed text-sm md:text-base italic">"{t.quote}"</p>
+              <div className="mt-5 flex items-center gap-3.5">
+                <div className="h-10 w-10 rounded-full bg-orange/30 grid place-items-center font-display text-orange text-sm font-bold">
                   {t.name
                     .split(" ")
                     .map((p) => p[0])
@@ -470,8 +470,8 @@ function Testimonials() {
                     .join("")}
                 </div>
                 <div>
-                  <div className="font-display text-lg">{t.name}</div>
-                  <div className="text-xs text-white/60 uppercase tracking-widest font-condensed">
+                  <div className="font-display text-base font-semibold">{t.name}</div>
+                  <div className="text-[11px] text-white/60 uppercase tracking-widest font-condensed">
                     {t.role}
                   </div>
                 </div>
@@ -491,13 +491,13 @@ function Readership() {
     "items",
   );
   return (
-    <section className="container-editorial py-16 md:py-24">
-      <div className="hr-divider mb-14">
+    <section className="container-editorial py-12 md:py-16">
+      <div className="hr-divider mb-10">
         <h2 className="section-title text-xl md:text-2xl text-center">
           {get("readership", "heading")}
         </h2>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
         {readership.map((s) => (
           <Counter key={s.label} value={s.value} label={s.label} />
         ))}
@@ -508,22 +508,44 @@ function Readership() {
 
 function Counter({ value, label }: { value: number; label: string }) {
   const [n, setN] = useState(0);
+  const [inView, setInView] = useState(false);
+  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+
   useEffect(() => {
+    if (!ref) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(ref);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  useEffect(() => {
+    if (!inView) return;
     const start = performance.now();
-    const dur = 1500;
+    const dur = 1400;
     const tick = (t: number) => {
       const p = Math.min(1, (t - start) / dur);
       setN(Math.floor(value * (1 - Math.pow(1 - p, 3))));
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [value]);
+  }, [value, inView]);
+
   return (
-    <div>
+    <div ref={setRef} className="p-4 bg-paper/60 border border-rule/60 rounded-sm">
       <div className="font-display font-bold text-2xl md:text-3xl text-orange tabular-nums">
         {n.toLocaleString()}+
       </div>
-      <div className="mt-2 text-xs uppercase tracking-widest font-condensed text-navy">{label}</div>
+      <div className="mt-1.5 text-xs uppercase tracking-widest font-condensed text-navy font-semibold">
+        {label}
+      </div>
     </div>
   );
 }
@@ -535,18 +557,18 @@ function Partners() {
     "items",
   );
   return (
-    <section className="bg-paper border-t border-rule py-16">
+    <section className="bg-paper border-t border-rule py-12 md:py-16">
       <div className="container-editorial">
-        <div className="hr-divider mb-12">
+        <div className="hr-divider mb-10">
           <h2 className="section-title text-xl md:text-2xl text-center">
             {get("partners", "heading")}
           </h2>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-6 items-center">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5 items-center">
           {partners.map((p, idx) => (
             <div
               key={p.name + "-" + idx}
-              className="aspect-[3/2] bg-white border border-rule grid place-items-center text-center p-3 hover-lift overflow-hidden"
+              className="aspect-[3/2] bg-white border border-rule grid place-items-center text-center p-3 hover-lift overflow-hidden rounded-sm"
             >
               {p.logo_url ? (
                 <img

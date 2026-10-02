@@ -38,7 +38,7 @@ export function SiteFooter() {
       title: "Authors",
       links: [
         { label: "Submit Article", href: "/submit" },
-        { label: "Author Guidelines", href: "/author-guidelines" },
+        { label: "Author Guidelines", href: "/submission-guidelines" },
         { label: "Membership", href: "/membership" },
         { label: "Author Dashboard", href: "/dashboard" },
       ],

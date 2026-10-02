@@ -39,6 +39,8 @@ export const Route = createFileRoute("/membership")({
   }),
 });
 
+import { useAuth } from "@/context/AuthContext";
+
 type PlanId = "single" | "annual" | "lifetime" | "institute";
 
 function Membership() {
@@ -47,9 +49,8 @@ function Membership() {
   const [activeTab, setActiveTab] = useState<"upi" | "bank">("upi");
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
-  // Authentication states
-  const [session, setSession] = useState<Session | null>(null);
-  const [loadingSession, setLoadingSession] = useState(true);
+  // Authentication from shared context
+  const { session, loading: loadingSession } = useAuth();
 
   // Form states
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("annual");
@@ -61,32 +62,6 @@ function Membership() {
   const [claimId, setClaimId] = useState<string>("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Fetch session
-  useEffect(() => {
-    async function initSession() {
-      try {
-        const {
-          data: { session: activeSession },
-        } = await supabase.auth.getSession();
-        setSession(activeSession);
-      } catch (err) {
-        console.error("Error fetching session:", err);
-      } finally {
-        setLoadingSession(false);
-      }
-    }
-    initSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, activeSession) => {
-      setSession(activeSession);
-      setLoadingSession(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   // Update amount automatically when plan changes
   useEffect(() => {

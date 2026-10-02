@@ -46,13 +46,16 @@ const submitSchema = z.object({
 const MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED_EXT = [".doc", ".docx"];
 
+import { useAuth } from "@/context/AuthContext";
+
 function Submit() {
   const nav = useNavigate();
   const [cats, setCats] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [checkedAuth, setCheckedAuth] = useState(false);
+  const { user, loading: authLoading } = useAuth();
+  const userId = user?.id ?? null;
+  const checkedAuth = !authLoading;
   const [prefill, setPrefill] = useState<{ name: string; email: string }>({ name: "", email: "" });
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -62,25 +65,22 @@ function Submit() {
       .select("id,name")
       .order("name")
       .then(({ data }) => setCats(data || []));
-    supabase.auth.getUser().then(async ({ data }) => {
-      const uid = data.user?.id ?? null;
-      setUserId(uid);
-      setCheckedAuth(true);
-      if (uid) {
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", uid)
-          .maybeSingle();
-        setPrefill({ name: prof?.full_name || "", email: data.user?.email || "" });
-      }
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setUserId(s?.user?.id ?? null);
-      setCheckedAuth(true);
-    });
-    return () => sub.subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .maybeSingle()
+        .then(({ data: prof }) => {
+          setPrefill({ name: prof?.full_name || "", email: user.email || "" });
+        });
+    } else {
+      setPrefill({ name: "", email: "" });
+    }
+  }, [user]);
 
   const onFile = (f: File | null) => {
     if (!f) {

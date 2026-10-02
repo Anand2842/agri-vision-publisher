@@ -38,66 +38,18 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   }),
 });
 
+import { useAuth } from "@/context/AuthContext";
+
 type Submission = { id: string; title: string; status: string; plan: string; created_at: string };
 
 // PaymentClaim type is imported from @/lib/paymentStorage (single source of truth)
 
 function Dashboard() {
   const nav = useNavigate();
-  const [session, setSession] = useState<Session | null>(null);
-  const [loadingSession, setLoadingSession] = useState(true);
-  const [isStaff, setIsStaff] = useState(false);
+  const { session, isModerator: isStaff, loading: loadingSession, signOut } = useAuth();
   const [subs, setSubs] = useState<Submission[] | null>(null);
   const [payments, setPayments] = useState<PaymentClaim[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(true);
-
-  useEffect(() => {
-    async function initSession() {
-      try {
-        const {
-          data: { session: activeSession },
-        } = await supabase.auth.getSession();
-        setSession(activeSession);
-        if (activeSession) {
-          const { data: roles } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", activeSession.user.id);
-          const roleList = (roles || []).map((r) => r.role);
-          setIsStaff(roleList.includes("admin") || roleList.includes("moderator"));
-        }
-      } catch (err) {
-        console.error("Auth init error:", err);
-      } finally {
-        setLoadingSession(false);
-      }
-    }
-
-    initSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, activeSession) => {
-      setSession(activeSession);
-      if (activeSession) {
-        try {
-          const { data: roles } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", activeSession.user.id);
-          const roleList = (roles || []).map((r) => r.role);
-          setIsStaff(roleList.includes("admin") || roleList.includes("moderator"));
-        } catch (err) {
-          console.error("Auth change role fetch error:", err);
-        }
-      } else {
-        setIsStaff(false);
-      }
-      setLoadingSession(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const loadData = async () => {
     if (!session) return;
@@ -160,7 +112,6 @@ function Dashboard() {
     } else {
       setSubs([]);
       setPayments([]);
-      setIsStaff(false);
     }
   }, [session]);
 
@@ -213,7 +164,7 @@ function Dashboard() {
             )}
             <button
               onClick={async () => {
-                await supabase.auth.signOut();
+                await signOut();
                 nav({ to: "/" });
               }}
               className="text-sm text-foreground/70 hover:text-primary cursor-pointer"

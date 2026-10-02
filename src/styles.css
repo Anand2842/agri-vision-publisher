@@ -230,8 +230,7 @@
     font-family: var(--font-display);
     font-weight: 700;
     color: var(--color-navy);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: -0.01em;
   }
   .hr-divider {
     display: flex;

@@ -9,19 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as SubmissionGuidelinesRouteImport } from './routes/submission-guidelines'
 import { Route as StartupSpotlightRouteImport } from './routes/startup-spotlight'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as PublicationEthicsRouteImport } from './routes/publication-ethics'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PlagiarismPolicyRouteImport } from './routes/plagiarism-policy'
+import { Route as OpenAccessRouteImport } from './routes/open-access'
 import { Route as ModerateRouteImport } from './routes/moderate'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EditorialBoardRouteImport } from './routes/editorial-board'
 import { Route as CurrentIssueRouteImport } from './routes/current-issue'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthorGuidelinesRouteImport } from './routes/author-guidelines'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArchivesRouteImport } from './routes/archives'
 import { Route as AdvertiseRouteImport } from './routes/advertise'
@@ -46,6 +50,11 @@ import { Route as AuthenticatedAdminBackupsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminArticlesRouteImport } from './routes/_authenticated.admin.articles'
 import { Route as ApiPublicHooksBackupMirrorRouteImport } from './routes/api/public/hooks/backup-mirror'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubmitRoute = SubmitRouteImport.update({
   id: '/submit',
   path: '/submit',
@@ -76,9 +85,19 @@ const PublicationEthicsRoute = PublicationEthicsRouteImport.update({
   path: '/publication-ethics',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlagiarismPolicyRoute = PlagiarismPolicyRouteImport.update({
   id: '/plagiarism-policy',
   path: '/plagiarism-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpenAccessRoute = OpenAccessRouteImport.update({
+  id: '/open-access',
+  path: '/open-access',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModerateRoute = ModerateRouteImport.update({
@@ -109,6 +128,11 @@ const CurrentIssueRoute = CurrentIssueRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthorGuidelinesRoute = AuthorGuidelinesRouteImport.update({
+  id: '/author-guidelines',
+  path: '/author-guidelines',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -242,19 +266,23 @@ export interface FileRoutesByFullPath {
   '/advertise': typeof AdvertiseRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
+  '/author-guidelines': typeof AuthorGuidelinesRoute
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/faq': typeof FaqRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
+  '/open-access': typeof OpenAccessRoute
   '/plagiarism-policy': typeof PlagiarismPolicyRoute
+  '/privacy': typeof PrivacyRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
   '/submit': typeof SubmitRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/articles/$slug': typeof ArticlesSlugRoute
@@ -279,19 +307,23 @@ export interface FileRoutesByTo {
   '/advertise': typeof AdvertiseRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
+  '/author-guidelines': typeof AuthorGuidelinesRoute
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/faq': typeof FaqRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
+  '/open-access': typeof OpenAccessRoute
   '/plagiarism-policy': typeof PlagiarismPolicyRoute
+  '/privacy': typeof PrivacyRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
   '/submit': typeof SubmitRoute
+  '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/membership-cert/$claimId': typeof MembershipCertClaimIdRoute
@@ -317,19 +349,23 @@ export interface FileRoutesById {
   '/advertise': typeof AdvertiseRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
+  '/author-guidelines': typeof AuthorGuidelinesRoute
   '/contact': typeof ContactRoute
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/faq': typeof FaqRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
+  '/open-access': typeof OpenAccessRoute
   '/plagiarism-policy': typeof PlagiarismPolicyRoute
+  '/privacy': typeof PrivacyRoute
   '/publication-ethics': typeof PublicationEthicsRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/startup-spotlight': typeof StartupSpotlightRoute
   '/submission-guidelines': typeof SubmissionGuidelinesRoute
   '/submit': typeof SubmitRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/articles/$slug': typeof ArticlesSlugRoute
@@ -356,19 +392,23 @@ export interface FileRouteTypes {
     | '/advertise'
     | '/archives'
     | '/auth'
+    | '/author-guidelines'
     | '/contact'
     | '/current-issue'
     | '/editorial-board'
     | '/faq'
     | '/membership'
     | '/moderate'
+    | '/open-access'
     | '/plagiarism-policy'
+    | '/privacy'
     | '/publication-ethics'
     | '/search'
     | '/sitemap.xml'
     | '/startup-spotlight'
     | '/submission-guidelines'
     | '/submit'
+    | '/terms'
     | '/admin'
     | '/dashboard'
     | '/articles/$slug'
@@ -393,19 +433,23 @@ export interface FileRouteTypes {
     | '/advertise'
     | '/archives'
     | '/auth'
+    | '/author-guidelines'
     | '/contact'
     | '/current-issue'
     | '/editorial-board'
     | '/faq'
     | '/membership'
     | '/moderate'
+    | '/open-access'
     | '/plagiarism-policy'
+    | '/privacy'
     | '/publication-ethics'
     | '/search'
     | '/sitemap.xml'
     | '/startup-spotlight'
     | '/submission-guidelines'
     | '/submit'
+    | '/terms'
     | '/dashboard'
     | '/articles/$slug'
     | '/membership-cert/$claimId'
@@ -430,19 +474,23 @@ export interface FileRouteTypes {
     | '/advertise'
     | '/archives'
     | '/auth'
+    | '/author-guidelines'
     | '/contact'
     | '/current-issue'
     | '/editorial-board'
     | '/faq'
     | '/membership'
     | '/moderate'
+    | '/open-access'
     | '/plagiarism-policy'
+    | '/privacy'
     | '/publication-ethics'
     | '/search'
     | '/sitemap.xml'
     | '/startup-spotlight'
     | '/submission-guidelines'
     | '/submit'
+    | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/articles/$slug'
@@ -469,19 +517,23 @@ export interface RootRouteChildren {
   AdvertiseRoute: typeof AdvertiseRoute
   ArchivesRoute: typeof ArchivesRoute
   AuthRoute: typeof AuthRoute
+  AuthorGuidelinesRoute: typeof AuthorGuidelinesRoute
   ContactRoute: typeof ContactRoute
   CurrentIssueRoute: typeof CurrentIssueRoute
   EditorialBoardRoute: typeof EditorialBoardRoute
   FaqRoute: typeof FaqRoute
   MembershipRoute: typeof MembershipRoute
   ModerateRoute: typeof ModerateRoute
+  OpenAccessRoute: typeof OpenAccessRoute
   PlagiarismPolicyRoute: typeof PlagiarismPolicyRoute
+  PrivacyRoute: typeof PrivacyRoute
   PublicationEthicsRoute: typeof PublicationEthicsRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StartupSpotlightRoute: typeof StartupSpotlightRoute
   SubmissionGuidelinesRoute: typeof SubmissionGuidelinesRoute
   SubmitRoute: typeof SubmitRoute
+  TermsRoute: typeof TermsRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
   MembershipCertClaimIdRoute: typeof MembershipCertClaimIdRoute
   ArticleCertificateSubmissionIdRoute: typeof ArticleCertificateSubmissionIdRoute
@@ -490,6 +542,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/submit': {
       id: '/submit'
       path: '/submit'
@@ -532,11 +591,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicationEthicsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/plagiarism-policy': {
       id: '/plagiarism-policy'
       path: '/plagiarism-policy'
       fullPath: '/plagiarism-policy'
       preLoaderRoute: typeof PlagiarismPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/open-access': {
+      id: '/open-access'
+      path: '/open-access'
+      fullPath: '/open-access'
+      preLoaderRoute: typeof OpenAccessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/moderate': {
@@ -579,6 +652,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/author-guidelines': {
+      id: '/author-guidelines'
+      path: '/author-guidelines'
+      fullPath: '/author-guidelines'
+      preLoaderRoute: typeof AuthorGuidelinesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -797,19 +877,23 @@ const rootRouteChildren: RootRouteChildren = {
   AdvertiseRoute: AdvertiseRoute,
   ArchivesRoute: ArchivesRoute,
   AuthRoute: AuthRoute,
+  AuthorGuidelinesRoute: AuthorGuidelinesRoute,
   ContactRoute: ContactRoute,
   CurrentIssueRoute: CurrentIssueRoute,
   EditorialBoardRoute: EditorialBoardRoute,
   FaqRoute: FaqRoute,
   MembershipRoute: MembershipRoute,
   ModerateRoute: ModerateRoute,
+  OpenAccessRoute: OpenAccessRoute,
   PlagiarismPolicyRoute: PlagiarismPolicyRoute,
+  PrivacyRoute: PrivacyRoute,
   PublicationEthicsRoute: PublicationEthicsRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StartupSpotlightRoute: StartupSpotlightRoute,
   SubmissionGuidelinesRoute: SubmissionGuidelinesRoute,
   SubmitRoute: SubmitRoute,
+  TermsRoute: TermsRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
   MembershipCertClaimIdRoute: MembershipCertClaimIdRoute,
   ArticleCertificateSubmissionIdRoute: ArticleCertificateSubmissionIdRoute,
