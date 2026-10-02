@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { adminKey, db, useAdminRefresh } from "@/lib/adminQuery";
+import { QueryState } from "@/components/admin/QueryState";
 import { toast } from "sonner";
 import {
   CheckCircle2,
@@ -72,31 +75,26 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 export function QueueConsole() {
-  const [rows, setRows] = useState<Sub[] | null>(null);
   const [filter, setFilter] = useState<SubmissionStatus | "">("submitted");
   const [open, setOpen] = useState<string | null>(null);
   const [limit, setLimit] = useState(50);
-  const [hasMore, setHasMore] = useState(false);
+  const refresh = useAdminRefresh();
 
-  const load = async () => {
-    const { data, error } = await supabase
-      .from("submissions")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(limit + 1);
-    if (error) toast.error(error.message);
-    const results = (data || []) as Sub[];
-    if (results.length > limit) {
-      setHasMore(true);
-      setRows(results.slice(0, limit));
-    } else {
-      setHasMore(false);
-      setRows(results);
-    }
-  };
-  useEffect(() => {
-    load();
-  }, [limit]);
+  const query = useQuery({
+    queryKey: adminKey("queue", limit),
+    queryFn: () =>
+      db(
+        supabase
+          .from("submissions")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(limit + 1),
+      ),
+    placeholderData: (prev) => prev,
+  });
+  const results = (query.data ?? null) as Sub[] | null;
+  const hasMore = (results?.length ?? 0) > limit;
+  const rows = results ? results.slice(0, limit) : null;
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -131,9 +129,7 @@ export function QueueConsole() {
       </div>
 
       <div className="mt-6 border border-rule">
-        {rows === null && (
-          <div className="p-10 text-center text-muted-foreground">Loading submissions…</div>
-        )}
+        {rows === null && <QueryState query={query} label="Loading submissions…" />}
         {rows !== null && filtered.length === 0 && (
           <div className="p-10 text-center text-muted-foreground">
             No submissions in this status.
@@ -147,7 +143,7 @@ export function QueueConsole() {
                 s={s}
                 open={open === s.id}
                 onToggle={() => setOpen(open === s.id ? null : s.id)}
-                onChanged={load}
+                onChanged={refresh}
               />
             ))}
           </ul>

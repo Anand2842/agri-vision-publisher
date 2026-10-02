@@ -484,6 +484,17 @@ export type Database = {
     Functions: {
       claim_admin_if_none: { Args: never; Returns: boolean }
       increment_article_views: { Args: { article_id: string }; Returns: undefined }
+      promote_submission: {
+        Args: {
+          p_abstract: string
+          p_category_id: string | null
+          p_issue_id: string | null
+          p_slug: string
+          p_submission_id: string
+          p_title: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

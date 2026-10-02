@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { adminKey, db, useAdminRefresh } from "@/lib/adminQuery";
+import { promoteSubmission } from "@/lib/admin.functions";
+import { QueryState } from "@/components/admin/QueryState";
 import { toast } from "sonner";
 import { FileUp, Download, Search, CalendarDays, Users, Clock, CheckCircle2 } from "lucide-react";
 import { format, formatDistanceToNow, startOfDay, startOfWeek, startOfMonth } from "date-fns";
@@ -60,11 +65,46 @@ const generateSlug = (title: string) =>
   title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 function AdminSubmissions() {
-  const [rows, setRows] = useState<Sub[] | null>(null);
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const [cats, setCats] = useState<Cat[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
-  const [payments, setPayments] = useState<Record<string, Payment>>({});
+  const query = useQuery({
+    queryKey: adminKey("submissions"),
+    queryFn: async () => {
+      const [subs, issues, cats] = await Promise.all([
+        db(supabase.from("submissions").select("*").order("created_at", { ascending: false })),
+        db(supabase.from("issues").select("id,volume,issue_number,title").order("volume", { ascending: false })),
+        db(supabase.from("categories").select("id,name").order("name")),
+      ]);
+      const profiles: Record<string, Profile> = {};
+      const payments: Record<string, Payment> = {};
+      const userIds = Array.from(new Set(subs.map((s) => s.user_id).filter((v): v is string => !!v)));
+      if (userIds.length) {
+        const [profRows, payRows] = await Promise.all([
+          db(supabase.from("profiles").select("id,full_name,institution").in("id", userIds)),
+          db(
+            supabase
+              .from("membership_payments")
+              .select("user_id,status,plan,created_at")
+              .in("user_id", userIds)
+              .order("created_at", { ascending: false }),
+          ),
+        ]);
+        profRows.forEach((p) => (profiles[p.id] = p));
+        // Keep only the latest per user, preferring approved > pending
+        payRows.forEach((p) => {
+          const existing = payments[p.user_id];
+          if (!existing) payments[p.user_id] = p;
+          else if (existing.status !== "approved" && p.status === "approved") payments[p.user_id] = p;
+        });
+      }
+      return { subs: subs as Sub[], issues: issues as Issue[], cats: cats as Cat[], profiles, payments };
+    },
+  });
+  const refresh = useAdminRefresh();
+  const promote = useServerFn(promoteSubmission);
+  const rows = query.data?.subs ?? null;
+  const issues = query.data?.issues ?? [];
+  const cats = query.data?.cats ?? [];
+  const profiles = query.data?.profiles ?? {};
+  const payments = query.data?.payments ?? {};
   const [open, setOpen] = useState<string | null>(null);
 
   // Filters
@@ -82,51 +122,6 @@ function AdminSubmissions() {
   const [customTitle, setCustomTitle] = useState("");
   const [customAbstract, setCustomAbstract] = useState("");
 
-  const load = async () => {
-    const [subRes, issueRes, catRes] = await Promise.all([
-      supabase.from("submissions").select("*").order("created_at", { ascending: false }),
-      supabase.from("issues").select("id,volume,issue_number,title").order("volume", { ascending: false }),
-      supabase.from("categories").select("id,name").order("name"),
-    ]);
-
-    if (subRes.error) toast.error(subRes.error.message);
-    if (issueRes.error) toast.error(issueRes.error.message);
-    if (catRes.error) toast.error(catRes.error.message);
-
-    const subs = (subRes.data as Sub[]) || [];
-    setRows(subs);
-    setIssues((issueRes.data as Issue[]) || []);
-    setCats((catRes.data as Cat[]) || []);
-
-    const userIds = Array.from(new Set(subs.map((s) => s.user_id).filter((v): v is string => !!v)));
-    if (userIds.length) {
-      const [profRes, payRes] = await Promise.all([
-        supabase.from("profiles").select("id,full_name,institution").in("id", userIds),
-        supabase
-          .from("membership_payments")
-          .select("user_id,status,plan,created_at")
-          .in("user_id", userIds)
-          .order("created_at", { ascending: false }),
-      ]);
-      const profMap: Record<string, Profile> = {};
-      ((profRes.data as Profile[]) || []).forEach((p) => (profMap[p.id] = p));
-      setProfiles(profMap);
-
-      // Keep only the latest per user, preferring approved > pending
-      const payMap: Record<string, Payment> = {};
-      ((payRes.data as Payment[]) || []).forEach((p) => {
-        const existing = payMap[p.user_id];
-        if (!existing) payMap[p.user_id] = p;
-        else if (existing.status !== "approved" && p.status === "approved") payMap[p.user_id] = p;
-      });
-      setPayments(payMap);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
   useEffect(() => {
     if (promotingSub) {
       setCustomTitle(promotingSub.title);
@@ -135,74 +130,56 @@ function AdminSubmissions() {
       setCustomAbstract(promotingSub.abstract || "");
       setSelectedIssueId(issues.length > 0 ? issues[0].id : "");
     }
-  }, [promotingSub, issues]);
+    // Only when the dialog opens, so a background refetch doesn't reset what the editor typed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promotingSub]);
 
   const setStatus = async (id: string, status: string, notes?: string) => {
-    const { error } = await supabase
-      .from("submissions")
-      .update({
-        status: status as
-          | "submitted"
-          | "under_review"
-          | "revision_requested"
-          | "approved"
-          | "published"
-          | "rejected",
-        ...(notes != null ? { notes } : {}),
-      })
-      .eq("id", id);
-    if (error) return toast.error(error.message);
+    try {
+      await db(
+        supabase
+          .from("submissions")
+          .update({
+            status: status as
+              | "submitted"
+              | "under_review"
+              | "revision_requested"
+              | "approved"
+              | "published"
+              | "rejected",
+            ...(notes != null ? { notes } : {}),
+          })
+          .eq("id", id),
+      );
+    } catch (err) {
+      return toast.error(err instanceof Error ? err.message : "Update failed");
+    }
     toast.success("Updated");
-    load();
+    refresh();
   };
 
   const handlePromote = async () => {
     if (!promotingSub) return;
     setIsPromoting(true);
     try {
-      // The manuscript (.doc/.docx) is not copied to public storage: readers need a typeset
-      // PDF, which editors attach on the Articles page.
-      const mainAuthor =
-        [promotingSub.salutation, promotingSub.author_name].filter(Boolean).join(" ") ||
-        (promotingSub.user_id ? profiles[promotingSub.user_id]?.full_name : promotingSub.guest_name) ||
-        null;
-      const authors = [mainAuthor, promotingSub.co_authors].filter(Boolean).join(", ") || null;
-      const affiliation = promotingSub.user_id
-        ? profiles[promotingSub.user_id]?.institution ?? null
-        : null;
-      const wordCount = (promotingSub.content || "").trim().split(/\s+/).length || 5;
-      const readTime = Math.max(1, Math.ceil(wordCount / 200));
-      const { data: article, error: insertError } = await supabase
-        .from("articles")
-        .insert({
+      // Runs on the server as one transaction (article created + submission marked published),
+      // then emails the author. The manuscript (.doc/.docx) is not copied to public storage:
+      // readers need a typeset PDF, which editors attach on the Articles page.
+      const res = await promote({
+        data: {
+          submissionId: promotingSub.id,
           title: customTitle,
           slug: customSlug || generateSlug(customTitle),
           abstract: customAbstract || null,
-          content: promotingSub.content || "",
-          author_id: promotingSub.user_id,
-          authors,
-          affiliation,
-          category_id: selectedCategoryId || null,
-          issue_id: selectedIssueId || null,
-          status: "published" as const,
-          published_at: new Date().toISOString(),
-          read_time: readTime,
-        })
-        .select("id")
-        .single();
-      if (insertError) throw insertError;
-      const { error: updateError } = await supabase
-        .from("submissions")
-        .update({ status: "published" })
-        .eq("id", promotingSub.id);
-      if (updateError) {
-        // Roll back so a retry doesn't create a duplicate article.
-        await supabase.from("articles").delete().eq("id", article.id);
-        throw updateError;
-      }
-      toast.success("Promoted to a published article. Attach the typeset PDF on the Articles page.");
+          issueId: selectedIssueId || null,
+          categoryId: selectedCategoryId || null,
+        },
+      });
+      toast.success(
+        `Published. ${res.emailed ? "The author has been emailed." : "Author email was not sent (no address or email not configured)."} Attach the typeset PDF on the Articles page.`,
+      );
       setPromotingSub(null);
-      load();
+      refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to promote submission");
     } finally {
@@ -275,7 +252,7 @@ function AdminSubmissions() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl text-ink">Submissions</h2>
+        <h1 className="text-2xl font-semibold text-ink">Submissions</h1>
         <div className="text-xs text-muted-foreground">
           Showing {filtered.length} of {rows?.length ?? 0}
         </div>
@@ -351,7 +328,9 @@ function AdminSubmissions() {
       </div>
 
       <div className="mt-6 border border-rule" role="table" aria-label="Submissions">
-        {rows === null ? (
+        {query.error ? (
+          <QueryState query={query} />
+        ) : rows === null ? (
           <AdminSubmissionsSkeleton count={6} />
         ) : filtered.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No submissions match your filters.</div>

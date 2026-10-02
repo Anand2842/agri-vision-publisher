@@ -75,7 +75,7 @@ function AdminBackupsPage() {
         <div>
           <div className="flex items-center gap-2">
             <DatabaseBackup className="h-5 w-5 text-orange" />
-            <h2 className="font-display text-2xl text-ink">Disaster Recovery Backups</h2>
+            <h1 className="text-2xl font-semibold text-ink">Disaster Recovery Backups</h1>
           </div>
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
             Nightly automated mirror of all tables, storage files, and auth users to a secondary

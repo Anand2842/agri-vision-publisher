@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { logSimulatedEmail } from "@/lib/notificationLogs";
+import { adminKey, db, useAdminRefresh } from "@/lib/adminQuery";
+import { reviewMembershipClaim } from "@/lib/admin.functions";
+import { QueryState } from "@/components/admin/QueryState";
 import { 
   Check, 
   X, 
@@ -53,222 +57,78 @@ export function getClaimMemberId(claim: { member_id?: string | null; notes?: str
   return null;
 }
 
-export function generateNextMemberId(existingClaims: PaymentClaim[]) {
-  let maxSeq = 0;
-  existingClaims.forEach((c) => {
-    const mid = getClaimMemberId(c);
-    if (mid) {
-      const parts = mid.split("-");
-      const seqStr = parts[parts.length - 1];
-      const seqNum = parseInt(seqStr, 10);
-      if (!isNaN(seqNum) && seqNum > maxSeq) {
-        maxSeq = seqNum;
-      }
-    }
-  });
-  const nextSeq = maxSeq + 1;
-  return `TAPAM-2026-${String(nextSeq).padStart(4, "0")}`;
-}
-
 function AdminMemberships() {
-  const [claims, setClaims] = useState<PaymentClaim[] | null>(null);
-  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
-  const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
-  const [receiptUrls, setReceiptUrls] = useState<Record<string, string>>({});
+  const refresh = useAdminRefresh();
+  const review = useServerFn(reviewMembershipClaim);
 
-  const loadData = async () => {
-    setLoading(true);
-    let claimsData: PaymentClaim[] = [];
-    
-    try {
-      // Fetch claims
-      const { data: remoteClaims, error: claimsErr } = await supabase
-        .from("membership_payments")
-        .select("*")
-        .order("created_at", { ascending: false });
+  const query = useQuery({
+    queryKey: adminKey("memberships"),
+    queryFn: async () => {
+      const claims = (await db(
+        supabase.from("membership_payments").select("*").order("created_at", { ascending: false }),
+      )) as PaymentClaim[];
 
-      if (claimsErr) throw claimsErr;
-      claimsData = (remoteClaims || []) as PaymentClaim[];
-    } catch (err: any) {
-      toast.error(`Failed to load membership claims: ${err.message || err}`);
-      setClaims([]);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      // Fetch profiles of users who made claims
-      const userIds = Array.from(new Set((claimsData || []).map((c) => c.user_id)));
-      
-      const profilesMap: Record<string, Profile> = {};
+      const userIds = Array.from(new Set(claims.map((c) => c.user_id)));
+      const profiles: Record<string, Profile> = {};
       if (userIds.length > 0) {
-        try {
-          const { data: profilesData, error: profsErr } = await supabase
-            .from("profiles")
-            .select("id, full_name, institution, country")
-            .in("id", userIds);
-
-          if (!profsErr && profilesData) {
-            profilesData.forEach((p) => {
-              profilesMap[p.id] = p;
-            });
-          }
-        } catch (profErr) {
-          console.warn("Failed to fetch profiles from database:", profErr);
-        }
+        const rows = await db(
+          supabase.from("profiles").select("id, full_name, institution, country").in("id", userIds),
+        );
+        rows.forEach((p) => (profiles[p.id] = p));
       }
 
-      userIds.forEach((uid) => {
-        if (!profilesMap[uid] || !profilesMap[uid].full_name) {
-          profilesMap[uid] = {
-            id: uid,
-            full_name: "Agri Researcher",
-            institution: "Agricultural Research Center",
-            country: "India"
-          };
-        }
-      });
-
-      // Generate secure signed URLs for receipts
-      const urlsMap: Record<string, string> = {};
+      // Receipts are in a private bucket: generate short-lived signed links.
+      const receiptUrls: Record<string, string> = {};
       await Promise.all(
-        claimsData.map(async (c) => {
-          if (c.receipt_path) {
-            if (c.receipt_path.startsWith("data:") || c.receipt_path.startsWith("http")) {
-              urlsMap[c.id] = c.receipt_path;
-              return;
-            }
-            try {
-              const { data, error } = await supabase.storage
-                .from("payment-receipts")
-                .createSignedUrl(c.receipt_path, 60);
-              if (!error && data) {
-                urlsMap[c.id] = data.signedUrl;
-              } else {
-                const { data: pubData } = supabase.storage
-                  .from("payment-receipts")
-                  .getPublicUrl(c.receipt_path);
-                urlsMap[c.id] = pubData.publicUrl;
-              }
-            } catch (err) {
-              const { data: pubData } = supabase.storage
-                .from("payment-receipts")
-                .getPublicUrl(c.receipt_path);
-              urlsMap[c.id] = pubData.publicUrl;
-            }
+        claims.map(async (c) => {
+          if (!c.receipt_path) return;
+          if (c.receipt_path.startsWith("data:") || c.receipt_path.startsWith("http")) {
+            receiptUrls[c.id] = c.receipt_path;
+            return;
           }
-        })
+          const { data } = await supabase.storage
+            .from("payment-receipts")
+            .createSignedUrl(c.receipt_path, 3600);
+          if (data) receiptUrls[c.id] = data.signedUrl;
+        }),
       );
-      setReceiptUrls(urlsMap);
-
-      setClaims(claimsData);
-      setProfiles(profilesMap);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to load membership claims");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
+      return { claims, profiles, receiptUrls };
+    },
+  });
+  const claims = query.data?.claims ?? null;
+  const profiles = query.data?.profiles ?? {};
+  const receiptUrls = query.data?.receiptUrls ?? {};
 
   const handleUpdateStatus = async (id: string, status: "approved" | "rejected") => {
     const claim = claims?.find((c) => c.id === id);
     if (!claim) return;
-    
-    let notes = claim.notes || "";
-    let memberId: string | null = null;
-    
-    if (status === "approved") {
-      const existing = getClaimMemberId(claim);
-      if (existing) {
-        memberId = existing;
-      } else {
-        memberId = generateNextMemberId(claims || []);
-        // Append it as fallback prefix in notes
-        const cleanNotes = notes.replace(/\[MEMBER_ID:\s*TAPAM-2026-\d{4}\]/g, "").trim();
-        notes = `[MEMBER_ID: ${memberId}] ${cleanNotes}`.trim();
-      }
-    }
-    
     try {
-      const updatePayload: any = { 
-        status, 
-        notes, 
-        updated_at: new Date().toISOString() 
-      };
-      
-      if (status === "approved" && memberId) {
-        updatePayload.member_id = memberId;
-      } else if (status === "rejected") {
-        updatePayload.member_id = null;
-      }
-
-      const { error } = await supabase
-        .from("membership_payments")
-        .update(updatePayload)
-        .eq("id", id);
-
-      if (error) {
-        if (error.message && error.message.includes("member_id")) {
-          console.warn("member_id column missing on remote Supabase. Retrying update with notes fallback.");
-          const { error: retryError } = await supabase
-            .from("membership_payments")
-            .update({ status, notes, updated_at: new Date().toISOString() })
-            .eq("id", id);
-            
-          if (retryError) throw retryError;
-        } else {
-          throw error;
-        }
-      }
-
-      toast.success(`Claim status updated to ${status}`);
-      
-      // Log simulated email dispatch
-      const { data: dbProfile } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("id", claim.user_id)
-        .single();
-      const authorName = dbProfile?.full_name || "Agri Author";
-
-      logSimulatedEmail(
-        status === "approved" ? "Membership Verified" : "Membership Rejected",
-        claim.user_id,
-        `Dear ${authorName},\n\nYour online membership verification claim for the ${claim.plan.toUpperCase()} Membership plan has been reviewed and ${status.toUpperCase()}.\n\n${status === "approved" ? `Your sequential Member ID is: ${memberId || getClaimMemberId({ notes })}. You can now download your certificate and submit manuscripts in your author dashboard.` : `Moderator feedback: ${notes || "None provided"}`}\n\nWarm regards,\nDr. Dileep Kumar Dangi\nEditor-in-Chief\nAgri Popular Article Magazine`
+      // Server-side: updates the claim (the database assigns the Member ID) and emails the member.
+      const res = await review({ data: { claimId: id, status, notes: claim.notes || "" } });
+      toast.success(
+        `Claim ${status}${res.memberId ? ` · Member ID ${res.memberId}` : ""}. ${res.emailed ? "Member emailed." : "Email not sent (no address or email not configured)."}`,
       );
-
-      loadData();
-    } catch (err: any) {
-      toast.error(err.message || "Failed to update claim");
+      refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update claim");
     }
   };
 
   const handleSaveNotes = async (id: string, notes: string) => {
     try {
-      const { error } = await supabase
-        .from("membership_payments")
-        .update({ notes, updated_at: new Date().toISOString() })
-        .eq("id", id);
-
-      if (error) throw error;
-
-      toast.success("Notes saved successfully");
-      setClaims((prev) =>
-        prev
-          ? prev.map((c) =>
-              c.id === id ? { ...c, notes, updated_at: new Date().toISOString() } : c
-            )
-          : null
+      await db(
+        supabase
+          .from("membership_payments")
+          .update({ notes, updated_at: new Date().toISOString() })
+          .eq("id", id),
       );
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save notes");
+      toast.success("Notes saved successfully");
+      refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save notes");
     }
   };
 
@@ -335,7 +195,7 @@ function AdminMemberships() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="font-display text-2xl text-ink">Membership Claims</h2>
+          <h1 className="text-2xl font-semibold text-ink">Membership Claims</h1>
           <p className="text-xs text-muted-foreground mt-1">
             Review, verify, and approve offline bank transfers & UPI QR code payments
           </p>
@@ -372,12 +232,9 @@ function AdminMemberships() {
       </div>
 
       {/* Loading state */}
-      {loading ? (
-        <div className="py-20 text-center text-muted-foreground border border-rule bg-paper">
-          <span className="inline-flex items-center gap-2">
-            <span className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-            Fetching claims and author profiles...
-          </span>
+      {query.isPending || query.error ? (
+        <div className="border border-rule bg-paper">
+          <QueryState query={query} label="Fetching claims and author profiles…" />
         </div>
       ) : filteredClaims.length === 0 ? (
         <div className="py-20 text-center text-muted-foreground border border-rule bg-paper">

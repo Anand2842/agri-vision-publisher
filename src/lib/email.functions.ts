@@ -2,10 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-// Real email delivery via Resend (https://resend.com).
-// Required server env vars: RESEND_API_KEY, EMAIL_FROM (a verified sender, e.g.
-// "Agriculture Magazine <editor@agriculturemagazine.in>"), EDITOR_EMAIL.
-// Without RESEND_API_KEY the message is logged on the server and { sent: false } is returned.
+// Real email delivery via Resend; see email.server.ts. Also needs EDITOR_EMAIL.
 
 const input = z.object({
   // "editor" = the editorial inbox (any signed-in user may notify it);
@@ -20,6 +17,7 @@ export const sendNotificationEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: z.infer<typeof input>) => input.parse(data))
   .handler(async ({ data, context }) => {
+    const { deliverEmail, userEmail } = await import("@/lib/email.server");
     let recipient: string;
     if (data.to === "editor") {
       recipient = process.env.EDITOR_EMAIL || "";
@@ -36,27 +34,11 @@ export const sendNotificationEmail = createServerFn({ method: "POST" })
       if (data.to.includes("@")) {
         recipient = data.to;
       } else {
-        const { data: u, error: uErr } = await supabaseAdmin.auth.admin.getUserById(data.to);
-        if (uErr || !u.user?.email) throw new Error("Recipient has no email address");
-        recipient = u.user.email;
+        const email = await userEmail(data.to);
+        if (!email) throw new Error("Recipient has no email address");
+        recipient = email;
       }
     }
 
-    const apiKey = process.env.RESEND_API_KEY;
-    const from = process.env.EMAIL_FROM;
-    if (!apiKey || !from) {
-      console.log(`[email not sent: RESEND_API_KEY/EMAIL_FROM missing] to=${recipient} subject=${data.subject}`);
-      return { sent: false };
-    }
-
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to: [recipient], subject: data.subject, text: data.body }),
-    });
-    if (!res.ok) {
-      console.error(`[email] Resend error ${res.status}: ${await res.text()}`);
-      return { sent: false };
-    }
-    return { sent: true };
+    return deliverEmail(recipient, data.subject, data.body);
   });

@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { adminKey, db, useAdminRefresh } from "@/lib/adminQuery";
+import { QueryState } from "@/components/admin/QueryState";
 import { toast } from "sonner";
 import { Trash2, Pencil, Plus, X, Upload } from "lucide-react";
 
@@ -18,7 +21,19 @@ type Issue = {
 };
 
 function AdminIssues() {
-  const [rows, setRows] = useState<Issue[] | null>(null);
+  const query = useQuery({
+    queryKey: adminKey("issues"),
+    queryFn: () =>
+      db(
+        supabase
+          .from("issues")
+          .select("*")
+          .order("volume", { ascending: false })
+          .order("issue_number", { ascending: false }),
+      ),
+  });
+  const rows: Issue[] | null = query.data ?? null;
+  const refresh = useAdminRefresh();
   const [editing, setEditing] = useState<Partial<Issue> | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -40,19 +55,6 @@ function AdminIssues() {
     }
   };
 
-  const load = async () => {
-    const { data, error } = await supabase
-      .from("issues")
-      .select("*")
-      .order("volume", { ascending: false })
-      .order("issue_number", { ascending: false });
-    if (error) toast.error(error.message);
-    setRows(data || []);
-  };
-  useEffect(() => {
-    load();
-  }, []);
-
   const save = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -72,7 +74,7 @@ function AdminIssues() {
     if (error) return toast.error(error.message);
     toast.success(editing?.id ? "Issue updated" : "Issue created");
     setEditing(null);
-    load();
+    refresh();
   };
 
   const remove = async (id: string) => {
@@ -80,13 +82,13 @@ function AdminIssues() {
     const { error } = await supabase.from("issues").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted");
-    load();
+    refresh();
   };
 
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl text-ink">Issues</h2>
+        <h1 className="text-2xl font-semibold text-ink">Issues</h1>
         <button
           onClick={() => setEditing({})}
           className="bg-navy text-white px-4 py-2 text-xs uppercase tracking-wider flex items-center gap-2"
@@ -148,7 +150,7 @@ function AdminIssues() {
 
       <div className="mt-6 border border-rule">
         {rows === null ? (
-          <div className="p-10 text-center text-muted-foreground">Loading…</div>
+          <QueryState query={query} />
         ) : rows.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No issues yet.</div>
         ) : (

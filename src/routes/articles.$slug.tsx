@@ -125,6 +125,9 @@ function Article() {
 
   return (
     <>
+      {citationAuthors(a).map((n) => (
+        <meta key={n} name="citation_author" content={n} />
+      ))}
       {articleSchema && (
         <script
           type="application/ld+json"
@@ -303,15 +306,19 @@ function absoluteUrl(url: string) {
   return url.startsWith("/") ? `${SITE}${url}` : url;
 }
 
+// The router keeps one meta tag per name, so the repeated citation_author tags are
+// rendered in the component instead (React hoists <meta> into <head>).
+function citationAuthors(a: DBArticle) {
+  return a.author
+    .split(",")
+    .map((n) => n.trim())
+    .filter((n) => n && n !== "Editorial Team");
+}
+
 // Google Scholar / Highwire tags so articles can be indexed as scholarly content.
 function citationMeta(a: DBArticle, slug: string) {
   const tags: { name: string; content: string }[] = [
     { name: "citation_title", content: a.title },
-    ...a.author
-      .split(",")
-      .map((n) => n.trim())
-      .filter((n) => n && n !== "Editorial Team")
-      .map((n) => ({ name: "citation_author", content: n })),
     { name: "citation_journal_title", content: "The Agriculture Popular Article Magazine" },
     { name: "citation_abstract_html_url", content: `${SITE}/articles/${slug}` },
   ];

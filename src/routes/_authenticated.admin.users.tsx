@@ -1,8 +1,12 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { adminKey, db, useAdminRefresh } from "@/lib/adminQuery";
+import { QueryState } from "@/components/admin/QueryState";
 import { toast } from "sonner";
-import { Search, UserCog, Loader2 } from "lucide-react";
+import { Search, UserCog } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -47,44 +51,21 @@ interface UserRole {
 const AVAILABLE_ROLES: AppRole[] = ["admin", "moderator", "author", "reader"];
 
 function AdminUsers() {
-  const [profiles, setProfiles] = useState<Profile[] | null>(null);
-  const [userRoles, setUserRoles] = useState<UserRole[] | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const currentUserId = useAuth().user?.id ?? null;
   const [searchQuery, setSearchQuery] = useState("");
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) return;
-      setCurrentUserId(session.user.id);
-
-      // Fetch all profiles
-      const { data: profs, error: profsErr } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (profsErr) throw profsErr;
-
-      // Fetch all roles
-      const { data: roles, error: rolesErr } = await supabase.from("user_roles").select("*");
-      if (rolesErr) throw rolesErr;
-
-      setProfiles(profs || []);
-      setUserRoles(roles || []);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load users and roles");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
+  const refresh = useAdminRefresh();
+  const usersQuery = useQuery({
+    queryKey: adminKey("users"),
+    queryFn: async () => {
+      const [profiles, userRoles] = await Promise.all([
+        db(supabase.from("profiles").select("*").order("created_at", { ascending: false })),
+        db(supabase.from("user_roles").select("*")),
+      ]);
+      return { profiles: profiles as Profile[], userRoles: userRoles as UserRole[] };
+    },
+  });
+  const profiles = usersQuery.data?.profiles ?? null;
+  const userRoles = usersQuery.data?.userRoles ?? null;
 
   const toggleRole = async (userId: string, roleName: AppRole, hasRole: boolean) => {
     if (userId === currentUserId && roleName === "admin" && hasRole) {
@@ -110,7 +91,7 @@ function AdminUsers() {
         if (error) throw error;
         toast.success(`Assigned role '${roleName}'`);
       }
-      loadData();
+      refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update role");
     }
@@ -122,13 +103,8 @@ function AdminUsers() {
     return userRoles.filter((r) => r.user_id === userId).map((r) => r.role);
   };
 
-  if (loading && !profiles) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-orange" />
-        <span className="ml-3 text-sm text-muted-foreground">Loading users console...</span>
-      </div>
-    );
+  if (!profiles) {
+    return <QueryState query={usersQuery} label="Loading users…" />;
   }
 
   // Filter profiles based on search query
@@ -165,7 +141,7 @@ function AdminUsers() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-display text-2xl text-ink">User & Role Manager</h2>
+        <h1 className="text-2xl font-semibold text-ink">User & Role Manager</h1>
         <p className="text-xs text-muted-foreground mt-1">
           Manage system permissions, view user profiles, and promote or demote moderators and
           admins.

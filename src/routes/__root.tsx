@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -189,13 +190,14 @@ import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const inAdmin = useRouterState({ select: (s) => s.location.pathname.startsWith("/admin") });
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Outlet />
         <Toaster position="top-right" richColors closeButton />
-        <WhatsAppButton />
+        {!inAdmin && <WhatsAppButton />}
         <ScrollToTop />
       </AuthProvider>
     </QueryClientProvider>

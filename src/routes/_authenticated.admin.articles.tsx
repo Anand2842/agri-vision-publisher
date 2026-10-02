@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { adminKey, db, useAdminRefresh } from "@/lib/adminQuery";
+import { QueryState } from "@/components/admin/QueryState";
 import { toast } from "sonner";
 import { Trash2, Pencil, Plus, X, Upload } from "lucide-react";
 
@@ -32,29 +35,28 @@ type Cat = { id: string; name: string };
 const STATUS = ["draft", "submitted", "under_review", "published", "archived"];
 
 function AdminArticles() {
-  const [rows, setRows] = useState<Article[] | null>(null);
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const [cats, setCats] = useState<Cat[]>([]);
+  const query = useQuery({
+    queryKey: adminKey("articles"),
+    queryFn: async () => {
+      const [a, i, c] = await Promise.all([
+        db(supabase.from("articles").select("*").order("created_at", { ascending: false })),
+        db(
+          supabase
+            .from("issues")
+            .select("id,volume,issue_number,title")
+            .order("volume", { ascending: false }),
+        ),
+        db(supabase.from("categories").select("id,name").order("name")),
+      ]);
+      return { rows: a as unknown as Article[], issues: i as Issue[], cats: c as Cat[] };
+    },
+  });
+  const rows = query.data?.rows ?? null;
+  const issues = query.data?.issues ?? [];
+  const cats = query.data?.cats ?? [];
+  const refresh = useAdminRefresh();
   const [editing, setEditing] = useState<Partial<Article> | null>(null);
   const [uploading, setUploading] = useState(false);
-
-  const load = async () => {
-    const [a, i, c] = await Promise.all([
-      supabase.from("articles").select("*").order("created_at", { ascending: false }),
-      supabase
-        .from("issues")
-        .select("id,volume,issue_number,title")
-        .order("volume", { ascending: false }),
-      supabase.from("categories").select("id,name").order("name"),
-    ]);
-    if (a.error) toast.error(a.error.message);
-    setRows((a.data || []) as unknown as Article[]);
-    setIssues(i.data || []);
-    setCats(c.data || []);
-  };
-  useEffect(() => {
-    load();
-  }, []);
 
   const save = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -114,7 +116,7 @@ function AdminArticles() {
     if (error) return toast.error(error.message);
     toast.success(editing?.id ? "Article updated" : "Article created");
     setEditing(null);
-    load();
+    refresh();
   };
 
   const remove = async (id: string) => {
@@ -122,7 +124,7 @@ function AdminArticles() {
     const { error } = await supabase.from("articles").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted");
-    load();
+    refresh();
   };
 
   const uploadPdf = async (file: File, setVal: (v: string) => void) => {
@@ -164,7 +166,7 @@ function AdminArticles() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-2xl text-ink">Articles</h2>
+        <h1 className="text-2xl font-semibold text-ink">Articles</h1>
         <button
           onClick={() => setEditing({ status: "draft", read_time: 8 })}
           className="bg-navy text-white px-4 py-2 text-xs uppercase tracking-wider flex items-center gap-2"
@@ -287,7 +289,7 @@ function AdminArticles() {
 
       <div className="mt-6 border border-rule overflow-x-auto">
         {rows === null ? (
-          <div className="p-10 text-center text-muted-foreground">Loading…</div>
+          <QueryState query={query} />
         ) : rows.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No articles yet.</div>
         ) : (

@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { adminKey, db, useAdminRefresh } from "@/lib/adminQuery";
+import { QueryState } from "@/components/admin/QueryState";
 import { toast } from "sonner";
 import { Trash2, Mail, Phone, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -18,39 +21,29 @@ type Message = {
 };
 
 function AdminMessages() {
-  const [messages, setMessages] = useState<Message[] | null>(null);
+  const query = useQuery({
+    queryKey: adminKey("messages"),
+    queryFn: () =>
+      db(supabase.from("contact_messages").select("*").order("created_at", { ascending: false })),
+  });
+  const messages: Message[] | null = query.data ?? null;
+  const refresh = useAdminRefresh();
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  const load = async () => {
-    const { data, error } = await supabase
-      .from("contact_messages")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      toast.error(`Failed to load messages: ${error.message}`);
-      return;
-    }
-    setMessages(data || []);
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
 
   const remove = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!confirm("Are you sure you want to delete this message?")) return;
 
-    const { error } = await supabase.from("contact_messages").delete().eq("id", id);
-    if (error) {
-      toast.error(`Failed to delete message: ${error.message}`);
+    try {
+      await db(supabase.from("contact_messages").delete().eq("id", id));
+    } catch (err) {
+      toast.error(`Failed to delete message: ${err instanceof Error ? err.message : err}`);
       return;
     }
 
     toast.success("Message deleted successfully");
     if (expandedId === id) setExpandedId(null);
-    load();
+    refresh();
   };
 
   const toggleExpand = (id: string) => {
@@ -59,14 +52,14 @@ function AdminMessages() {
 
   return (
     <div>
-      <h2 className="font-display text-2xl text-ink">Contact Messages</h2>
+      <h1 className="text-2xl font-semibold text-ink">Contact Messages</h1>
       <p className="text-sm text-muted-foreground mt-1 mb-6">
         Review and manage enquiries sent to the Editorial Office contact form.
       </p>
 
       <div className="border border-rule">
         {messages === null ? (
-          <div className="p-10 text-center text-muted-foreground">Loading messages…</div>
+          <QueryState query={query} label="Loading messages…" />
         ) : messages.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No messages found.</div>
         ) : (

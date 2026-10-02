@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { adminKey, db, useAdminRefresh } from "@/lib/adminQuery";
+import { QueryState } from "@/components/admin/QueryState";
 import { toast } from "sonner";
 import { Trash2, Plus } from "lucide-react";
 
@@ -11,16 +13,12 @@ export const Route = createFileRoute("/_authenticated/admin/categories")({
 type Cat = { id: string; name: string; slug: string; description: string | null };
 
 function AdminCategories() {
-  const [rows, setRows] = useState<Cat[] | null>(null);
-
-  const load = async () => {
-    const { data, error } = await supabase.from("categories").select("*").order("name");
-    if (error) toast.error(error.message);
-    setRows(data || []);
-  };
-  useEffect(() => {
-    load();
-  }, []);
+  const query = useQuery({
+    queryKey: adminKey("categories"),
+    queryFn: () => db(supabase.from("categories").select("*").order("name")),
+  });
+  const rows: Cat[] | null = query.data ?? null;
+  const refresh = useAdminRefresh();
 
   const create = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,19 +35,19 @@ function AdminCategories() {
     if (error) return toast.error(error.message);
     (e.currentTarget as HTMLFormElement).reset();
     toast.success("Category added");
-    load();
+    refresh();
   };
 
   const remove = async (id: string) => {
     if (!confirm("Delete category?")) return;
     const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) return toast.error(error.message);
-    load();
+    refresh();
   };
 
   return (
     <div>
-      <h2 className="font-display text-2xl text-ink">Categories</h2>
+      <h1 className="text-2xl font-semibold text-ink">Categories</h1>
 
       <form
         onSubmit={create}
@@ -71,7 +69,7 @@ function AdminCategories() {
 
       <div className="mt-6 border border-rule">
         {rows === null ? (
-          <div className="p-10 text-center text-muted-foreground">Loading…</div>
+          <QueryState query={query} />
         ) : rows.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">No categories.</div>
         ) : (
