@@ -22,8 +22,12 @@ export const Route = createFileRoute("/search")({
           { name: "description", content: loaderData.description },
           { property: "og:title", content: loaderData.title },
           { property: "og:description", content: loaderData.description },
+          { name: "robots", content: "noindex, follow" },
         ]
-      : [{ title: "Search Articles — The Agriculture Popular Article Magazine" }],
+      : [
+          { title: "Search Articles — The Agriculture Popular Article Magazine" },
+          { name: "robots", content: "noindex, follow" },
+        ],
     links: [{ rel: "canonical", href: "https://agriculturemagazine.in/search" }],
   }),
 });

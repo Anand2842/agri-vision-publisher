@@ -105,17 +105,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@AgricMagazine" },
-      { name: "twitter:title", content: "The Agriculture Popular Article Magazine" },
-      {
-        name: "twitter:description",
-        content:
-          "A peer-reviewed, open-access monthly magazine for agriculture and allied sciences.",
-      },
       { property: "og:image", content: "https://agriculturemagazine.in/og-default.jpg" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "theme-color", content: "#356B3A" },
-      { name: "twitter:image", content: "https://agriculturemagazine.in/og-default.jpg" },
       {
         name: "google-site-verification",
         content: "Cm8UqdLMIQQccshAlvkEEcpX53Ke3IhMRZrVOkVEMFs",
@@ -123,12 +116,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap",
-      },
     ],
     scripts: [
       {

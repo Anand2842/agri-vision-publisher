@@ -1,0 +1,10 @@
+# Cloudflare static-asset headers. Article images are never edited in place
+# (a new image gets a new file name), so browsers can keep them for 30 days.
+/articles/*
+  Cache-Control: public, max-age=2592000
+
+/og-default.jpg
+  Cache-Control: public, max-age=86400
+
+/templates/*
+  Cache-Control: public, max-age=86400

@@ -1,6 +1,8 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/playfair-display";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -13,10 +15,10 @@
  */
 
 @theme inline {
-  --font-display: "Playfair Display", "Cormorant Garamond", Georgia, serif;
-  --font-sans: "Inter", "Source Sans Pro", "Helvetica Neue", system-ui, sans-serif;
-  --font-script: "Playfair Display", Georgia, serif;
-  --font-condensed: "Inter", sans-serif;
+  --font-display: "Playfair Display Variable", "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter Variable", "Inter", "Source Sans Pro", "Helvetica Neue", system-ui, sans-serif;
+  --font-script: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+  --font-condensed: "Inter Variable", "Inter", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --radius-sm: calc(var(--radius) - 4px);

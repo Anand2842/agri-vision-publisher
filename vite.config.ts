@@ -15,6 +15,8 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    // Read by src/server.ts to scope the edge HTML cache to one deployment.
+    define: { __BUILD_ID__: JSON.stringify(Date.now().toString(36)) },
     plugins: [{
       name: "load-server-email-env",
       config(_, { mode }) {

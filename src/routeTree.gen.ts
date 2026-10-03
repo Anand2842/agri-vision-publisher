@@ -21,6 +21,7 @@ import { Route as PlagiarismPolicyRouteImport } from './routes/plagiarism-policy
 import { Route as OpenAccessRouteImport } from './routes/open-access'
 import { Route as ModerateRouteImport } from './routes/moderate'
 import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EditorialBoardRouteImport } from './routes/editorial-board'
 import { Route as CurrentIssueRouteImport } from './routes/current-issue'
@@ -110,6 +111,11 @@ const ModerateRoute = ModerateRouteImport.update({
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -283,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/faq': typeof FaqRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
   '/open-access': typeof OpenAccessRoute
@@ -326,6 +333,7 @@ export interface FileRoutesByTo {
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/faq': typeof FaqRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
   '/open-access': typeof OpenAccessRoute
@@ -370,6 +378,7 @@ export interface FileRoutesById {
   '/current-issue': typeof CurrentIssueRoute
   '/editorial-board': typeof EditorialBoardRoute
   '/faq': typeof FaqRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/membership': typeof MembershipRoute
   '/moderate': typeof ModerateRoute
   '/open-access': typeof OpenAccessRoute
@@ -415,6 +424,7 @@ export interface FileRouteTypes {
     | '/current-issue'
     | '/editorial-board'
     | '/faq'
+    | '/llms.txt'
     | '/membership'
     | '/moderate'
     | '/open-access'
@@ -458,6 +468,7 @@ export interface FileRouteTypes {
     | '/current-issue'
     | '/editorial-board'
     | '/faq'
+    | '/llms.txt'
     | '/membership'
     | '/moderate'
     | '/open-access'
@@ -501,6 +512,7 @@ export interface FileRouteTypes {
     | '/current-issue'
     | '/editorial-board'
     | '/faq'
+    | '/llms.txt'
     | '/membership'
     | '/moderate'
     | '/open-access'
@@ -546,6 +558,7 @@ export interface RootRouteChildren {
   CurrentIssueRoute: typeof CurrentIssueRoute
   EditorialBoardRoute: typeof EditorialBoardRoute
   FaqRoute: typeof FaqRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   MembershipRoute: typeof MembershipRoute
   ModerateRoute: typeof ModerateRoute
   OpenAccessRoute: typeof OpenAccessRoute
@@ -650,6 +663,13 @@ declare module '@tanstack/react-router' {
       path: '/membership'
       fullPath: '/membership'
       preLoaderRoute: typeof MembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -922,6 +942,7 @@ const rootRouteChildren: RootRouteChildren = {
   CurrentIssueRoute: CurrentIssueRoute,
   EditorialBoardRoute: EditorialBoardRoute,
   FaqRoute: FaqRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   MembershipRoute: MembershipRoute,
   ModerateRoute: ModerateRoute,
   OpenAccessRoute: OpenAccessRoute,

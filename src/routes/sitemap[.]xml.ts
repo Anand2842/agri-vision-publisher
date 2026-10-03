@@ -24,12 +24,14 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/current-issue", changefreq: "weekly", priority: "0.9" },
           { path: "/editorial-board", changefreq: "monthly", priority: "0.6" },
           { path: "/membership", changefreq: "monthly", priority: "0.7" },
+          { path: "/open-access", changefreq: "yearly", priority: "0.5" },
           { path: "/plagiarism-policy", changefreq: "monthly", priority: "0.5" },
+          { path: "/privacy", changefreq: "yearly", priority: "0.3" },
           { path: "/publication-ethics", changefreq: "monthly", priority: "0.6" },
-          { path: "/search", changefreq: "weekly", priority: "0.7" },
           { path: "/startup-spotlight", changefreq: "weekly", priority: "0.7" },
           { path: "/submission-guidelines", changefreq: "monthly", priority: "0.7" },
           { path: "/submit", changefreq: "monthly", priority: "0.8" },
+          { path: "/terms", changefreq: "yearly", priority: "0.3" },
         ];
 
         // Fetch published articles for dynamic URLs
