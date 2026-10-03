@@ -235,17 +235,17 @@ function Advertise() {
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm font-sans">
               <a
-                href={`mailto:${getContact("office", "email") || "dkdkdangi@gmail.com"}`}
+                href={`mailto:${getContact("office", "email") || "dkdkdkdangi@gmail.com"}`}
                 className="flex items-center gap-2.5 underline hover:text-orange transition-colors"
               >
                 <Mail className="h-4 w-4" />{" "}
-                {getContact("office", "email") || "dkdkdangi@gmail.com"}
+                {getContact("office", "email") || "dkdkdkdangi@gmail.com"}
               </a>
               <a
-                href={`tel:${getContact("office", "phone") || "+91 9509164410"}`}
+                href={`tel:${getContact("office", "phone") || "+91 8107240852"}`}
                 className="flex items-center gap-2.5 hover:text-orange transition-colors"
               >
-                <Phone className="h-4 w-4" /> {getContact("office", "phone") || "+91 9509164410"}
+                <Phone className="h-4 w-4" /> {getContact("office", "phone") || "+91 8107240852"}
               </a>
             </div>
           </div>

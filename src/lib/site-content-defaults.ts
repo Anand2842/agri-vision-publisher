@@ -126,7 +126,7 @@ export type SiteContentKeys = {
 
 export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string, string>>> = {
   header: {
-    topbar: { phone: "+91 9509164410", email: "dkdkdangi@gmail.com" },
+    topbar: { phone: "+91 8107240852", email: "dkdkdkdangi@gmail.com" },
     branding: { tagline: "Knowledge · Innovation · Sustainability", logo_url: logo, title_line1: "The Agriculture", title_line2: "Popular Article Magazine" },
     cta: { special_issue_label: "Special Issue" },
     navigation: {
@@ -153,8 +153,8 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
     contact: {
       name: "Dr. Dileep Kumar",
       address: "ICAR–RRS–CAZRI, Jaisalmer 345001",
-      phone: "+91 9509164410",
-      email: "dkdkdangi@gmail.com",
+      phone: "+91 8107240852",
+      email: "dkdkdkdangi@gmail.com",
     },
     legal: { publisher_name: "Dr. Dileep Kumar", eissn: "", pissn: "" },
     navigation: {
@@ -238,22 +238,22 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       items: '["Disseminate practical, science-based agricultural knowledge to farmers, extension workers, students and policy-makers.","Highlight indigenous innovations, traditional wisdom and locally adapted practices alongside contemporary research.","Bridge the gap between scientific research and on-farm application through accessible popular articles.","Support young scientists, research scholars and field practitioners with a credible publishing platform.","Encourage interdisciplinary work across agronomy, horticulture, animal sciences, extension and allied fields.","Strengthen India\'s rural development ecosystem by amplifying voices from KVKs, ICAR institutes and state universities."]',
     },
     particulars: {
-      items: '[["Title","The Agriculture Popular Article Magazine"],["E-ISSN","Applied For"],["P-ISSN","Applied For"],["Frequency","Monthly"],["Subject","Agriculture"],["Language","English"],["Format","Online (PDF)"],["Starting Year","2026"],["Publisher","Dr. Dileep Kumar"],["Chief Editor","Dr. Dileep Kumar"],["Publisher Address","ICAR–CAZRI–RRS Jaisalmer, Jodhpur Road, Jaisalmer 345001, Rajasthan, India"],["Mobile","+91 95091 64410"],["Email","dkdkdangi@gmail.com"]]',
+      items: '[["Title","The Agriculture Popular Article Magazine"],["E-ISSN","Applied For"],["P-ISSN","Applied For"],["Frequency","Monthly"],["Subject","Agriculture"],["Language","English"],["Format","Online (PDF)"],["Starting Year","2026"],["Publisher","Dr. Dileep Kumar"],["Chief Editor","Dr. Dileep Kumar"],["Publisher Address","ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India"],["Mobile","+91 8107240852"],["Email","dkdkdkdangi@gmail.com"]]',
     },
   },
   contact: {
     office: {
-      chief_editor: "Dr. Dileep Kumar Dangi",
+      chief_editor: "Dr. Dileep Kumar",
       chief_editor_title: "Senior Scientist (Agriculture Extension)",
-      email: "dkdkdangi@gmail.com",
-      phone: "+91 9509164410",
-      address: "ICAR-RRS-CAZRI, Jaisalmer 345001, Rajasthan, India",
+      email: "dkdkdkdangi@gmail.com",
+      phone: "+91 8107240852",
+      address: "ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India",
       hours: "Mon–Sat · 08:00 to 20:00 IST",
       turnaround: "Editorial decisions are typically returned within 21 days.",
     },
     publisher: {
       name: "Dr. Dileep Kumar",
-      address: "ICAR–CAZRI–RRS Jaisalmer, Jodhpur Road, Jaisalmer 345001, Rajasthan, India",
+      address: "ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India",
     },
     advertise: {
       heading: "Reach the agriculture community",
@@ -463,9 +463,9 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       bank_name: "State Bank of India",
       bank_ifsc: "SBIN0003877",
       bank_branch: "SBI Main Jaisalmer",
-      upi_number: "+91 9509164410",
+      upi_number: "+91 8107240852",
       upi_qr_url: "",
-      contact_email: "dkdkdangi@gmail.com",
+      contact_email: "dkdkdkdangi@gmail.com",
       heading: "Payment Details",
       body: "We support direct bank transfers (NEFT/IMPS) and UPI mobile payments. Please find the credentials below.",
     },
@@ -486,7 +486,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       items: '[{"who":"Annual Members","fee":"Free","note":"Up to 8 articles in 12 months"},{"who":"Non-member Authors","fee":"₹200 / article","note":"Single article membership"},{"who":"Non-member Co-authors","fee":"₹100 / co-author","note":"Per additional author"}]',
     },
     requirements: {
-      items: '["Manuscripts must be submitted in Microsoft Word format (.doc / .docx). Other formats will be rejected at screening.","Article length: 2–4 pages (approximately 1,500–3,000 words).","Each article must contain a clear introduction and a conclusion.","Submissions for the next monthly issue close on the 25th of every month.","Submit online through the portal, or e-mail your file to dkdkdangi@gmail.com."]',
+      items: '["Manuscripts must be submitted in Microsoft Word format (.doc / .docx). Other formats will be rejected at screening.","Article length: 2–4 pages (approximately 1,500–3,000 words).","Each article must contain a clear introduction and a conclusion.","Submissions for the next monthly issue close on the 25th of every month.","Submit online through the portal, or e-mail your file to dkdkdkdangi@gmail.com."]',
     },
     formatting: {
       items: '[{"l":"Title","v":"Times New Roman 14 pt · Bold · Centered"},{"l":"Author details","v":"TNR 12 pt — name, designation, affiliation"},{"l":"Corresponding email","v":"TNR 12 pt · Bold"},{"l":"Headings","v":"TNR 14 pt · Bold"},{"l":"Sub-headings","v":"TNR 12 pt · Bold"},{"l":"Body text","v":"TNR 12 pt · Justified · 1.5 line spacing"},{"l":"Units & abbreviations","v":"SI units · IUB / IUPAC nomenclature"},{"l":"File format","v":"Microsoft Word (.doc / .docx) only"}]',

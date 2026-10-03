@@ -75,7 +75,7 @@ function PrivacyPolicy() {
 
         <Section title="5. Contact Regarding Privacy">
           <p>
-            For any queries or requests regarding your personal data or privacy preferences, please contact our Editorial Office at <strong>dkdkdangi@gmail.com</strong> or phone <strong>+91 9509164410</strong>.
+            For any queries or requests regarding your personal data or privacy preferences, please contact our Editorial Office at <strong>dkdkdkdangi@gmail.com</strong> or phone <strong>+91 8107240852</strong>.
           </p>
         </Section>
       </main>

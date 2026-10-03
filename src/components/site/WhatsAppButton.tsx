@@ -3,7 +3,7 @@ import { useGlobalSiteContent } from "@/hooks/useSiteContent";
 
 export function WhatsAppButton() {
   const { getHeader } = useGlobalSiteContent();
-  const rawPhone = getHeader("topbar", "phone") || "9509164410";
+  const rawPhone = getHeader("topbar", "phone") || "8107240852";
   const cleanPhone = rawPhone.replace(/\D/g, "");
   const phoneFormatted = cleanPhone.startsWith("91") ? cleanPhone : `91${cleanPhone}`;
 

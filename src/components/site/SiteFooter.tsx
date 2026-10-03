@@ -111,18 +111,18 @@ export function SiteFooter() {
             </li>
             <li>
               <a
-                href={`tel:${getFooter("contact", "phone") || "+91 9509164410"}`}
+                href={`tel:${getFooter("contact", "phone") || "+91 8107240852"}`}
                 className="hover:text-orange transition-colors"
               >
-                {getFooter("contact", "phone") || "+91 9509164410"}
+                {getFooter("contact", "phone") || "+91 8107240852"}
               </a>
             </li>
             <li>
               <a
-                href={`mailto:${getFooter("contact", "email") || "dkdkdangi@gmail.com"}`}
+                href={`mailto:${getFooter("contact", "email") || "dkdkdkdangi@gmail.com"}`}
                 className="hover:text-orange transition-colors break-all"
               >
-                {getFooter("contact", "email") || "dkdkdangi@gmail.com"}
+                {getFooter("contact", "email") || "dkdkdkdangi@gmail.com"}
               </a>
             </li>
           </ul>

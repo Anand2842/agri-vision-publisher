@@ -189,11 +189,11 @@ export function SiteHeader() {
         <div className="container-editorial flex items-center justify-between min-h-[32px] py-0.5">
           <div className="flex items-center gap-3 min-w-0">
             <a
-              href={`tel:${getHeader("topbar", "phone") || "+91 9509164410"}`}
+              href={`tel:${getHeader("topbar", "phone") || "+91 8107240852"}`}
               className="flex items-center gap-1.5 text-orange font-medium hover:brightness-110 shrink-0"
             >
               <Phone className="h-3.5 w-3.5" />
-              <span>{getHeader("topbar", "phone") || "+91 9509164410"}</span>
+              <span>{getHeader("topbar", "phone") || "+91 8107240852"}</span>
             </a>
             <span className="text-white/40">|</span>
             <span className="truncate text-orange/90 font-semibold">
@@ -213,12 +213,12 @@ export function SiteHeader() {
             </Link>
             <span className="hidden md:inline w-px h-3.5 bg-white/20" />
             <a
-              href={`mailto:${getHeader("topbar", "email") || "dkdkdangi@gmail.com"}`}
+              href={`mailto:${getHeader("topbar", "email") || "dkdkdkdangi@gmail.com"}`}
               aria-label="Email"
               className="hover:text-orange flex items-center gap-1.5"
             >
               <Mail className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{getHeader("topbar", "email") || "dkdkdangi@gmail.com"}</span>
+              <span className="hidden sm:inline">{getHeader("topbar", "email") || "dkdkdkdangi@gmail.com"}</span>
             </a>
           </div>
         </div>

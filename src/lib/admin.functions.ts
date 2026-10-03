@@ -8,7 +8,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const SITE = "https://agriculturemagazine.in";
 const SIGNATURE =
-  "Warm regards,\nDr. Dileep Kumar Dangi\nEditor-in-Chief\nAgri Popular Article Magazine";
+  "Warm regards,\nDr. Dileep Kumar\nEditor-in-Chief\nThe Agriculture Popular Article Magazine";
 
 const promoteInput = z.object({
   submissionId: z.string().uuid(),
