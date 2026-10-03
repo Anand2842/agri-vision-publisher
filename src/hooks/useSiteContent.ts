@@ -65,6 +65,45 @@ export function updateSiteContentCache(page: string, section: string, key: strin
   }
 }
 
+export function normalizeSiteContentValue(val: string): string {
+  if (!val || typeof val !== "string") return val;
+  return val
+    .replace(/dkdkdangi@gmail\.com/gi, "dkdkdkdangi@gmail.com")
+    .replace(/\+91\s*95091\s*64410/g, "+91 8107240852")
+    .replace(/9509164410/g, "8107240852")
+    .replace(/Dr\.\s*Dileep\s*Kumar\s*Dangi/gi, "Dr. Dileep Kumar")
+    .replace(/ICAR[–-]CAZRI[–-]RRS\s*Jaisalmer,\s*Jodhpur\s*Road,\s*Jaisalmer\s*345001,\s*Rajasthan,\s*India/gi, "ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India");
+}
+
+async function syncLegacyRowsIfAdmin(rows: { page: string; section: string; key: string; value?: string | null }[]) {
+  try {
+    const outdated = rows.filter((r) => {
+      const v = r.value || "";
+      return (
+        v.includes("9509164410") ||
+        v.includes("95091 64410") ||
+        v.includes("dkdkdangi@gmail.com") ||
+        v.includes("Dileep Kumar Dangi") ||
+        v.includes("Jodhpur Road")
+      );
+    });
+    if (outdated.length === 0) return;
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData?.session) return;
+    for (const r of outdated) {
+      const cleaned = normalizeSiteContentValue(r.value || "");
+      await supabase.from("site_content").upsert({
+        page: r.page,
+        section: r.section,
+        key: r.key,
+        value: cleaned,
+      }, { onConflict: "page,section,key" });
+    }
+  } catch {
+    // Non-blocking sync
+  }
+}
+
 export function useSiteContent<P extends keyof SiteContentKeys>(page: P) {
   const [content, setContent] = useState<PageContent>(cache[page as string] || {});
   const [loading, setLoading] = useState(!cache[page as string]);
@@ -94,10 +133,11 @@ export function useSiteContent<P extends keyof SiteContentKeys>(page: P) {
                 const headerContent: PageContent = {};
                 const footerContent: PageContent = {};
                 if (data && !error) {
+                  syncLegacyRowsIfAdmin(data);
                   data.forEach((row) => {
                     const target = row.page === "header" ? headerContent : footerContent;
                     if (!target[row.section]) target[row.section] = {};
-                    target[row.section][row.key] = row.value || "";
+                    target[row.section][row.key] = normalizeSiteContentValue(row.value || "");
                   });
                 }
                 cache["header"] = headerContent;
@@ -123,9 +163,10 @@ export function useSiteContent<P extends keyof SiteContentKeys>(page: P) {
             .then(({ data, error }) => {
               const newContent: PageContent = {};
               if (data && !error) {
+                syncLegacyRowsIfAdmin(data.map(d => ({ ...d, page: page as string })));
                 data.forEach((row) => {
                   if (!newContent[row.section]) newContent[row.section] = {};
-                  newContent[row.section][row.key] = row.value || "";
+                  newContent[row.section][row.key] = normalizeSiteContentValue(row.value || "");
                 });
               }
               cache[page as string] = newContent;
@@ -148,7 +189,8 @@ export function useSiteContent<P extends keyof SiteContentKeys>(page: P) {
     section: S,
     key: K
   ): string {
-    return content[section]?.[key] ?? SITE_CONTENT_DEFAULTS[page as string]?.[section]?.[key] ?? "";
+    const raw = content[section]?.[key] || SITE_CONTENT_DEFAULTS[page as string]?.[section]?.[key] || "";
+    return normalizeSiteContentValue(raw);
   }
 
   function getJson<S extends keyof SiteContentKeys[P] & string, K extends SiteContentKeys[P][S] & string, T = any>(
