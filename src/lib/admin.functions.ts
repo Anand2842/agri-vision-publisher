@@ -35,8 +35,9 @@ export const promoteSubmission = createServerFn({ method: "POST" })
       p_title: data.title,
       p_slug: data.slug,
       p_abstract: data.abstract ?? "",
-      p_issue_id: data.issueId ?? "",
-      p_category_id: data.categoryId ?? "",
+      // Generated RPC types mark these nullable database arguments as required strings.
+      p_issue_id: data.issueId as string,
+      p_category_id: data.categoryId as string,
     });
     if (error) {
       throw new Error(
