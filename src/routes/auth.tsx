@@ -42,6 +42,7 @@ type Screen =
   | "signin"
   | "signup"
   | "forgot-email"   // Request a password-reset link
+  | "forgot-sent"    // Link request confirmation
   | "signup-pending" // Email confirmation pending
   | "recovery";      // Arrived via password-reset link
 
