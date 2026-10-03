@@ -3,6 +3,7 @@
 ## Email setup
 
 - [x] Verify notify.agriupdates.online and create branded authentication emails
+- [x] Align the forgot-password screen with the password-reset email link
 - [ ] Confirm delivery after publishing the updated app
 
 ## ISSN compliance

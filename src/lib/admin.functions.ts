@@ -35,8 +35,8 @@ export const promoteSubmission = createServerFn({ method: "POST" })
       p_title: data.title,
       p_slug: data.slug,
       p_abstract: data.abstract ?? "",
-      p_issue_id: data.issueId,
-      p_category_id: data.categoryId,
+      p_issue_id: data.issueId ?? "",
+      p_category_id: data.categoryId ?? "",
     });
     if (error) {
       throw new Error(
