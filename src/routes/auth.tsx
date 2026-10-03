@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useEffect, useState } from "react";
@@ -17,7 +17,14 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (search) => authSearchSchema.parse(search),
   component: Auth,
   head: () => ({
-    meta: [{ title: "Sign in — The Agriculture Popular Article Magazine" }],
+    meta: [
+      { title: "Sign in — The Agriculture Popular Article Magazine" },
+      { name: "description", content: "Sign in or reset your password for The Agriculture Popular Article Magazine." },
+      { property: "og:title", content: "Sign in — The Agriculture Popular Article Magazine" },
+      { property: "og:description", content: "Access your account at The Agriculture Popular Article Magazine." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
     links: [{ rel: "canonical", href: "https://agriculturemagazine.in/auth" }],
   }),
 });
@@ -34,11 +41,10 @@ const signUpSchema = signInSchema.extend({
 type Screen =
   | "signin"
   | "signup"
-  | "forgot-email"   // Step 1: enter email for OTP
-  | "forgot-otp"     // Step 2: enter 6-digit OTP
-  | "forgot-newpw"   // Step 3: set new password (already verified)
+  | "forgot-email"   // Request a password-reset link
+  | "forgot-sent"    // Link request confirmation
   | "signup-pending" // Email confirmation pending
-  | "recovery";      // Arrived via magic-link recovery (legacy)
+  | "recovery";      // Arrived via password-reset link
 
 function Auth() {
   const { get: getHeader } = useSiteContent("header");
@@ -46,7 +52,6 @@ function Auth() {
     (getHeader("branding", "title_line1") || "The Agriculture") +
     " " +
     (getHeader("branding", "title_line2") || "Popular Article Magazine");
-  const nav = useNavigate();
   const { redirect: redirectUrl } = Route.useSearch();
 
   const [screen, setScreen] = useState<Screen>("signin");
@@ -54,13 +59,7 @@ function Auth() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showPw, setShowPw] = useState(false);
 
-  // forgot-password state
   const [resetEmail, setResetEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [newPw, setNewPw] = useState("");
-  const [confirmPw, setConfirmPw] = useState("");
-
-  // recovery (legacy magic-link) state
   const [recoveryNewPw, setRecoveryNewPw] = useState("");
   const [recoveryConfirmPw, setRecoveryConfirmPw] = useState("");
 
@@ -71,7 +70,7 @@ function Auth() {
 
   const clearErr = () => setErrorMsg(null);
 
-  // ─── Check if already signed in or if arriving via magic-link recovery ───
+  // ─── Check if already signed in or arriving via password-reset link ───
   useEffect(() => {
     const hash = typeof window !== "undefined" ? window.location.hash : "";
 
@@ -167,8 +166,8 @@ function Auth() {
     }
   };
 
-  // ─── Forgot: Step 1 — Send OTP ───
-  const handleSendOtp = async (e: React.FormEvent) => {
+  // ─── Request a recovery link, not a login OTP ───
+  const handleRequestReset = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErr();
     const emailParsed = z.string().email().max(255).safeParse(resetEmail.trim());
@@ -176,72 +175,25 @@ function Auth() {
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: emailParsed.data,
-        options: { shouldCreateUser: false },
+      const { error } = await supabase.auth.resetPasswordForEmail(emailParsed.data, {
+        redirectTo: `${window.location.origin}/auth`,
       });
       if (error) {
         if (error.message?.toLowerCase().includes("rate limit")) {
-          err("Please wait a moment before requesting another code.");
+          err("Please wait a moment before requesting another link.");
         } else {
           err(error.message);
         }
         return;
       }
-      toast.success("6-digit code sent to your email.");
-      setScreen("forgot-otp");
+      toast.success("If an account exists for that email, a password-reset link is on its way.");
+      setScreen("forgot-sent");
     } finally {
       setLoading(false);
     }
   };
 
-  // ─── Forgot: Step 2 — Verify OTP ───
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearErr();
-    if (otp.trim().length !== 6) { err("Please enter the 6-digit code from your email."); return; }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        email: resetEmail.trim(),
-        token: otp.trim(),
-        type: "email",
-      });
-      if (error) {
-        err("Invalid or expired code. Please check and try again.");
-        return;
-      }
-      // Verified — now show new password screen (user is already signed in via OTP)
-      toast.success("Code verified! Now set your new password.");
-      setScreen("forgot-newpw");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ─── Forgot: Step 3 — Set new password & auto-redirect ───
-  const handleSetNewPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearErr();
-    if (newPw.length < 8) { err("Password must be at least 8 characters."); return; }
-    if (newPw !== confirmPw) { err("Passwords do not match."); return; }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPw });
-      if (error) { err(error.message); return; }
-      toast.success("Password updated! Signing you in…");
-      // Short delay so toast is visible, then redirect directly
-      setTimeout(() => {
-        window.location.href = redirectUrl || "/dashboard";
-      }, 800);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ─── Recovery (legacy magic-link) — Update password & auto-redirect ───
+  // ─── Recovery link — Update password & auto-redirect ───
   const handleRecoveryUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErr();
@@ -381,9 +333,9 @@ function Auth() {
         <div className="eyebrow">Reset password</div>
         <h1 className="font-display text-2xl mt-3 text-ink">Forgot your password?</h1>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          Enter your email and we'll send a <strong>6-digit code</strong> to verify it's you.
+          Enter your email and we'll send you a link to choose a new password.
         </p>
-        <form onSubmit={handleSendOtp} className="mt-8 space-y-4">
+        <form onSubmit={handleRequestReset} className="mt-8 space-y-4">
           <ErrorBox />
           <input
             type="email"
@@ -394,7 +346,7 @@ function Auth() {
             onChange={(e) => setResetEmail(e.target.value)}
             className="w-full h-11 bg-paper border border-rule px-4 rounded-sm text-sm focus:outline-none focus:border-primary"
           />
-          <SubmitBtn label="Send 6-digit code" loadingLabel="Sending…" />
+          <SubmitBtn label="Send reset link" loadingLabel="Sending…" />
         </form>
         <button
           onClick={() => { clearErr(); setScreen("signin"); }}
@@ -406,72 +358,29 @@ function Auth() {
     );
   }
 
-  if (screen === "forgot-otp") {
+  if (screen === "forgot-sent") {
     return (
       <Container>
-        <div className="eyebrow">Reset password — Step 2 of 3</div>
-        <h1 className="font-display text-2xl mt-3 text-ink">Enter verification code</h1>
+        <div className="eyebrow">Check your email</div>
+        <h1 className="font-display text-2xl mt-3 text-ink">Reset link requested</h1>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          We sent a 6-digit code to <strong>{resetEmail}</strong>. It expires in 10 minutes.
+          If an account exists for <strong>{resetEmail}</strong>, you'll receive a link to set a new password. Check your spam folder too.
         </p>
-        <form onSubmit={handleVerifyOtp} className="mt-8 space-y-4">
-          <ErrorBox />
-          <input
-            type="text"
-            required
-            inputMode="numeric"
-            pattern="[0-9]{6}"
-            maxLength={6}
-            placeholder="6-digit code"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            className="w-full h-11 bg-paper border border-rule px-4 rounded-sm text-sm tracking-widest text-center text-lg font-mono focus:outline-none focus:border-primary"
-          />
-          <SubmitBtn label="Verify code" loadingLabel="Verifying…" />
-        </form>
         <div className="mt-5 flex items-center justify-between text-sm">
           <button
-            onClick={() => { clearErr(); setScreen("forgot-email"); }}
+            onClick={() => { clearErr(); setScreen("signin"); }}
             className="text-muted-foreground hover:text-orange hover:underline"
           >
-            ← Different email
+            ← Back to sign in
           </button>
           <button
-            onClick={handleSendOtp as any}
+            onClick={() => { clearErr(); setScreen("forgot-email"); }}
             disabled={loading}
             className="text-primary hover:underline disabled:opacity-50"
           >
-            Resend code
+            Try another email
           </button>
         </div>
-      </Container>
-    );
-  }
-
-  if (screen === "forgot-newpw") {
-    return (
-      <Container>
-        <div className="eyebrow text-primary">Reset password — Step 3 of 3</div>
-        <h1 className="font-display text-2xl mt-3 text-ink">Set your new password</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          You'll be signed in automatically after saving.
-        </p>
-        <form onSubmit={handleSetNewPassword} className="mt-8 space-y-4">
-          <ErrorBox />
-          <PwInput
-            value={newPw}
-            onChange={setNewPw}
-            placeholder="New password (min 8 characters)"
-            autoComplete="new-password"
-          />
-          <PwInput
-            value={confirmPw}
-            onChange={setConfirmPw}
-            placeholder="Confirm new password"
-            autoComplete="new-password"
-          />
-          <SubmitBtn label="Save password & sign in" loadingLabel="Saving…" />
-        </form>
       </Container>
     );
   }
