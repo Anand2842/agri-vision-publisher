@@ -117,6 +117,9 @@ export type SiteContentKeys = {
   certificate: {
     branding: "magazine_name" | "publisher" | "chief_editor" | "chief_editor_title" | "chief_editor_signature" | "publisher_title" | "publisher_institution" | "publisher_signature" | "seal_text" | "seal_text_membership";
   };
+  aim_scope: {
+    main: "aim" | "scope_items" | "audience";
+  };
   faq: {
     hero: "eyebrow" | "title" | "intro";
     main: "items";
@@ -137,6 +140,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
         { label: "Membership", href: "/membership" },
         { label: "About", href: "/about", children: [
             { label: "About the Magazine", href: "/about" },
+            { label: "Aim & Scope", href: "/aim-and-scope" },
             { label: "Editorial Board", href: "/editorial-board" },
             { label: "Startup Spotlight", href: "/startup-spotlight" },
             { label: "Contact Office", href: "/contact" }
@@ -626,6 +630,13 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       seal_text: "• TAPAM • PUBLISHER • RESEARCH & POPULAR SCIENCE PUBLICATION",
       seal_text_membership: "• TAPAM ESTD 2026 • SCIENCE & AGRICULTURE RURAL ADVANCEMENT"
     }
+  },
+  aim_scope: {
+    main: {
+      aim: "The Agriculture Popular Article Magazine aims to disseminate practical, science-based knowledge in agriculture and allied sciences to farmers, extension workers, students, researchers and policy-makers in clear, accessible English. It publishes peer-reviewed popular articles monthly, online only, and open access.",
+      scope_items: '["Agronomy and crop production","Horticulture and plantation crops","Soil science, water management and irrigation","Plant protection: entomology, pathology and nematology","Animal husbandry, dairy, veterinary and fisheries","Agricultural extension, economics and agri-business","Agricultural engineering, farm mechanisation and post-harvest technology","Arid and dryland agriculture, climate resilience and natural resource management","Forestry, agroforestry and environment","Food science, nutrition and rural development","Agri start-ups, innovations and indigenous technical knowledge"]',
+      audience: "Farmers, KVK and extension professionals, students, research scholars, scientists, teachers, entrepreneurs and policy-makers.",
+    },
   },
   faq: {
     hero: {

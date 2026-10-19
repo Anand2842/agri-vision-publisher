@@ -32,6 +32,8 @@ export function SiteFooter() {
         { label: "Editorial Board", href: "/editorial-board" },
         { label: "Advertise", href: "/advertise" },
         { label: "About", href: "/about" },
+        { label: "Aim & Scope", href: "/aim-and-scope" },
+        { label: "Contact", href: "/contact" },
       ],
     },
     {
