@@ -71,7 +71,6 @@ function CurrentIssue() {
     );
   }
 
-  const pdfHref = issue.pdfUrl;
   const issueSchema = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "PublicationIssue",
