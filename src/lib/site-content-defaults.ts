@@ -126,7 +126,7 @@ export type SiteContentKeys = {
 
 export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string, string>>> = {
   header: {
-    topbar: { phone: "+91 8107240852", email: "dkdkdkdangi@gmail.com" },
+    topbar: { phone: "+91 8107240852", email: "agriculturemagazine3@gmail.com" },
     branding: { tagline: "Knowledge · Innovation · Sustainability", logo_url: logo, title_line1: "The Agriculture", title_line2: "Popular Article Magazine" },
     cta: { special_issue_label: "Special Issue" },
     navigation: {
@@ -151,12 +151,12 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       tagwords: '["Knowledge", "Innovation", "Sustainability", "Community"]',
     },
     contact: {
-      name: "Dr. Dileep Kumar",
-      address: "ICAR–RRS–CAZRI, Jaisalmer 345001",
+      name: "Rammangalam Agri Rural Development Foundation (RADF)",
+      address: "A-64, RP Colony, Jaisalmer 345001, Rajasthan, India",
       phone: "+91 8107240852",
-      email: "dkdkdkdangi@gmail.com",
+      email: "agriculturemagazine3@gmail.com",
     },
-    legal: { publisher_name: "Dr. Dileep Kumar", eissn: "", pissn: "" },
+    legal: { publisher_name: "Rammangalam Agri Rural Development Foundation (RADF)", eissn: "", pissn: "" },
     navigation: {
       columns: JSON.stringify([
         {
@@ -224,7 +224,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
   about: {
     hero: {
       tagline: "A peer-reviewed magazine for India's agricultural community.",
-      para1: "The Agriculture Popular Article Magazine is a monthly, online, peer-reviewed publication dedicated to advancing Indian agriculture through knowledge, innovation, sustainability and community. It is published and edited by Dr. Dileep Kumar, Senior Scientist (Agriculture Extension) at ICAR–RRS–CAZRI, Jaisalmer.",
+      para1: "The Agriculture Popular Article Magazine is a monthly, online, peer-reviewed publication dedicated to advancing Indian agriculture through knowledge, innovation, sustainability and community. It is published by the Rammangalam Agri Rural Development Foundation (RADF), A-64, RP Colony, Jaisalmer 345001, Rajasthan, India. The owner and responsible person is Dileep Kumar, who also serves as Editor-in-Chief.",
       para2: "We sit between the academic journal and the trade magazine: rigorous enough for research, accessible enough for the field officer, the KVK scientist and the progressive farmer. Every article is reviewed by qualified specialists before it reaches our readers.",
       para3: "Our pages cover agronomy, horticulture, soil and water management, animal sciences, agri-business, extension and allied disciplines — with a particular focus on the arid and semi-arid systems of western India and on the smallholder economies of South Asia.",
       para4: "The magazine is open-access. Copyright of accepted articles is transferred to the publisher upon acceptance. Readers pay nothing. Members and institutional partners support the work that makes the magazine possible.",
@@ -238,22 +238,22 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       items: '["Disseminate practical, science-based agricultural knowledge to farmers, extension workers, students and policy-makers.","Highlight indigenous innovations, traditional wisdom and locally adapted practices alongside contemporary research.","Bridge the gap between scientific research and on-farm application through accessible popular articles.","Support young scientists, research scholars and field practitioners with a credible publishing platform.","Encourage interdisciplinary work across agronomy, horticulture, animal sciences, extension and allied fields.","Strengthen India\'s rural development ecosystem by amplifying voices from KVKs, ICAR institutes and state universities."]',
     },
     particulars: {
-      items: '[["Title","The Agriculture Popular Article Magazine"],["E-ISSN","Applied For"],["P-ISSN","Applied For"],["Frequency","Monthly"],["Subject","Agriculture"],["Language","English"],["Format","Online (PDF)"],["Starting Year","2026"],["Publisher","Dr. Dileep Kumar"],["Chief Editor","Dr. Dileep Kumar"],["Publisher Address","ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India"],["Mobile","+91 8107240852"],["Email","dkdkdkdangi@gmail.com"]]',
+      items: '[["Title","The Agriculture Popular Article Magazine"],["E-ISSN","Awaiting assignment"],["Starting Year","2026 (January)"],["Frequency","Monthly"],["Format","Online only"],["Subject","Agriculture and allied sciences"],["Language","English"],["Publishing Body","Rammangalam Agri Rural Development Foundation (RADF)"],["Owner / Responsible Person","Dileep Kumar"],["Editor-in-Chief","Dr. Dileep Kumar"],["Publisher Address","A-64, RP Colony, Jaisalmer 345001, Rajasthan, India"],["Mobile","+91 8107240852"],["Email","agriculturemagazine3@gmail.com"]]',
     },
   },
   contact: {
     office: {
       chief_editor: "Dr. Dileep Kumar",
       chief_editor_title: "Senior Scientist (Agriculture Extension)",
-      email: "dkdkdkdangi@gmail.com",
+      email: "agriculturemagazine3@gmail.com",
       phone: "+91 8107240852",
-      address: "ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India",
+      address: "A-64, RP Colony, Jaisalmer 345001, Rajasthan, India",
       hours: "Mon–Sat · 08:00 to 20:00 IST",
       turnaround: "Editorial decisions are typically returned within 21 days.",
     },
     publisher: {
-      name: "Dr. Dileep Kumar",
-      address: "ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India",
+      name: "Rammangalam Agri Rural Development Foundation (RADF)",
+      address: "A-64, RP Colony, Jaisalmer 345001, Rajasthan, India",
     },
     advertise: {
       heading: "Reach the agriculture community",
@@ -465,7 +465,7 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
       bank_branch: "SBI Main Jaisalmer",
       upi_number: "+91 8107240852",
       upi_qr_url: "",
-      contact_email: "dkdkdkdangi@gmail.com",
+      contact_email: "agriculturemagazine3@gmail.com",
       heading: "Payment Details",
       body: "We support direct bank transfers (NEFT/IMPS) and UPI mobile payments. Please find the credentials below.",
     },
@@ -513,11 +513,11 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
     },
     about: {
       title: "About — The Agriculture Popular Article Magazine",
-      description: "About The Agriculture Popular Article Magazine — a peer-reviewed monthly published and edited by Dr. Dileep Kumar.",
+      description: "About The Agriculture Popular Article Magazine — a peer-reviewed online monthly published by Rammangalam Agri Rural Development Foundation (RADF), Jaisalmer.",
     },
     contact: {
       title: "Contact — The Agriculture Popular Article Magazine",
-      description: "Reach the editorial office of The Agriculture Popular Article Magazine at ICAR-RRS-CAZRI, Jaisalmer.",
+      description: "Reach the editorial office of The Agriculture Popular Article Magazine at A-64, RP Colony, Jaisalmer, Rajasthan.",
     },
     editorial_board: {
       title: "Editorial Board — The Agriculture Popular Article Magazine",
@@ -616,12 +616,12 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
   certificate: {
     branding: {
       magazine_name: "The Agriculture Popular Article Magazine",
-      publisher: "Dr. Dileep Kumar",
+      publisher: "Rammangalam Agri Rural Development Foundation (RADF)",
       chief_editor: "Dr. Dileep Kumar",
       chief_editor_title: "Chief Editor, ICAR-CAZRI",
       chief_editor_signature: "Dileep K. Dangi",
       publisher_title: "Publisher",
-      publisher_institution: "The Agriculture Popular Article Magazine",
+      publisher_institution: "Rammangalam Agri Rural Development Foundation (RADF)",
       publisher_signature: "Dileep Kumar",
       seal_text: "• TAPAM • PUBLISHER • RESEARCH & POPULAR SCIENCE PUBLICATION",
       seal_text_membership: "• TAPAM ESTD 2026 • SCIENCE & AGRICULTURE RURAL ADVANCEMENT"
