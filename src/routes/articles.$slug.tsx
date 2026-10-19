@@ -4,7 +4,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchArticleBySlug, fetchPublishedArticles, articlePdf, type DBArticle } from "@/lib/data";
-import { Bookmark, Share2, Download, Quote, Clock, Eye, Printer, FileText, BookOpen, ExternalLink } from "lucide-react";
+import { Bookmark, Share2, Download, Quote, Clock, Eye, Printer, FileText } from "lucide-react";
 import logo from "@/assets/logo.webp";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { sanitizeHtml } from "@/lib/sanitize";
@@ -84,7 +84,6 @@ function Article() {
     " " +
     (getHeader("branding", "title_line2") || "Popular Article Magazine");
   const pdfHref = articlePdf(a.pdfPath);
-  const [view, setView] = useState<"read" | "pdf">("read");
   const citation = `${a.author} (${a.date}). ${a.title}. ${siteTitle}${a.volume ? `, Vol. ${a.volume}` : ""}${a.issueNumber ? `, No. ${a.issueNumber}` : ""}.`;
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const onShare = async () => {
@@ -225,24 +224,14 @@ function Article() {
           <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-2">
             {pdfHref ? (
               <>
-                <div className="inline-flex rounded-sm border border-rule p-0.5" role="tablist">
-                  <button
-                    role="tab"
-                    aria-selected={view === "read"}
-                    onClick={() => setView("read")}
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm rounded-sm ${view === "read" ? "bg-navy text-white" : "text-foreground/75 hover:text-primary"}`}
-                  >
-                    <BookOpen className="h-4 w-4" /> Read online
-                  </button>
-                  <button
-                    role="tab"
-                    aria-selected={view === "pdf"}
-                    onClick={() => setView("pdf")}
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm rounded-sm ${view === "pdf" ? "bg-navy text-white" : "text-foreground/75 hover:text-primary"}`}
-                  >
-                    <FileText className="h-4 w-4" /> View PDF
-                  </button>
-                </div>
+                <a
+                  href={pdfHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 bg-navy text-white px-4 py-2.5 text-sm rounded-sm hover:bg-primary transition-colors"
+                >
+                  <FileText className="h-4 w-4" /> View PDF
+                </a>
                 <a
                   href={pdfDownloadHref(pdfHref, a.slug)}
                   download={`${a.slug}.pdf`}
@@ -252,42 +241,14 @@ function Article() {
                 </a>
               </>
             ) : (
-              <button
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 border border-rule px-4 py-2.5 text-sm rounded-sm hover:border-orange hover:text-orange transition-colors"
-              >
-                <Printer className="h-4 w-4" /> Print / Save as PDF
-              </button>
+              <span className="inline-flex items-center gap-1.5 border border-rule px-4 py-2.5 text-sm rounded-sm text-muted-foreground">
+                <FileText className="h-4 w-4" /> PDF coming soon
+              </span>
             )}
           </div>
         </div>
 
-        {pdfHref && view === "pdf" && (
-          <div className="container-editorial mt-8 print:hidden">
-            <object
-              data={pdfHref}
-              type="application/pdf"
-              aria-label={`PDF of ${a.title}`}
-              className="w-full h-[85vh] border border-rule rounded-sm bg-paper"
-            >
-              <div className="p-10 text-center text-sm text-muted-foreground">
-                This browser can't show the PDF inside the page.
-              </div>
-            </object>
-            <div className="mt-2 text-center text-xs">
-              <a
-                href={pdfHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-primary hover:text-orange"
-              >
-                <ExternalLink className="h-3.5 w-3.5" /> Open the PDF in a new tab
-              </a>
-            </div>
-          </div>
-        )}
-
-        <div className={`container-editorial grid md:grid-cols-12 gap-12 mt-14 print:mt-0 print:block ${view === "pdf" ? "hidden" : ""}`}>
+        <div className={`container-editorial grid md:grid-cols-12 gap-12 mt-14 print:mt-0 print:block hidden`}>
           <aside className="md:col-span-1 md:sticky md:top-36 self-start flex flex-col gap-3 text-muted-foreground print:hidden">
             <button
               onClick={onShare}

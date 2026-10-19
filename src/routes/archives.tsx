@@ -297,13 +297,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                       </div>
                     </div>
                     <div className="shrink-0 flex items-center gap-2 ml-2">
-                      <Link
-                        to="/articles/$slug"
-                        params={{ slug: a.slug }}
-                        className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[var(--navy)]/60 hover:text-[var(--navy)] transition-colors"
-                      >
-                        <FileText className="h-3 w-3" /> Read
-                      </Link>
+
                       {pdf ? (
                         <a
                           href={pdf}
@@ -311,7 +305,7 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[var(--orange)] hover:text-[var(--orange)]/80 transition-colors"
                         >
-                          <Download className="h-3 w-3" /> PDF
+                          <FileText className="h-3 w-3" /> View PDF
                         </a>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-foreground/25 cursor-not-allowed">
