@@ -38,6 +38,7 @@ function AdminContentPage() {
           <TabsTrigger value="advertise">Advertise</TabsTrigger>
           <TabsTrigger value="publication_ethics">Publication Ethics</TabsTrigger>
           <TabsTrigger value="certificate">Certificates</TabsTrigger>
+          <TabsTrigger value="aim_scope">Aim &amp; Scope</TabsTrigger>
           <TabsTrigger value="faq">FAQ</TabsTrigger>
           <TabsTrigger value="seo">SEO Meta</TabsTrigger>
         </TabsList>
@@ -86,6 +87,9 @@ function AdminContentPage() {
         </TabsContent>
         <TabsContent value="certificate">
           <CertificateCms />
+        </TabsContent>
+        <TabsContent value="aim_scope">
+          <AimScopeCms />
         </TabsContent>
         <TabsContent value="faq">
           <FaqCms />
@@ -666,6 +670,20 @@ function AdvertiseCms() {
             { key: "highlighted", label: "Highlighted / Featured (Boolean)", type: "boolean" }
           ]}
         />
+      </CmsSection>
+    </div>
+  );
+}
+
+function AimScopeCms() {
+  const { get, loading } = useSiteContent("aim_scope");
+  if (loading) return <Loader2 className="animate-spin" />;
+  return (
+    <div className="space-y-6">
+      <CmsSection title="Aim & Scope page">
+        <TextareaEditor page="aim_scope" section="main" contentKey="aim" label="Aim" initialValue={get("main", "aim")} />
+        <JsonArrayEditor page="aim_scope" section="main" contentKey="scope_items" label="Subject areas covered" initialValue={get("main", "scope_items")} />
+        <TextareaEditor page="aim_scope" section="main" contentKey="audience" label="Readership" initialValue={get("main", "audience")} />
       </CmsSection>
     </div>
   );

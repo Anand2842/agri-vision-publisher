@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdvertiseRouteImport } from './routes/advertise'
+import { Route as AimAndScopeRouteImport } from './routes/aim-and-scope'
 import { Route as ArchivesRouteImport } from './routes/archives'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthorGuidelinesRouteImport } from './routes/author-guidelines'
@@ -70,6 +71,11 @@ const AboutRoute = AboutRouteImport.update({
 const AdvertiseRoute = AdvertiseRouteImport.update({
   id: '/advertise',
   path: '/advertise',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AimAndScopeRoute = AimAndScopeRouteImport.update({
+  id: '/aim-and-scope',
+  path: '/aim-and-scope',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArchivesRoute = ArchivesRouteImport.update({
@@ -282,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/advertise': typeof AdvertiseRoute
+  '/aim-and-scope': typeof AimAndScopeRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/author-guidelines': typeof AuthorGuidelinesRoute
@@ -326,6 +333,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/advertise': typeof AdvertiseRoute
+  '/aim-and-scope': typeof AimAndScopeRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/author-guidelines': typeof AuthorGuidelinesRoute
@@ -371,6 +379,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/advertise': typeof AdvertiseRoute
+  '/aim-and-scope': typeof AimAndScopeRoute
   '/archives': typeof ArchivesRoute
   '/auth': typeof AuthRoute
   '/author-guidelines': typeof AuthorGuidelinesRoute
@@ -417,6 +426,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/advertise'
+    | '/aim-and-scope'
     | '/archives'
     | '/auth'
     | '/author-guidelines'
@@ -461,6 +471,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/advertise'
+    | '/aim-and-scope'
     | '/archives'
     | '/auth'
     | '/author-guidelines'
@@ -505,6 +516,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/advertise'
+    | '/aim-and-scope'
     | '/archives'
     | '/auth'
     | '/author-guidelines'
@@ -551,6 +563,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
   AdvertiseRoute: typeof AdvertiseRoute
+  AimAndScopeRoute: typeof AimAndScopeRoute
   ArchivesRoute: typeof ArchivesRoute
   AuthRoute: typeof AuthRoute
   AuthorGuidelinesRoute: typeof AuthorGuidelinesRoute
@@ -607,6 +620,13 @@ declare module '@tanstack/react-router' {
       path: '/advertise'
       fullPath: '/advertise'
       preLoaderRoute: typeof AdvertiseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aim-and-scope': {
+      id: '/aim-and-scope'
+      path: '/aim-and-scope'
+      fullPath: '/aim-and-scope'
+      preLoaderRoute: typeof AimAndScopeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/archives': {
@@ -935,6 +955,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
   AdvertiseRoute: AdvertiseRoute,
+  AimAndScopeRoute: AimAndScopeRoute,
   ArchivesRoute: ArchivesRoute,
   AuthRoute: AuthRoute,
   AuthorGuidelinesRoute: AuthorGuidelinesRoute,

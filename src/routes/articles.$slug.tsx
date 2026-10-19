@@ -128,7 +128,7 @@ function Article() {
         : {}),
       publisher: {
         "@type": "Organization",
-        name: siteTitle,
+        name: "Rammangalam Agri Rural Development Foundation (RADF)",
         url: "https://agriculturemagazine.in",
         logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/slAjYeeuQ8SRuPj17PjsNhvrcv43/social-images/social-1779385100705-logo.webp",
       },

@@ -16,4 +16,6 @@
 - [x] Verify public views
 - [ ] Verify admin views with an authenticated session
 - [ ] Import verified board sheet and genuine additional issues when supplied
-- [ ] Add downloadable PDFs for the six published articles when supplied
+- [ ] Add downloadable PDFs for the six published articles when supplied- [x] Publisher = RADF, owner Dileep Kumar, A-64 RP Colony Jaisalmer, agriculturemagazine3@gmail.com (site + saved content)
+- [x] Aim & Scope page; full-issue downloads hidden; advisory/reviewers marked not board
+- [ ] Final article PDFs with volume/issue/month/year (client)

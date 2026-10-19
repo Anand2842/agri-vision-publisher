@@ -71,7 +71,6 @@ function CurrentIssue() {
     );
   }
 
-  const pdfHref = issue.pdfUrl;
   const issueSchema = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "PublicationIssue",
@@ -87,8 +86,8 @@ function CurrentIssue() {
       url: "https://agriculturemagazine.in",
     },
     publisher: {
-      "@type": "Person",
-      name: "Dr. Dileep Kumar",
+      "@type": "Organization",
+      name: "Rammangalam Agri Rural Development Foundation (RADF)",
       url: "https://agriculturemagazine.in",
     },
     hasPart: articles.map((a: DBArticle) => ({
@@ -146,35 +145,12 @@ function CurrentIssue() {
 
               {/* Download / Read CTAs */}
               <div className="mt-8 max-w-md mx-auto space-y-3">
-                {pdfHref ? (
-                  <a
-                    href={pdfHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-between gap-4 bg-[var(--navy)] text-white px-5 py-4 hover:bg-[var(--navy)]/90 transition-colors"
-                  >
-                    <span className="flex items-center gap-3">
-                      <Download className="h-5 w-5" />
-                      <span>
-                        <span className="block text-sm font-semibold">
-                          View / Download Full Issue
-                        </span>
-                        <span className="block text-xs uppercase tracking-wider opacity-70">
-                          PDF
-                        </span>
-                      </span>
-                    </span>
-                    <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
-                  </a>
-                ) : (
-                  <div className="flex items-center gap-3 border border-dashed border-rule bg-muted px-5 py-4 text-muted-foreground">
-                    <FileText className="h-5 w-5 shrink-0" />
-                    <span className="text-sm">
-                      The full-issue PDF is not published yet — read the articles below.
-                    </span>
-                  </div>
-
-                )}
+                <div className="flex items-center gap-3 border border-rule bg-muted px-5 py-4 text-muted-foreground">
+                  <FileText className="h-5 w-5 shrink-0" />
+                  <span className="text-sm">
+                    Each article below has its own page and downloadable PDF.
+                  </span>
+                </div>
                 <Link
                   to="/archives"
                   className="group flex items-center justify-between gap-4 border border-[var(--navy)]/25 text-[var(--navy)] px-5 py-4 hover:bg-[var(--navy)]/5 transition-colors"
