@@ -34,10 +34,17 @@ export const Route = createFileRoute("/archives")({
 });
 
 function Archives() {
-  const { issues } = Route.useLoaderData() as {
+  const { issues: allIssues } = Route.useLoaderData() as {
     seo: { title: string; description: string };
     issues: IssueRow[];
   };
+  const issues = useMemo(
+    () =>
+      allIssues
+        .filter((i) => i.publishedAt)
+        .sort((a, b) => String(b.publishedAt).localeCompare(String(a.publishedAt))),
+    [allIssues],
+  );
   const [year, setYear] = useState<string>("all");
   const [month, setMonth] = useState<string>("all");
   const { get } = useSiteContent("archives");

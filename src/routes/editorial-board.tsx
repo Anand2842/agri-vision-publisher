@@ -160,8 +160,7 @@ function Board() {
 
   const groupBy = (role: string) => editorialBoard.filter((m) => m.role === role);
   const eic = groupBy("Editor-in-Chief")[0];
-  const international = groupBy("International Editor");
-  const associate = groupBy("Associate Editor");
+  const members = editorialBoard.filter((m) => m.role !== "Editor-in-Chief");
 
   return (
     <>
@@ -182,16 +181,9 @@ function Board() {
         <SectionHeader eyebrow="Leadership" title="Editor-in-Chief" />
         <div className="grid md:grid-cols-1 max-w-xs">{eic && <PersonCard m={eic} large />}</div>
 
-        <SectionHeader eyebrow={`${international.length} Editors`} title="International Editors" />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
-          {international.map((m) => (
-            <PersonCard key={m.name} m={m} />
-          ))}
-        </div>
-
-        <SectionHeader eyebrow={`${associate.length} Editors`} title="Associate Editors" />
+        <SectionHeader eyebrow={`${members.length} Members`} title="Editorial Board" />
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
-          {associate.map((m) => (
+          {members.map((m) => (
             <PersonCard key={m.name} m={m} />
           ))}
         </div>
