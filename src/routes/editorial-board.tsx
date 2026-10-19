@@ -200,12 +200,14 @@ function Board() {
           eyebrow={`${advisoryCommittee.length} Members`}
           title="International Advisory Committee"
         />
+        <p className="-mt-8 mb-4 text-xs uppercase tracking-wider text-muted-foreground">Not part of the Editorial Board</p>
         <p className="-mt-6 mb-10 text-foreground/70 max-w-2xl">{get("advisory", "description")}</p>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-[var(--navy)]/15">
           {advisoryCommittee.map((m) => <DirectoryEntry key={`${m.name}-${m.inst}`} member={m} />)}
         </div>
 
         <SectionHeader eyebrow={`${reviewers.length} Reviewers`} title="Peer Reviewers" />
+        <p className="-mt-8 mb-4 text-xs uppercase tracking-wider text-muted-foreground">Not part of the Editorial Board</p>
         <p className="-mt-6 mb-10 text-foreground/70 max-w-2xl">
           {get("reviewers", "description")}
         </p>
