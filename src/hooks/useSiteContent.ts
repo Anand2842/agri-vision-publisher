@@ -72,7 +72,7 @@ export function normalizeSiteContentValue(val: string): string {
     .replace(/\+91\s*95091\s*64410/g, "+91 8107240852")
     .replace(/9509164410/g, "8107240852")
     .replace(/Dr\.\s*Dileep\s*Kumar\s*Dangi/gi, "Dr. Dileep Kumar")
-    .replace(/ICAR[–-]CAZRI[–-]RRS\s*Jaisalmer,\s*Jodhpur\s*Road,\s*Jaisalmer\s*345001,\s*Rajasthan,\s*India/gi, "ICAR–RRS–CAZRI, Jaisalmer 345001, Rajasthan, India");
+    ;
 }
 
 async function syncLegacyRowsIfAdmin(rows: { page: string; section: string; key: string; value?: string | null }[]) {
@@ -83,8 +83,7 @@ async function syncLegacyRowsIfAdmin(rows: { page: string; section: string; key:
         v.includes("9509164410") ||
         v.includes("95091 64410") ||
         v.includes("dkdkdangi@gmail.com") ||
-        v.includes("Dileep Kumar Dangi") ||
-        v.includes("Jodhpur Road")
+        v.includes("Dileep Kumar Dangi")
       );
     });
     if (outdated.length === 0) return;

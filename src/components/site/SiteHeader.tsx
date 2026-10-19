@@ -213,12 +213,12 @@ export function SiteHeader() {
             </Link>
             <span className="hidden md:inline w-px h-3.5 bg-white/20" />
             <a
-              href={`mailto:${getHeader("topbar", "email") || "dkdkdkdangi@gmail.com"}`}
+              href={`mailto:${getHeader("topbar", "email") || "agriculturemagazine3@gmail.com"}`}
               aria-label="Email"
               className="hover:text-orange flex items-center gap-1.5"
             >
               <Mail className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{getHeader("topbar", "email") || "dkdkdkdangi@gmail.com"}</span>
+              <span className="hidden sm:inline">{getHeader("topbar", "email") || "agriculturemagazine3@gmail.com"}</span>
             </a>
           </div>
         </div>

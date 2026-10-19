@@ -103,11 +103,11 @@ export function SiteFooter() {
           />
         ))}
         <div>
-          <div className="eyebrow mb-4 text-white/50">Editorial Office</div>
+          <div className="eyebrow mb-4 text-white/50">Publisher &amp; Office</div>
           <ul className="space-y-2 text-sm text-white/80">
-            <li>{getFooter("contact", "name") || "Dr. Dileep Kumar"}</li>
+            <li>{getFooter("contact", "name") || "Rammangalam Agri Rural Development Foundation (RADF)"}</li>
             <li className="text-white/60">
-              {getFooter("contact", "address") || "ICAR–RRS–CAZRI, Jaisalmer 345001"}
+              {getFooter("contact", "address") || "A-64, RP Colony, Jaisalmer 345001, Rajasthan, India"}
             </li>
             <li>
               <a
@@ -119,10 +119,10 @@ export function SiteFooter() {
             </li>
             <li>
               <a
-                href={`mailto:${getFooter("contact", "email") || "dkdkdkdangi@gmail.com"}`}
+                href={`mailto:${getFooter("contact", "email") || "agriculturemagazine3@gmail.com"}`}
                 className="hover:text-orange transition-colors break-all"
               >
-                {getFooter("contact", "email") || "dkdkdkdangi@gmail.com"}
+                {getFooter("contact", "email") || "agriculturemagazine3@gmail.com"}
               </a>
             </li>
           </ul>
@@ -152,7 +152,7 @@ export function SiteFooter() {
             © {new Date().getFullYear()} {getHeader("branding", "title_line1") || "The Agriculture"}{" "}
             {getHeader("branding", "title_line2") || "Popular Article Magazine"}. Published by{" "}
             {getFooter("legal", "publisher_name") ||
-              "Dr. Dileep Kumar"}
+              "Rammangalam Agri Rural Development Foundation (RADF)"}
             .
           </div>
           <div>Published monthly · Peer reviewed · Open access</div>
