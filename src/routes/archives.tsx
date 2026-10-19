@@ -224,16 +224,6 @@ function IssueCard({ issue }: { issue: IssueRow }) {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            {issue.pdfUrl && (
-              <a
-                href={issue.pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-[var(--navy)] border border-[var(--navy)]/25 px-3 py-1.5 hover:bg-[var(--navy)]/5 transition-colors"
-              >
-                <Download className="h-3.5 w-3.5" /> Full Issue PDF
-              </a>
-            )}
             <button
               onClick={handleToggle}
               className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-primary border border-primary/25 px-3 py-1.5 hover:bg-primary/5 transition-colors"
