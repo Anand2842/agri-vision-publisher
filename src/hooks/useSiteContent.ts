@@ -68,7 +68,6 @@ export function updateSiteContentCache(page: string, section: string, key: strin
 export function normalizeSiteContentValue(val: string): string {
   if (!val || typeof val !== "string") return val;
   return val
-    .replace(/dkdkdangi@gmail\.com/gi, "dkdkdkdangi@gmail.com")
     .replace(/\+91\s*95091\s*64410/g, "+91 8107240852")
     .replace(/9509164410/g, "8107240852")
     .replace(/Dr\.\s*Dileep\s*Kumar\s*Dangi/gi, "Dr. Dileep Kumar")
@@ -82,7 +81,6 @@ async function syncLegacyRowsIfAdmin(rows: { page: string; section: string; key:
       return (
         v.includes("9509164410") ||
         v.includes("95091 64410") ||
-        v.includes("dkdkdangi@gmail.com") ||
         v.includes("Dileep Kumar Dangi")
       );
     });
