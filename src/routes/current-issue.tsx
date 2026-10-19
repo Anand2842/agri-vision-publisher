@@ -87,8 +87,8 @@ function CurrentIssue() {
       url: "https://agriculturemagazine.in",
     },
     publisher: {
-      "@type": "Person",
-      name: "Dr. Dileep Kumar",
+      "@type": "Organization",
+      name: "Rammangalam Agri Rural Development Foundation (RADF)",
       url: "https://agriculturemagazine.in",
     },
     hasPart: articles.map((a: DBArticle) => ({

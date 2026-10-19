@@ -366,7 +366,7 @@ function Submit() {
               className="text-sm text-foreground/80 leading-normal font-sans select-none"
             >
               I confirm this is original, unpublished work and I agree to transfer the copyright of
-              the accepted article to the publisher, Dr. Dileep Kumar,
+              the accepted article to the publisher, Rammangalam Agri Rural Development Foundation (RADF),
               upon acceptance.
             </label>
           </div>
