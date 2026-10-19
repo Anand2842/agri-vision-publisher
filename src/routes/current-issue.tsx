@@ -247,7 +247,7 @@ function CurrentIssue() {
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 mt-1 text-[var(--navy)] hover:text-[var(--orange)] uppercase tracking-wider font-semibold"
                             >
-                              <Download className="h-3 w-3" /> PDF
+                              <FileText className="h-3 w-3" /> View PDF
                             </a>
                           ) : (
                             <span className="inline-flex items-center gap-1 mt-1 text-foreground/30 uppercase tracking-wider font-semibold cursor-not-allowed">
