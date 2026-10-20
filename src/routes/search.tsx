@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArticleLink } from "@/components/site/ArticleLink";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { searchArticles, type DBArticle } from "@/lib/data";
@@ -123,7 +124,7 @@ function SearchPage() {
           {!loading &&
             results.map((a) => (
               <li key={a.slug} className="py-7">
-                <Link to="/articles/$slug" params={{ slug: a.slug }} className="group block">
+                <ArticleLink slug={a.slug} pdfPath={a.pdfPath}  className="group block">
                   <div className="eyebrow">{a.category}</div>
                   <div className="font-display text-2xl mt-1 group-hover:text-primary">
                     {a.title}
@@ -132,7 +133,7 @@ function SearchPage() {
                   <div className="text-xs text-muted-foreground mt-3">
                     {a.author} · {a.affiliation} · {a.date}
                   </div>
-                </Link>
+                </ArticleLink>
               </li>
             ))}
         </ul>

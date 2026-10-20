@@ -1,4 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { fetchIssues } from "@/lib/data";
 import {
   Search,
   Menu,
@@ -47,37 +48,32 @@ type NavLeaf = { to: string; label: string; description?: string };
 type NavItem = { to: string; label: string; description?: string; children?: NavLeaf[] };
 
 const defaultNav: NavItem[] = [
-  { to: "/", label: "Home", description: "Latest from the magazine" },
-  { to: "/about", label: "About", description: "Our mission & story" },
-  { to: "/editorial-board", label: "Editorial", description: "Meet the board" },
-  { to: "/current-issue", label: "Current Issue", description: "This month's edition" },
-  { to: "/archives", label: "Archives", description: "Browse every back issue" },
+  { to: "/", label: "Home" },
+  { to: "/editorial-board", label: "Editorial Board" },
+  { to: "/current-issue", label: "Current Issue" },
+  { to: "/archives", label: "Archives", children: [] },
   {
-    to: "/submission-guidelines",
+    to: "/submit",
     label: "Submission",
     children: [
-      {
-        to: "/submission-guidelines",
-        label: "Author Guidelines",
-        description: "Format, scope & review process",
-      },
       { to: "/submit", label: "Submit Article", description: "Start a new manuscript" },
+      { to: "/author-guidelines", label: "Author Guidelines" },
+      { to: "/submission-guidelines", label: "Submission Guidelines" },
+      { to: "/membership", label: "Membership" },
     ],
   },
-  { to: "/membership", label: "Membership", description: "Join the community" },
   {
-    to: "/startup-spotlight",
-    label: "Resources",
+    to: "/aim-and-scope",
+    label: "Publication",
     children: [
-      {
-        to: "/startup-spotlight",
-        label: "Startup Spotlight",
-        description: "Agri-ventures to watch",
-      },
-      { to: "/advertise", label: "Advertise", description: "Reach our readership" },
-      { to: "/contact", label: "Contact", description: "Get in touch" },
+      { to: "/aim-and-scope", label: "Aim & Scope" },
+      { to: "/publication-ethics", label: "Publication Ethics" },
+      { to: "/plagiarism-policy", label: "Plagiarism Policy" },
+      { to: "/open-access", label: "Open Access" },
+      { to: "/faq", label: "FAQ" },
     ],
   },
+  { to: "/advertise", label: "Advertise" },
 ];
 
 const iconFor = (label: string) => {
@@ -108,20 +104,30 @@ export function SiteHeader() {
   const { getHeader, getHeaderJson, getFooter } = useGlobalSiteContent();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const rawNav = getHeaderJson("navigation", "items");
-  const navResult = rawNav ? NavSchema.safeParse(rawNav) : null;
-  const cmsNav: NavItem[] | null = navResult?.success
-    ? navResult.data.map((item) => ({
-        to: item.href || item.to || "/",
-        label: item.label,
-        children: item.children?.map((child) => ({
-          to: child.href || child.to || "/",
-          label: child.label,
-        })),
-      }))
-    : null;
+  void getHeaderJson;
+  void NavSchema;
+  const [issues, setIssues] = useState<{ id: string; label: string }[]>([]);
+  useEffect(() => {
+    fetchIssues()
+      .then((rows) =>
+        setIssues(
+          rows.map((r) => ({ id: r.id, label: `Vol. ${r.volume}, No. ${r.number} — ${r.date}` })),
+        ),
+      )
+      .catch(() => {});
+  }, []);
 
-  const currentNav: NavItem[] = cmsNav ?? defaultNav;
+  const currentNav: NavItem[] = defaultNav.map((n) =>
+    n.label === "Archives"
+      ? {
+          ...n,
+          children: [
+            ...issues.map((i) => ({ to: `/archives#issue-${i.id}`, label: i.label })),
+            { to: "/archives", label: "All Archives" },
+          ],
+        }
+      : n,
+  );
 
   const isActive = (to: string) => {
     if (to === "/") return pathname === "/";
@@ -361,7 +367,7 @@ export function SiteHeader() {
                     />
                   </Link>
                   {hasChildren && (
-                    <div className="invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-200 absolute left-0 top-full z-50 min-w-[320px] bg-background text-foreground border border-rule shadow-2xl">
+                    <div className="invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 transition-all duration-200 absolute left-0 top-full z-50 min-w-[280px] max-h-[70vh] overflow-y-auto bg-background text-foreground border border-rule shadow-2xl">
                       <div className="h-1 bg-orange" />
                       <ul className="py-2">
                         {n.children!.map((c) => {
@@ -370,7 +376,8 @@ export function SiteHeader() {
                           return (
                             <li key={c.label}>
                               <Link
-                                to={c.to}
+                                to={c.to.split("#")[0]}
+                                hash={c.to.split("#")[1]}
                                 className={`flex items-start gap-3 px-4 py-3 hover:bg-secondary/60 transition-colors ${
                                   cActive ? "bg-secondary/50" : ""
                                 }`}
@@ -479,7 +486,8 @@ export function SiteHeader() {
                         return (
                           <Link
                             key={c.label}
-                            to={c.to}
+                            to={c.to.split("#")[0]}
+                            hash={c.to.split("#")[1]}
                             onClick={() => setOpen(false)}
                             className="flex items-start gap-2.5 py-2 text-foreground/80 hover:text-orange"
                           >

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArticleLink } from "@/components/site/ArticleLink";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import {
@@ -205,8 +206,21 @@ function IssueCard({ issue }: { issue: IssueRow }) {
     }
   };
 
+  useEffect(() => {
+    const check = () => {
+      if (window.location.hash === `#issue-${issue.id}` && !open) {
+        handleToggle();
+        document.getElementById(`issue-${issue.id}`)?.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+    check();
+    window.addEventListener("hashchange", check);
+    return () => window.removeEventListener("hashchange", check);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [issue.id]);
+
   return (
-    <div className="border border-rule bg-background">
+    <div id={`issue-${issue.id}`} className="border border-rule bg-background scroll-mt-40">
       {/* Issue header row */}
       <div className="grid sm:grid-cols-[auto_1fr] gap-6 p-6">
         <div className="bg-paper border border-rule w-28 sm:w-36 aspect-[3/4] overflow-hidden flex items-center justify-center shrink-0">
@@ -282,13 +296,13 @@ function IssueCard({ issue }: { issue: IssueRow }) {
                       <div className="text-xs uppercase tracking-wider text-foreground/50 font-semibold">
                         {a.category}
                       </div>
-                      <Link
-                        to="/articles/$slug"
-                        params={{ slug: a.slug }}
+                      <ArticleLink
+                        slug={a.slug} pdfPath={a.pdfPath}
+                        
                         className="font-display text-[var(--navy)] hover:text-[var(--orange)] transition-colors leading-snug block mt-0.5"
                       >
                         {a.title}
-                      </Link>
+                      </ArticleLink>
                       <div className="text-xs text-foreground/55 mt-1 font-sans">
                         <span className="font-medium text-foreground/80">{a.author}</span>
                         {a.affiliation && <span className="italic"> · {a.affiliation}</span>}

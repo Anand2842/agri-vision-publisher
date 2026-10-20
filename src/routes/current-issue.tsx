@@ -1,4 +1,5 @@
 import { createFileRoute, Link, ErrorComponent, useRouter, type ErrorComponentProps } from "@tanstack/react-router";
+import { ArticleLink } from "@/components/site/ArticleLink";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { fetchIssues, fetchPublishedArticles, articlePdf, type DBArticle } from "@/lib/data";
@@ -212,14 +213,14 @@ function CurrentIssue() {
                           <div className="text-xs uppercase tracking-[0.2em] text-[var(--orange)] font-semibold">
                             {a.category}
                           </div>
-                          <Link to="/articles/$slug" params={{ slug: a.slug }} className="block">
+                          <ArticleLink slug={a.slug} pdfPath={a.pdfPath}  className="block">
                             <h4 className="font-display text-xl md:text-2xl mt-1.5 text-[var(--navy)] hover:text-[var(--orange)] transition-colors leading-snug">
                               {a.title}
                             </h4>
                             <p className="mt-2 text-sm text-muted-foreground leading-relaxed line-clamp-2">
                               {a.abstract}
                             </p>
-                          </Link>
+                          </ArticleLink>
                           <div className="mt-3 text-xs text-muted-foreground">
                             <span className="text-[var(--navy)] font-medium">
                               {a.author}

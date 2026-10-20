@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArticleLink } from "@/components/site/ArticleLink";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { ArrowRight, BadgeCheck, BookOpenCheck, CalendarClock, Globe2 } from "lucide-react";
@@ -164,13 +165,13 @@ function Hero({ deadline, latest }: { deadline: string; latest: DBArticle[] }) {
               <ul className="mt-3 space-y-2">
                 {latest.slice(0, 3).map((a) => (
                   <li key={a.slug}>
-                    <Link
-                      to="/articles/$slug"
-                      params={{ slug: a.slug }}
+                    <ArticleLink
+                      slug={a.slug} pdfPath={a.pdfPath}
+                      
                       className="font-display text-ink leading-snug hover:text-primary line-clamp-1"
                     >
                       {a.title}
-                    </Link>
+                    </ArticleLink>
                   </li>
                 ))}
               </ul>
@@ -306,9 +307,9 @@ function RecentBlogs({ initialArticles }: { initialArticles?: DBArticle[] }) {
                 key={a.slug}
                 className="bg-white border border-rule hover-lift flex flex-col group overflow-hidden"
               >
-                <Link
-                  to="/articles/$slug"
-                  params={{ slug: a.slug }}
+                <ArticleLink
+                  slug={a.slug} pdfPath={a.pdfPath}
+                  
                   className="block aspect-[16/10] overflow-hidden bg-muted"
                 >
                   <img
@@ -323,19 +324,19 @@ function RecentBlogs({ initialArticles }: { initialArticles?: DBArticle[] }) {
                       if (!t.src.endsWith("/placeholder.svg")) t.src = "/placeholder.svg";
                     }}
                   />
-                </Link>
+                </ArticleLink>
                 <div className="p-5 flex flex-col flex-1">
                   <div className="text-[11px] text-orange font-semibold uppercase tracking-wider">
                     {a.category}
                   </div>
                   <h3 className="font-display text-base md:text-lg mt-1.5 font-bold leading-snug text-navy">
-                    <Link
-                      to="/articles/$slug"
-                      params={{ slug: a.slug }}
+                    <ArticleLink
+                      slug={a.slug} pdfPath={a.pdfPath}
+                      
                       className="hover:text-orange transition-colors line-clamp-2"
                     >
                       {a.title}
-                    </Link>
+                    </ArticleLink>
                   </h3>
                   <div className="mt-2 text-xs text-muted-foreground font-sans leading-relaxed">
                     <span className="font-medium text-foreground/85">{a.author}</span>
@@ -353,13 +354,13 @@ function RecentBlogs({ initialArticles }: { initialArticles?: DBArticle[] }) {
                   <p className="mt-2.5 text-xs text-foreground/70 leading-relaxed line-clamp-3">
                     {a.abstract}
                   </p>
-                  <Link
-                    to="/articles/$slug"
-                    params={{ slug: a.slug }}
+                  <ArticleLink
+                    slug={a.slug} pdfPath={a.pdfPath}
+                    
                     className="mt-auto pt-4 inline-flex items-center text-xs uppercase font-condensed tracking-wider font-semibold text-orange hover:text-navy transition-colors"
                   >
                     Read Article →
-                  </Link>
+                  </ArticleLink>
                 </div>
               </article>
             ))}

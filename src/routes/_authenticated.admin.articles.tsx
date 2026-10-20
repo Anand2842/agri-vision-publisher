@@ -132,10 +132,6 @@ function AdminArticles() {
     const status = String(fd.get("status")) as "draft" | "published" | "archived";
     const content = String(fd.get("content") || "").trim();
     const pdfUrl = String(fd.get("pdf_url") || "").trim();
-    if (status === "published" && !content) {
-      toast.error("Published articles need the full text.");
-      return;
-    }
     const payload = {
       title,
       slug,
@@ -417,7 +413,7 @@ function AdminArticles() {
                   </Td>
                   <Td>
                     <div className="flex flex-wrap gap-2 text-xs">
-                      <span className={r.content?.trim() ? "text-primary" : "text-destructive"}>{r.content?.trim() ? "Full text ready" : "Full text missing"}</span>
+                      <span className={r.content?.trim() ? "text-primary" : "text-muted-foreground"}>{r.content?.trim() ? "Full text added" : "Full text optional"}</span>
                       <span aria-hidden="true">·</span>
                       {r.pdf_url ? <a href={r.pdf_url} target="_blank" rel="noreferrer" className="text-primary underline">PDF ready</a> : <span className="text-destructive">PDF missing</span>}
                       <label className={`inline-flex items-center gap-1 cursor-pointer text-navy hover:text-orange ${uploading ? "pointer-events-none opacity-50" : ""}`}>
