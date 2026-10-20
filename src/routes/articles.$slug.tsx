@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ArticleLink } from "@/components/site/ArticleLink";
 import { supabase } from "@/integrations/supabase/client";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -314,13 +315,13 @@ function Article() {
               <ul className="mt-5 space-y-7">
                 {related.map((r: typeof a) => (
                   <li key={r.slug}>
-                    <Link to="/articles/$slug" params={{ slug: r.slug }} className="group block">
+                    <ArticleLink slug={r.slug} pdfPath={r.pdfPath}  className="group block">
                       <div className="eyebrow text-[0.6rem]">{r.category}</div>
                       <h3 className="font-display text-lg mt-1 group-hover:text-primary leading-snug">
                         {r.title}
                       </h3>
                       <div className="text-xs text-muted-foreground mt-1">{r.author}</div>
-                    </Link>
+                    </ArticleLink>
                   </li>
                 ))}
               </ul>
