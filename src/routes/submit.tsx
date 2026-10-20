@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { friendlyZodError } from "@/lib/form-errors";
 import { z } from "zod";
-import { FileText, Upload } from "lucide-react";
+import { FileText, Upload, MessageCircle, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/submit")({
   component: Submit,
@@ -226,6 +226,44 @@ function Submit() {
           </a>{" "}
           to track your submissions in a personal dashboard.
         </p>
+
+        <section
+          aria-labelledby="alt-submit"
+          className="mt-8 border border-rule bg-paper p-5 rounded-sm"
+        >
+          <h2 id="alt-submit" className="font-display text-lg text-ink">
+            Prefer instant submission?
+          </h2>
+          <p className="mt-1 text-sm text-foreground/70">
+            Send your Word/PDF manuscript directly via WhatsApp or Email. Please attach the full
+            manuscript, author photo with affiliation, and originality declaration.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a
+              href={`https://wa.me/918107240852?text=${encodeURIComponent(
+                "Hello Editor, I want to submit an article to The Agriculture Popular Article Magazine.\nAuthor Name: \nTitle: \nCategory: \nI am attaching the Word/PDF manuscript here.",
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" /> Submit via WhatsApp
+            </a>
+            <a
+              href={`mailto:agriculturemagazine3@gmail.com?subject=${encodeURIComponent(
+                "[New Article Submission] - <Article Title> - <Author Name>",
+              )}&body=${encodeURIComponent(
+                "Hello Editor,\n\nPlease find attached my manuscript for The Agriculture Popular Article Magazine.\n\nAuthor Name:\nAffiliation:\nTitle:\nCategory:\nContact number:\n",
+              )}`}
+              className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-rule px-4 py-2 text-sm font-medium text-ink hover:bg-muted"
+            >
+              <Mail className="h-4 w-4" aria-hidden="true" /> Submit via Email
+            </a>
+          </div>
+          <p className="mt-3 text-xs text-foreground/60">
+            WhatsApp: +91 8107240852 · Email: agriculturemagazine3@gmail.com
+          </p>
+        </section>
 
         <form onSubmit={onSubmit} className="mt-12 space-y-6">
           <div className="border border-rule bg-paper p-4 rounded-sm space-y-6">
