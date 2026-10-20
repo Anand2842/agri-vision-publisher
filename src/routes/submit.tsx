@@ -250,11 +250,13 @@ function Submit() {
               <MessageCircle className="h-4 w-4" aria-hidden="true" /> Submit via WhatsApp
             </a>
             <a
-              href={`mailto:agriculturemagazine3@gmail.com?subject=${encodeURIComponent(
+              href={`https://mail.google.com/mail/?view=cm&fs=1&to=agriculturemagazine3@gmail.com&su=${encodeURIComponent(
                 "[New Article Submission] - <Article Title> - <Author Name>",
               )}&body=${encodeURIComponent(
                 "Hello Editor,\n\nPlease find attached my manuscript for The Agriculture Popular Article Magazine.\n\nAuthor Name:\nAffiliation:\nTitle:\nCategory:\nContact number:\n",
               )}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-rule px-4 py-2 text-sm font-medium text-ink hover:bg-muted"
             >
               <Mail className="h-4 w-4" aria-hidden="true" /> Submit via Email
