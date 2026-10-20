@@ -1,4 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { fetchIssues } from "@/lib/data";
 import {
   Search,
   Menu,
