@@ -206,8 +206,21 @@ function IssueCard({ issue }: { issue: IssueRow }) {
     }
   };
 
+  useEffect(() => {
+    const check = () => {
+      if (window.location.hash === `#issue-${issue.id}` && !open) {
+        handleToggle();
+        document.getElementById(`issue-${issue.id}`)?.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+    check();
+    window.addEventListener("hashchange", check);
+    return () => window.removeEventListener("hashchange", check);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [issue.id]);
+
   return (
-    <div className="border border-rule bg-background">
+    <div id={`issue-${issue.id}`} className="border border-rule bg-background scroll-mt-40">
       {/* Issue header row */}
       <div className="grid sm:grid-cols-[auto_1fr] gap-6 p-6">
         <div className="bg-paper border border-rule w-28 sm:w-36 aspect-[3/4] overflow-hidden flex items-center justify-center shrink-0">

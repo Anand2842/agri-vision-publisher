@@ -103,20 +103,30 @@ export function SiteHeader() {
   const { getHeader, getHeaderJson, getFooter } = useGlobalSiteContent();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const rawNav = getHeaderJson("navigation", "items");
-  const navResult = rawNav ? NavSchema.safeParse(rawNav) : null;
-  const cmsNav: NavItem[] | null = navResult?.success
-    ? navResult.data.map((item) => ({
-        to: item.href || item.to || "/",
-        label: item.label,
-        children: item.children?.map((child) => ({
-          to: child.href || child.to || "/",
-          label: child.label,
-        })),
-      }))
-    : null;
+  void getHeaderJson;
+  void NavSchema;
+  const [issues, setIssues] = useState<{ id: string; label: string }[]>([]);
+  useEffect(() => {
+    fetchIssues()
+      .then((rows) =>
+        setIssues(
+          rows.map((r) => ({ id: r.id, label: `Vol. ${r.volume}, No. ${r.number} — ${r.date}` })),
+        ),
+      )
+      .catch(() => {});
+  }, []);
 
-  const currentNav: NavItem[] = cmsNav ?? defaultNav;
+  const currentNav: NavItem[] = defaultNav.map((n) =>
+    n.label === "Archives"
+      ? {
+          ...n,
+          children: [
+            ...issues.map((i) => ({ to: `/archives#issue-${i.id}`, label: i.label })),
+            { to: "/archives", label: "All Archives" },
+          ],
+        }
+      : n,
+  );
 
   const isActive = (to: string) => {
     if (to === "/") return pathname === "/";
