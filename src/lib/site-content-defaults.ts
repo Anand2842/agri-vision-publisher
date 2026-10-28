@@ -279,10 +279,10 @@ export const SITE_CONTENT_DEFAULTS: Record<string, Record<string, Record<string,
     },
     audience: {
       stats: JSON.stringify([
-        { value: "50,000+", label: "Monthly Readers" },
-        { value: "30,000+", label: "Active Farmers" },
-        { value: "55,000+", label: "Academicians" },
-        { value: "2,500+", label: "International Visitors" }
+        { value: "1,000+", label: "Monthly Readers" },
+        { value: "500+", label: "Active Farmers" },
+        { value: "500+", label: "Academicians" },
+        { value: "100+", label: "International Visitors" }
       ]),
     },
     sponsorship: {
