@@ -64,11 +64,17 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
   );
 
   return (
-    <article className="group">
+    <article
+      className={
+        large
+          ? "group flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left"
+          : "group flex flex-col items-center text-center h-full"
+      }
+    >
       <div
         className={`aspect-square bg-muted rounded-full flex items-center justify-center font-display ${
-          large ? "text-4xl" : "text-2xl"
-        } text-[var(--navy)]/30 border border-rule overflow-hidden max-w-[120px] mx-auto`}
+          large ? "text-4xl w-36 sm:w-40" : "text-2xl w-[120px]"
+        } shrink-0 text-[var(--navy)]/30 border border-rule overflow-hidden`}
       >
         {m.photo_url ? (
           <img
@@ -83,8 +89,9 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
           <span className="tracking-wider">{initials(m.name)}</span>
         )}
       </div>
+      <div className={large ? "min-w-0 sm:pt-2" : "min-w-0"}>
       <h4
-        className={`font-display ${large ? "text-lg" : "text-lg"} mt-4 text-[var(--navy)] leading-tight`}
+        className={`font-display ${large ? "text-xl sm:mt-0" : "text-lg"} mt-4 text-[var(--navy)] leading-tight`}
       >
         {nameNode}
       </h4>
@@ -114,17 +121,19 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
           {m.email}
         </a>
       )}
+      </div>
     </article>
   );
 }
 
-function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
+function SectionHeader({ eyebrow, title, note }: { eyebrow: string; title: string; note?: string }) {
   return (
     <header className="mt-12 mb-6">
       <div className="text-xs uppercase tracking-[0.2em] text-[var(--orange)] font-semibold">
         {eyebrow}
       </div>
       <h2 className="font-display text-xl md:text-2xl mt-2 text-[var(--navy)]">{title}</h2>
+      {note && <p className="mt-2 text-xs uppercase tracking-wider text-muted-foreground">{note}</p>}
       <div className="h-px bg-[var(--navy)]/20 mt-4" />
     </header>
   );
@@ -133,20 +142,23 @@ function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
 function DirectoryEntry({ member }: { member: BoardMember & { dept?: string } }) {
   const department = member.department || member.dept;
   return (
-    <article className="py-5 border-b border-[var(--navy)]/10 grid sm:grid-cols-[minmax(0,1fr)_minmax(220px,0.8fr)] gap-3 sm:gap-6">
-      <div className="min-w-0">
-        <div className="font-display text-lg text-[var(--navy)] leading-snug">
-          {member.profile_url ? <a href={member.profile_url} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--orange)] transition-colors">{member.name}</a> : member.name}
+    <article className="py-5 border-b border-[var(--navy)]/10 min-w-0">
+      <div className="font-display text-lg text-[var(--navy)] leading-snug">
+        {member.profile_url ? <a href={member.profile_url} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--orange)] transition-colors">{member.name}</a> : member.name}
+      </div>
+      {(member.designation || department) && <div className="mt-1 text-xs text-foreground/65">{[member.designation, department].filter(Boolean).join(" · ")}</div>}
+      {(member.inst || member.country) && (
+        <div className="mt-1 text-sm text-muted-foreground leading-snug">
+          {[member.inst, member.country].filter(Boolean).join(", ")}
         </div>
-        {(member.designation || department) && <div className="mt-1 text-xs text-foreground/65">{[member.designation, department].filter(Boolean).join(" · ")}</div>}
-        {member.email && <a href={`mailto:${member.email}`} className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-xs text-[var(--navy)]/70 hover:text-[var(--orange)] transition-colors break-all"><Mail className="h-3 w-3 shrink-0" />{member.email}</a>}
-        {member.mobile && <a href={`tel:${member.mobile.replace(/\s/g, "")}`} className="mt-1 block text-xs text-[var(--navy)]/70 hover:text-[var(--orange)]">Mobile: {member.mobile}</a>}
-      </div>
-      <div className="text-sm text-muted-foreground sm:text-right leading-snug">
-        {member.inst && <span className="block italic">{member.inst}</span>}
-        {member.address && <span className="block mt-1 text-xs text-foreground/55">{member.address}</span>}
-        {member.country && <span className="block mt-1 text-xs text-foreground/50">{member.country}</span>}
-      </div>
+      )}
+      {member.address && <div className="mt-1 text-xs text-foreground/55">{member.address}</div>}
+      {(member.email || member.mobile) && (
+        <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs text-[var(--navy)]/70">
+          {member.email && <a href={`mailto:${member.email}`} className="inline-flex items-center gap-1.5 hover:text-[var(--orange)] break-all"><Mail className="h-3 w-3 shrink-0" />{member.email}</a>}
+          {member.mobile && <a href={`tel:${member.mobile.replace(/\s/g, "")}`} className="hover:text-[var(--orange)]">Mobile: {member.mobile}</a>}
+        </div>
+      )}
     </article>
   );
 }
@@ -181,7 +193,7 @@ function Board() {
         </div>
 
         <SectionHeader eyebrow="Leadership" title="Editor-in-Chief" />
-        <div className="grid md:grid-cols-1 max-w-xs">{eic && <PersonCard m={eic} large />}</div>
+        <div className="max-w-3xl">{eic && <PersonCard m={eic} large />}</div>
 
         <SectionHeader eyebrow={`${members.length} Members`} title="Editorial Board" />
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
@@ -193,16 +205,15 @@ function Board() {
         <SectionHeader
           eyebrow={`${advisoryCommittee.length} Members`}
           title="International Advisory Committee"
+          note="Not part of the Editorial Board"
         />
-        <p className="-mt-8 mb-4 text-xs uppercase tracking-wider text-muted-foreground">Not part of the Editorial Board</p>
-        <p className="-mt-6 mb-10 text-foreground/70 max-w-2xl">{get("advisory", "description")}</p>
+        <p className="mb-8 text-foreground/70 max-w-2xl">{get("advisory", "description")}</p>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-[var(--navy)]/15">
           {advisoryCommittee.map((m) => <DirectoryEntry key={`${m.name}-${m.inst}`} member={m} />)}
         </div>
 
-        <SectionHeader eyebrow={`${reviewers.length} Reviewers`} title="Peer Reviewers" />
-        <p className="-mt-8 mb-4 text-xs uppercase tracking-wider text-muted-foreground">Not part of the Editorial Board</p>
-        <p className="-mt-6 mb-10 text-foreground/70 max-w-2xl">
+        <SectionHeader eyebrow={`${reviewers.length} Reviewers`} title="Peer Reviewers" note="Not part of the Editorial Board" />
+        <p className="mb-8 text-foreground/70 max-w-2xl">
           {get("reviewers", "description")}
         </p>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-[var(--navy)]/15">
