@@ -192,7 +192,7 @@ function Board() {
         </div>
 
         <SectionHeader eyebrow="Leadership" title="Editor-in-Chief" />
-        <div className="grid md:grid-cols-1 max-w-xs">{eic && <PersonCard m={eic} large />}</div>
+        <div className="max-w-3xl">{eic && <PersonCard m={eic} large />}</div>
 
         <SectionHeader eyebrow={`${members.length} Members`} title="Editorial Board" />
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8">
