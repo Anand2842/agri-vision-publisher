@@ -16,6 +16,7 @@ export type BoardMember = {
   /** Full official postal address — required by ISSN India */
   address?: string;
   email?: string;
+  mobile?: string;
   country?: string;
   photo_url?: string;
   /** Institutional profile URL — shown if available */
@@ -139,6 +140,7 @@ function DirectoryEntry({ member }: { member: BoardMember & { dept?: string } })
         </div>
         {(member.designation || department) && <div className="mt-1 text-xs text-foreground/65">{[member.designation, department].filter(Boolean).join(" · ")}</div>}
         {member.email && <a href={`mailto:${member.email}`} className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-xs text-[var(--navy)]/70 hover:text-[var(--orange)] transition-colors break-all"><Mail className="h-3 w-3 shrink-0" />{member.email}</a>}
+        {member.mobile && <a href={`tel:${member.mobile.replace(/\s/g, "")}`} className="mt-1 block text-xs text-[var(--navy)]/70 hover:text-[var(--orange)]">Mobile: {member.mobile}</a>}
       </div>
       <div className="text-sm text-muted-foreground sm:text-right leading-snug">
         {member.inst && <span className="block italic">{member.inst}</span>}
