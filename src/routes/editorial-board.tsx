@@ -126,13 +126,14 @@ function PersonCard({ m, large = false }: { m: BoardMember; large?: boolean }) {
   );
 }
 
-function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
+function SectionHeader({ eyebrow, title, note }: { eyebrow: string; title: string; note?: string }) {
   return (
     <header className="mt-12 mb-6">
       <div className="text-xs uppercase tracking-[0.2em] text-[var(--orange)] font-semibold">
         {eyebrow}
       </div>
       <h2 className="font-display text-xl md:text-2xl mt-2 text-[var(--navy)]">{title}</h2>
+      {note && <p className="mt-2 text-xs uppercase tracking-wider text-muted-foreground">{note}</p>}
       <div className="h-px bg-[var(--navy)]/20 mt-4" />
     </header>
   );
@@ -204,15 +205,14 @@ function Board() {
         <SectionHeader
           eyebrow={`${advisoryCommittee.length} Members`}
           title="International Advisory Committee"
+          note="Not part of the Editorial Board"
         />
-        <p className="-mt-2 mb-2 text-xs uppercase tracking-wider text-muted-foreground">Not part of the Editorial Board</p>
         <p className="mb-8 text-foreground/70 max-w-2xl">{get("advisory", "description")}</p>
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-0 border-t border-[var(--navy)]/15">
           {advisoryCommittee.map((m) => <DirectoryEntry key={`${m.name}-${m.inst}`} member={m} />)}
         </div>
 
-        <SectionHeader eyebrow={`${reviewers.length} Reviewers`} title="Peer Reviewers" />
-        <p className="-mt-2 mb-2 text-xs uppercase tracking-wider text-muted-foreground">Not part of the Editorial Board</p>
+        <SectionHeader eyebrow={`${reviewers.length} Reviewers`} title="Peer Reviewers" note="Not part of the Editorial Board" />
         <p className="mb-8 text-foreground/70 max-w-2xl">
           {get("reviewers", "description")}
         </p>
